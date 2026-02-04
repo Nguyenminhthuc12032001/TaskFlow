@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,4 +5,294 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// Users & Auth
+model User {
+  id           String @id @default(uuid()) @db.Uuid
+  name         String
+  email        String @unique
+  passwordHash String @map("password_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updateAt  DateTime @updatedAt @map("updated_at")
+
+  refreshTokens     RefreshToken[]
+  workspacesCreated Workspace[]
+  memberships       WorkspacesMember[]
+  invitesCreated    Invite[]           @relation("InviteCreatedBy")
+  projectsCreated   Project[]          @relation("ProjectCreatedBy")
+  tasksCreated      Task[]             @relation("TaskCreatedBy")
+  assassignedTasks  TaskAssignee[]
+  commentsCreated   Comment[]
+  leadsCreated      Lead[]             @relation("LeadCreatedBy")
+  activities        ActivityLog[]      @relation("ActivityActor")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String @id @default(uuid()) @db.Uuid
+  userId    String @map("user_id") @db.Uuid
+  tokenHash String @unique @map("token_hash")
+
+  expiredAt DateTime  @map("expired_at")
+  revokeAt  DateTime? @map("revoke_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_token")
+}
+
+// Workspaces & Members & Invites
+model Workspace {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+
+  createdBy String   @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members   WorkspacesMember[]
+  invites   Invite[]
+  projects  Project[]
+  leads     Lead[]
+  activites ActivityLog[]
+
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdBy])
+  @@map("workspaces")
+}
+
+enum WorkspacesRole {
+  owner
+  admin
+  member
+  viewer
+}
+
+model WorkspacesMember {
+  workspacesId String         @map("workspace_id") @db.Uuid
+  userId       String         @map("user_id") @db.Uuid
+  role         WorkspacesRole @default(member)
+  joinedAt     DateTime       @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspacesId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([workspacesId, userId])
+  @@index([userId])
+  @@map("workspace_member")
+}
+
+model Invite {
+  id          String         @id @default(uuid()) @db.Uuid
+  workspaceId String         @map("workspace_id") @db.Uuid
+  email       String
+  role        WorkspacesRole @default(member)
+
+  token     String    @unique
+  expiresAt DateTime  @map("expired_at")
+  usedAt    DateTime? @map("used_at")
+
+  createdBy String   @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation("InviteCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@index([email])
+  @@map("invites")
+}
+
+// Projects & Columns (Kanban)
+model Project {
+  id          String  @id @default(uuid()) @db.Uuid
+  workspaceId String  @map("workspace_id") @db.Uuid
+  name        String
+  description String?
+
+  createdBy String   @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation("ProjectCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  columns Column[]
+  tasks   Task[]
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@map("projects")
+}
+
+model Column {
+  id        String   @id @default(uuid()) @db.Uuid
+  projectId String   @map("project_id") @db.Uuid
+  name      String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+
+  @@unique([projectId, position])
+  @@index([projectId])
+  @@map("columns")
+}
+
+// Tasks + Assignees + Comments
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+model Task {
+  id        String @id @default(uuid()) @db.Uuid
+  projectId String @map("project_id") @db.Uuid
+  columnId  String @map("column_id") @db.Uuid
+
+  title      String
+  descripton String?
+  priority   TaskPriority @default(medium)
+  dueDate    DateTime?    @map("due_date")
+
+  position Int @default(0)
+
+  createdBy String   @map("created_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  column  Column  @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  creator User    @relation("TaskCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  assignees TaskAssignee[]
+  comments  Comment[]
+  leadsLink LeadTaskLink[]
+
+  @@index([projectId])
+  @@index([columnId])
+  @@index([createdBy])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+model TaskAssignee {
+  taskId String @map("task_id") @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@index([userId])
+  @@map("task_assignees")
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  authorId  String   @map("author_id") @db.Uuid
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+// Leads + Lead↔Task Link
+enum LeadStage {
+  new
+  contacted
+  qualified
+  won
+  lost
+}
+
+model Lead {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @map("workspace_id") @db.Uuid
+  name        String
+  email       String?
+  phone       String?
+  source      String?
+  stage       LeadStage @default(new)
+  note        String
+  createdBy   String    @map("created_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User      @relation("LeadCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  taskLinks LeadTaskLink[]
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@index([stage])
+  @@index([workspaceId, stage])
+  @@map("leads")
+}
+
+model LeadTaskLink {
+  leadId String @map("lead_id") @db.Uuid
+  taskId String @map("task_id") @db.Uuid
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([leadId, taskId])
+  @@index([taskId])
+  @@map("lead_task_links")
+}
+
+// Activity Logs
+enum ActivityAction {
+  CREATE_WORKSPACE
+  CREATE_PROJECT
+  CREATE_TASK
+  UPDATE_TASK
+  MOVE_TASK
+  ASSIGN_TASK
+  COMMENT_TASK
+  CREATE_LEAD
+  UPDATE_LEAD
+  UPDATE_LEAD_STAGE
+  CREATE_FOLLOWUP_TASK
+  INVITE_MEMBER
+  ACCEPT_INVITE
+}
+
+model ActivityLog {
+  id          String  @id @default(uuid()) @db.Uuid
+  workspaceId String  @map("workspace_id") @db.Uuid
+  actorId     String? @map("actor_id") @db.Uuid
+
+  action     ActivityAction
+  entityType String         @map("entity_type")
+  entityId   String?        @map("entity_id") @db.Uuid
+
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor     User?     @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([actorId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@map("activity_logs")
 }
