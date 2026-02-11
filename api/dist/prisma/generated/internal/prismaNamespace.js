@@ -69,6 +69,7 @@ export const AnyNull = runtime.AnyNull;
 export const ModelName = {
     User: 'User',
     RefreshToken: 'RefreshToken',
+    PasswordResetToken: 'PasswordResetToken',
     Workspace: 'Workspace',
     WorkspacesMember: 'WorkspacesMember',
     Invite: 'Invite',
@@ -102,9 +103,20 @@ export const RefreshTokenScalarFieldEnum = {
     id: 'id',
     userId: 'userId',
     tokenHash: 'tokenHash',
+    jti: 'jti',
     expiresAt: 'expiresAt',
     revokedAt: 'revokedAt',
     createdAt: 'createdAt'
+};
+export const PasswordResetTokenScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    tokenHash: 'tokenHash',
+    jti: 'jti',
+    expiresAt: 'expiresAt',
+    usedAt: 'usedAt',
+    createdAt: 'createdAt',
+    deletedAt: 'deletedAt'
 };
 export const WorkspaceScalarFieldEnum = {
     id: 'id',

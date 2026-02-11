@@ -19,30 +19,30 @@ export const registerBodySchema = z.object({
         .max(100, "Name must be less than or equal 100 characters"),
     email: emailSchema,
     password: passwordSchema
-});
+}).strict();
 // POST auth/login
 export const loginBodySchema = z.object({
     email: emailSchema,
     password: z
         .string()
         .min(1, "Password cannot be empty")
-});
+}).strict();
 // POST auth/forgot-password
 export const forgotPasswordSchema = z.object({
     email: emailSchema
-});
+}).strict();
 // POST auth/reset-password
 export const resetPasswordBodySchema = z.object({
-    token: z.string().min(10, "Invalid reset token"),
+    resetToken: z.string().min(10, "Invalid reset token"),
     newPassword: passwordSchema
-});
+}).strict();
 // POST auth/change-password
 export const changePasswordBodySchema = z.object({
     currentPassword: z
         .string()
         .min(1, "Current password cannot be empty"),
     newPassword: passwordSchema
-});
+}).strict();
 // POST auth/refresh
 export const refreshBodySchema = z.undefined()
     .or(z.object({}).strict());
@@ -58,18 +58,18 @@ export const safeUserSchema = z.object({
     id: z.uuid(),
     name: z.string(),
     email: emailSchema,
-});
+}).strict();
 // REGISTER
 export const registerResponseSchema = z.object({
     user: safeUserSchema,
     accessToken: z.string(),
-});
+}).strict();
 // LOGIN
 export const loginResponseSchema = z.object({
     user: safeUserSchema,
     accessToken: z.string(),
-});
+}).strict();
 // REFRESH
 export const refreshResponseSchema = z.object({
     accessToken: z.string(),
-});
+}).strict();

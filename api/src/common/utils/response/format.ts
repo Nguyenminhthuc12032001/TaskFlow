@@ -1,22 +1,55 @@
-export function ok<T>(data: T) {
-    return {
-        ok: true,
-        data
-    }
-}
+import z from "zod";
+export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
+    z
+        .object({
+            ok: z.literal(true),
+            data: dataSchema,
+        })
+        .strict();
 
-export function created<T>(data: T) {
-    return {
-        ok: true,
-        created: true,
-        data
-    }
-}
+export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
+    z
+        .object({
+            ok: z.literal(true),
+            created: z.literal(true),
+            data: dataSchema,
+        })
+        .strict();
 
-export function fail(message: string, details?: any) {
-    return {
-        ok: false,
-        message: message,
-        details
-    }
-}
+export const failEnvelopeSchema = z
+    .object({
+        ok: z.literal(false),
+        message: z.string().min(1),
+        details: z.unknown().optional(),
+    })
+    .strict();
+
+export type Ok<T = unknown> = {
+    ok: true;
+    data: T;
+};
+
+export type Created<T = unknown> = {
+    ok: true;
+    created: true;
+    data: T;
+};
+
+export type Fail = z.infer<typeof failEnvelopeSchema>;
+
+export const ok = <T>(data: T): Ok<T> => ({
+    ok: true,
+    data,
+});
+
+export const created = <T>(data: T): Created<T> => ({
+    ok: true,
+    created: true,
+    data,
+});
+
+export const fail = (message: string, details?: unknown): Fail => ({
+    ok: false,
+    message,
+    ...(details === undefined ? {} : { details }),
+});

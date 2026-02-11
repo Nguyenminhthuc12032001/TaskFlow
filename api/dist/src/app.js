@@ -3,14 +3,29 @@ import { corsMiddleware } from "./config/cors.js";
 import { rateLimitMiddleware } from "./common/middlewares/rateLimit.middleware.js";
 import { errorMiddleware } from "./common/middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
+import { setupSwagger } from "./docs/swagger.js";
+import cookieParser from "cookie-parser";
+import csurf from "csurf";
+import { env } from "./config/env.js";
+export const csrfProtection = csurf({
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: env.NODE_ENV === "production"
+    }
+});
 const app = express();
 app.set("trust proxy", 1);
 app.use(rateLimitMiddleware);
 app.use(corsMiddleware);
 app.use(express.json({ limit: "1mb" }));
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.get("/health", (_req, res) => {
     res.status(200).json({ ok: true });
+});
+app.get("/csurf-token", csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
 });
 app.use("/api/auth", authRoutes);
 app.use((req, res) => {
@@ -20,4 +35,5 @@ app.use((req, res) => {
     });
 });
 app.use(errorMiddleware);
+setupSwagger(app);
 export default app;

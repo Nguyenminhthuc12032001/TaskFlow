@@ -1,6 +1,6 @@
 import { prisma } from "../../db/prisma.js";
 export const authRepo = {
-    async findUserByid(userId) {
+    async findUserById(userId) {
         return prisma.user.findUnique({
             where: { id: userId }
         });
@@ -10,43 +10,77 @@ export const authRepo = {
             where: { email }
         });
     },
-    async createUser(data) {
-        return prisma.user.create({ data });
+    async createUser(data, prisma_transaction = prisma) {
+        return prisma_transaction.user.create({ data });
     },
-    async updatePassword(userId, passwordHash) {
-        return prisma.user.update({
+    async updatePassword(userId, passwordHash, prisma_transaction = prisma) {
+        return prisma_transaction.user.update({
             where: { id: userId },
             data: { passwordHash }
         });
     },
-    async saveRefreshToken(userId, tokenHash, expiresAt) {
-        return prisma.refreshToken.create({
+    async saveRefreshToken(userId, jti, tokenHash, expiresAt, prisma_transaction = prisma) {
+        return prisma_transaction.refreshToken.create({
             data: {
                 userId,
+                jti,
                 tokenHash,
                 expiresAt,
             }
         });
     },
-    async deleteRefreshToken(id) {
-        return prisma.refreshToken.delete({
-            where: { id }
-        });
-    },
-    async findRefreshToken(id) {
+    async findRefreshToken(jti) {
         return prisma.refreshToken.findUnique({
-            where: { id }
+            where: {
+                jti,
+                revokedAt: null,
+                expiresAt: { gt: new Date() }
+            }
         });
     },
-    async deleteAllRefreshTokenByUser(userId) {
-        return prisma.refreshToken.deleteMany({
-            where: { userId }
-        });
-    },
-    async revokeRefreshTokenById(id) {
-        return prisma.refreshToken.update({
-            where: { id, revokedAt: null },
+    async revokeAllRefreshTokenByUser(userId, prisma_transaction = prisma) {
+        return prisma_transaction.refreshToken.updateMany({
+            where: { userId, revokedAt: null },
             data: { revokedAt: new Date() }
+        });
+    },
+    async revokeRefreshToken(jti, prisma_transaction = prisma) {
+        return prisma_transaction.refreshToken.updateMany({
+            where: {
+                jti,
+                revokedAt: null,
+                expiresAt: { gt: new Date() }
+            },
+            data: { revokedAt: new Date() }
+        });
+    },
+    async saveResetToken(userId, jti, tokenHash, expiresAt) {
+        return prisma.passwordResetToken.create({
+            data: {
+                userId,
+                jti,
+                tokenHash,
+                expiresAt,
+            }
+        });
+    },
+    async findResetToken(jti) {
+        return prisma.passwordResetToken.findUnique({
+            where: {
+                jti,
+                usedAt: null,
+                expiresAt: { gt: new Date() }
+            }
+        });
+    },
+    async markResetToken(jti, prisma_transaction = prisma) {
+        return prisma_transaction.passwordResetToken.updateMany({
+            where: {
+                jti,
+                usedAt: null,
+                expiresAt: { gt: new Date() }
+            },
+            data: { usedAt: new Date() }
         });
     }
 };

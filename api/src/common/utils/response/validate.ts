@@ -1,8 +1,8 @@
-import { ZodType } from "zod";
+import z, { ZodType } from "zod";
 import { AppError } from "../../errors/AppError.js";
 
 export function validateResponse<T extends ZodType>(schema: T) {
-    return (data: unknown) => {
+    return (data: unknown): z.infer<T> => {
         const result = schema.safeParse(data);
 
         if (!result.success) {

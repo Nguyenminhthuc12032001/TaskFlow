@@ -15,6 +15,7 @@ const envSchema = z.object({
     EMAIL_APP_PASSWORD: z.string().min(10, "EMAIL_APP_PASSWORD looks invalid"),
     EMAIL_FROM: z.string().min(3),
     FRONTEND_URL: z.url(),
+    NODE_ENV: z.string().min(5)
 });
 
 const rawEnv = {
@@ -31,6 +32,7 @@ const rawEnv = {
     EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD,
     EMAIL_FROM: process.env.EMAIL_FROM,
     FRONTEND_URL: process.env.FRONTEND_URL,
+    NODE_ENV: process.env.NODE_ENV
 }
 
 export const env = envSchema.parse(rawEnv)

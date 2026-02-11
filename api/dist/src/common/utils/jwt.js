@@ -12,3 +12,9 @@ export function signRefreshToken(payload) {
 export function verifyRefreshToken(token) {
     return jwt.verify(token, env.JWT_REFRESH_SECRET);
 }
+export function signResetToken(payload) {
+    return jwt.sign(payload, env.JWT_RESET_SECRET, { expiresIn: "15m" });
+}
+export function verifyResetToken(token) {
+    return jwt.verify(token, env.JWT_RESET_SECRET);
+}
