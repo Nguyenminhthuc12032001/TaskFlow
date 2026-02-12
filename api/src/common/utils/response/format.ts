@@ -1,23 +1,21 @@
 import z from "zod";
-export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
-    z
-        .object({
-            ok: z.literal(true),
-            data: dataSchema,
-        })
-        .strict();
+export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) => z.object
+    ({
+        ok: z.literal(true),
+        data: dataSchema,
+    })
+    .strict();
 
-export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
-    z
-        .object({
-            ok: z.literal(true),
-            created: z.literal(true),
-            data: dataSchema,
-        })
-        .strict();
+export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) => z.object
+    ({
+        ok: z.literal(true),
+        created: z.literal(true),
+        data: dataSchema,
+    })
+    .strict();
 
-export const failEnvelopeSchema = z
-    .object({
+export const failEnvelopeSchema = z.object
+    ({
         ok: z.literal(false),
         message: z.string().min(1),
         details: z.unknown().optional(),

@@ -28,7 +28,7 @@ export const loginBodySchema = z.object({
         .min(1, "Password cannot be empty")
 }).strict();
 // POST auth/forgot-password
-export const forgotPasswordSchema = z.object({
+export const forgotPasswordBodySchema = z.object({
     email: emailSchema
 }).strict();
 // POST auth/reset-password

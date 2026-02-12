@@ -4,7 +4,7 @@ import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
 import {
     registerBodySchema,
     loginBodySchema,
-    forgotPasswordSchema,
+    forgotPasswordBodySchema,
     resetPasswordBodySchema,
     changePasswordBodySchema,
     refreshBodySchema,
@@ -33,7 +33,7 @@ router.post("/refresh",
 
 router.post("/forgot-password",
     csrfProtection,
-    validateBody(forgotPasswordSchema),
+    validateBody(forgotPasswordBodySchema),
     authController.forgotPassword);
 
 router.post("/reset-password",

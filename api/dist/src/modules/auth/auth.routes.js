@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authController } from "./auth.controller.js";
 import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
-import { registerBodySchema, loginBodySchema, forgotPasswordSchema, resetPasswordBodySchema, changePasswordBodySchema, refreshBodySchema, logoutBodySchema, } from "./auth.schemas.js";
+import { registerBodySchema, loginBodySchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema, refreshBodySchema, logoutBodySchema, } from "./auth.schemas.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
 import { csrfProtection } from "../../app.js";
 const router = Router();
@@ -9,7 +9,7 @@ const router = Router();
 router.post("/register", csrfProtection, validateBody(registerBodySchema), authController.register);
 router.post("/login", csrfProtection, validateBody(loginBodySchema), authController.login);
 router.post("/refresh", csrfProtection, validateBody(refreshBodySchema), authController.refresh);
-router.post("/forgot-password", csrfProtection, validateBody(forgotPasswordSchema), authController.forgotPassword);
+router.post("/forgot-password", csrfProtection, validateBody(forgotPasswordBodySchema), authController.forgotPassword);
 router.post("/reset-password", csrfProtection, validateBody(resetPasswordBodySchema), authController.resetPassword);
 // PROTECTED
 router.post("/logout", authMiddleware, csrfProtection, validateBody(logoutBodySchema), authController.logout);

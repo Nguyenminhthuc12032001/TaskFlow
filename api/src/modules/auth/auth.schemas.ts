@@ -38,10 +38,10 @@ export const loginBodySchema = z.object({
 export type LoginBody = z.infer<typeof loginBodySchema>;
 
 // POST auth/forgot-password
-export const forgotPasswordSchema = z.object({
+export const forgotPasswordBodySchema = z.object({
     email: emailSchema
 }).strict();
-export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>;
+export type ForgotPasswordBody = z.infer<typeof forgotPasswordBodySchema>;
 
 // POST auth/reset-password
 export const resetPasswordBodySchema = z.object({

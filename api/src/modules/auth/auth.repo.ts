@@ -14,7 +14,7 @@ export const authRepo = {
     },
 
     async createUser(data: { email: string; name: string; passwordHash: string }, prisma_transaction: any = prisma) {
-        return prisma_transaction.user.create({ data })
+        return prisma_transaction.user.create({ data });
     },
 
     async updatePassword(userId: string, passwordHash: string, prisma_transaction: any = prisma) {
