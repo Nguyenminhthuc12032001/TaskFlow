@@ -1,4 +1,3 @@
-import type { ZodType } from "zod";
 import { createdEnvelopeSchema, failEnvelopeSchema, okEnvelopeSchema } from "../../common/utils/response/format.js";
 import { registry } from "../../docs/openapi.js";
 import { loginBodySchema, loginResponseSchema, logoutBodySchema, meBodySchema, refreshResponseSchema, registerBodySchema, registerResponseSchema, safeUserSchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema } from "./auth.schemas.js";
