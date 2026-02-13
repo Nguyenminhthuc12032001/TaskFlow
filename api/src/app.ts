@@ -5,16 +5,7 @@ import { errorMiddleware } from "./common/middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
-import csurf from "csurf";
-import { env } from "./config/env.js";
-
-export const csrfProtection = csurf({
-    cookie: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: env.NODE_ENV === "production"
-    }
-});
+import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
 
 const app = express();
 
@@ -35,6 +26,7 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
 })
 
 app.use("/api/auth", authRoutes);
+setupSwagger(app);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({
@@ -44,7 +36,5 @@ app.use((req: Request, res: Response) => {
 })
 
 app.use(errorMiddleware);
-
-setupSwagger(app);
 
 export default app;

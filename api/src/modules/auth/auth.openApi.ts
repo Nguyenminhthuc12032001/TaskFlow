@@ -1,6 +1,6 @@
 import { createdEnvelopeSchema, failEnvelopeSchema, okEnvelopeSchema } from "../../common/utils/response/format.js";
 import { registry } from "../../docs/openapi.js";
-import { loginBodySchema, loginResponseSchema, logoutBodySchema, meBodySchema, refreshResponseSchema, registerBodySchema, registerResponseSchema, safeUserSchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema } from "./auth.schemas.js";
+import { loginBodySchema, loginResponseSchema, refreshResponseSchema, registerBodySchema, registerResponseSchema, safeUserSchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema } from "./auth.schemas.js";
 
 registry.registerComponent("securitySchemes", "refreshCookie", {
     type: "apiKey",
@@ -36,10 +36,10 @@ const fail500 = {
 // POST /auth/register (public)
 registry.registerPath({
     method: "post",
-    path: "/auth/register",
+    path: "/api/auth/register",
     tags: ["Auth"],
     summary: "Register",
-    security: [],
+    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { "application/json": { schema: registerBodySchema } }
@@ -67,10 +67,10 @@ registry.registerPath({
 // POST /auth/login (public)
 registry.registerPath({
     method: "post",
-    path: "/auth/login",
+    path: "/api/auth/login",
     tags: ["Auth"],
     summary: "Login",
-    security: [],
+    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { "application/json": { schema: loginBodySchema } }
@@ -98,15 +98,10 @@ registry.registerPath({
 // POST /auth/logout (bearer)
 registry.registerPath({
     method: "post",
-    path: "/auth/logout",
+    path: "/api/auth/logout",
     tags: ["Auth"],
     summary: "Logout",
-    security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: logoutBodySchema } }
-        },
-    },
+    security: [{ csrfToken: [] }, { bearerAuth: [] }],
     responses: {
         204: {
             description: "No content (clears refreshToken cookie). If cookie is missing, still returns 204",
@@ -128,15 +123,10 @@ registry.registerPath({
 // POST /auth/refresh (cookie)
 registry.registerPath({
     method: "post",
-    path: "/auth/refresh",
+    path: "/api/auth/refresh",
     tags: ["Auth"],
     summary: "Refresh access Token",
-    security: [{ refreshCookie: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: loginBodySchema } }
-        },
-    },
+    security: [{ csrfToken: [] }, { refreshCookie: [] }],
     responses: {
         200: {
             description: "Refresh success (roates refreshToken cookie)",
@@ -158,15 +148,10 @@ registry.registerPath({
 // GET /auth/me (bearer)
 registry.registerPath({
     method: "get",
-    path: "/auth/me",
+    path: "/api/auth/me",
     tags: ["Auth"],
     summary: "Get current user",
     security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: meBodySchema } }
-        },
-    },
     responses: {
         200: {
             description: "OK",
@@ -182,10 +167,10 @@ registry.registerPath({
 // POST /auth/forgot-password (public)
 registry.registerPath({
     method: "post",
-    path: "/auth/forgot-password",
+    path: "/api/auth/forgot-password",
     tags: ["Auth"],
     summary: "Forgot-password",
-    security: [],
+    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { "application/json": { schema: forgotPasswordBodySchema } }
@@ -202,10 +187,10 @@ registry.registerPath({
 // POST /auth/reset-password (public)
 registry.registerPath({
     method: "post",
-    path: "/auth/reset-password",
+    path: "/api/auth/reset-password",
     tags: ["Auth"],
     summary: "Reset password",
-    security: [],
+    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { "application/json": { schema: resetPasswordBodySchema } }
@@ -223,10 +208,10 @@ registry.registerPath({
 // POST /auth/change-password (bearer)
 registry.registerPath({
     method: "post",
-    path: "/auth/change-password",
+    path: "/api/auth/change-password",
     tags: ["Auth"],
     summary: "Change password",
-    security: [],
+    security: [{ csrfToken: [] }, { bearerAuth: [] }],
     request: {
         body: {
             content: { "application/json": { schema: changePasswordBodySchema } }
@@ -236,9 +221,9 @@ registry.registerPath({
         204: {
             description: "No content"
         },
-        400: { ...fail400, description: "New password must be different"},
-        401: { ...fail401, description: "Invalid current password"},
+        400: { ...fail400, description: "New password must be different" },
+        401: { ...fail401, description: "Invalid current password" },
         404: fail404,
         500: fail500
     }
-})
+});

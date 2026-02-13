@@ -105,6 +105,13 @@ export const authController = {
     changePassword: async (req: Request<{}, {}, ChangePasswordBody>, res: Response) => {
         await authService.changePassword(req.user!.id, req.body);
 
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/api/auth"
+        })
+
         return res.sendStatus(204);
     },
 

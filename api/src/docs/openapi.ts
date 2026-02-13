@@ -6,7 +6,13 @@ registry.registerComponent("securitySchemes", "bearerAuth", {
     type: "http",
     scheme: "bearer",
     bearerFormat: "JWT",
-})
+});
+
+registry.registerComponent("securitySchemes", "csrfToken", {
+    type: "apiKey",
+    in: "header",
+    name: "x-csrf-token",
+});
 
 export function generateOpenAPIDocument() {
     const generator = new OpenApiGeneratorV3(registry.definitions);

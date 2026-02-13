@@ -9,9 +9,10 @@ import {
     changePasswordBodySchema,
     refreshBodySchema,
     logoutBodySchema,
+    meBodySchema,
 } from "./auth.schemas.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
-import { csrfProtection } from "../../app.js";
+import { csrfProtection } from "../../common/middlewares/csrf.middleware.js";
 
 const router = Router();
 
@@ -50,6 +51,7 @@ router.post("/logout",
 
 router.get("/me",
     authMiddleware,
+    validateBody(meBodySchema),
     authController.me);
 
 router.post("/change-password",

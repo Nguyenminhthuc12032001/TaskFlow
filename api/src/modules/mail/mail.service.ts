@@ -2,13 +2,14 @@ import nodemailer from "nodemailer";
 import { env } from "../../config/env.js";
 
 export const transporter = nodemailer.createTransport({
-    host: "smpt.gmail.com",
+    host: "smtp.gmail.com",
     port: 587,
     secure: false,
     auth: {
         user: env.EMAIL_USER,
         pass: env.EMAIL_APP_PASSWORD
-    }
+    },
+    tls: { minVersion: "TLSv1.2" }
 });
 
 export async function sendPasswordResetEmail(email: string, resetLink: string) {
@@ -17,7 +18,7 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
         to: email,
         subject: "Reset your password",
         html:`
-        <p>Click here to reset:</>
+        <p>Click here to reset:</p>
         <a href="${resetLink}">${resetLink}</a>
         `
     });
