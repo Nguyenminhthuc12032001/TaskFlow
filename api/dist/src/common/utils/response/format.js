@@ -1,19 +1,16 @@
 import z from "zod";
-export const okEnvelopeSchema = (dataSchema) => z
-    .object({
+export const okEnvelopeSchema = (dataSchema) => z.object({
     ok: z.literal(true),
     data: dataSchema,
 })
     .strict();
-export const createdEnvelopeSchema = (dataSchema) => z
-    .object({
+export const createdEnvelopeSchema = (dataSchema) => z.object({
     ok: z.literal(true),
     created: z.literal(true),
     data: dataSchema,
 })
     .strict();
-export const failEnvelopeSchema = z
-    .object({
+export const failEnvelopeSchema = z.object({
     ok: z.literal(false),
     message: z.string().min(1),
     details: z.unknown().optional(),
