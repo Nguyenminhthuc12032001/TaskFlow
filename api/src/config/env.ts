@@ -26,26 +26,15 @@ const envSchema = z.object({
     TTL_RESET_TOKEN: ttl.default("15m"),
 });
 
-const rawEnv = {
-    PORT: process.env.PORT ? Number(process.env.PORT) : undefined,
-    DATABASE_URL: process.env.DATABASE_URL,
-    CORS_ORIGIN: process.env.CORS_ORIGIN,
+export type Env = z.infer<typeof envSchema>;
 
-    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
-    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-    JWT_RESET_SECRET: process.env.JWT_RESET_SECRET,
-    INVITE_TOKEN_SECRET: process.env.INVITE_TOKEN_SECRET,
-
-    EMAIL_USER: process.env.EMAIL_USER,
-    EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD,
-    EMAIL_FROM: process.env.EMAIL_FROM,
-    FRONTEND_URL: process.env.FRONTEND_URL,
-    NODE_ENV: process.env.NODE_ENV,
-    LOG_LEVEL: process.env.LOG_LEVEL,
-
-    TTL_ACCESS_TOKEN: process.env.TTL_ACCESS_TOKEN,
-    TTL_REFRESH_TOKEN: process.env.TTL_REFRESH_TOKEN,
-    TTL_RESET_TOKEN: process.env.TTL_RESET_TOKEN,
+export function loadEnv(): Env {
+    const parsed = envSchema.safeParse(process.env);
+    if (!parsed.success) {
+        const issues = parsed.error.issues.map(issue => `${issue.path.join(".")}: ${issue.message}`).join("; ");
+        throw new Error(`Invalid environment variables: ${issues}`);
+    }
+    return parsed.data;
 }
 
-export const env = envSchema.parse(rawEnv)
+export const env = loadEnv();
