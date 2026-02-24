@@ -1,5 +1,8 @@
 import { z } from "zod";
 import "dotenv/config";
+import ms from "ms";
+
+const ttl = z.string().default("15m").refine(val => ms(val as ms.StringValue) !== undefined, "Invalid TTL format");
 
 const envSchema = z.object({
     PORT: z.number().default(4000),
@@ -16,7 +19,11 @@ const envSchema = z.object({
     EMAIL_FROM: z.string().min(3),
     FRONTEND_URL: z.url(),
     NODE_ENV: z.string().min(5),
-    LOG_LEVEL: z.string().min(2)
+    LOG_LEVEL: z.string().min(2),
+
+    TTL_ACCESS_TOKEN: ttl.default("15m"),
+    TTL_REFRESH_TOKEN: ttl.default("7d"),
+    TTL_RESET_TOKEN: ttl.default("15m"),
 });
 
 const rawEnv = {
@@ -34,7 +41,11 @@ const rawEnv = {
     EMAIL_FROM: process.env.EMAIL_FROM,
     FRONTEND_URL: process.env.FRONTEND_URL,
     NODE_ENV: process.env.NODE_ENV,
-    LOG_LEVEL: process.env.LOG_LEVEL
+    LOG_LEVEL: process.env.LOG_LEVEL,
+
+    TTL_ACCESS_TOKEN: process.env.TTL_ACCESS_TOKEN,
+    TTL_REFRESH_TOKEN: process.env.TTL_REFRESH_TOKEN,
+    TTL_RESET_TOKEN: process.env.TTL_RESET_TOKEN,
 }
 
 export const env = envSchema.parse(rawEnv)

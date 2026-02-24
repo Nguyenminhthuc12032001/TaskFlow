@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../errors/AppError.js";
 import { fail } from "../utils/response/format.js";
+import { log } from "../logger/logger.js";
+import path from "node:path";
 
 export function errorMiddleware (
     err: any,
@@ -8,14 +10,18 @@ export function errorMiddleware (
     res: Response,
     next: NextFunction
 ) {
-    console.error(err);
-
     if (err instanceof AppError) {
         return res.status(err.status).json(fail(err.message))
     }
 
-    const status = err.status || 500;
-    const message = err.message || "Internal Server Error";
+    log.error(
+        {
+            error: err,
+            requestId: req.requestId,
+            userId: req.user?.id,
+        },
+        "Unhandled error"
+    )
 
-    res.status(status).json(fail(message))
+    res.status(500).json(fail("Internal Server Error"))
 }

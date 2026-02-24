@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
+import ms from "ms";
 
 // ============ ACCESS ============
 export type AccessTokenPayload = {
@@ -10,7 +11,7 @@ export type AccessTokenPayload = {
 }
 
 export function signAccessToken(payload: AccessTokenPayload) {
-    return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: "15m" });
+    return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: (env.TTL_ACCESS_TOKEN as ms.StringValue) });
 }
 
 export function verifyAccessToken(token: string) {
@@ -25,7 +26,7 @@ export type RefreshTokenPayload = {
 }
 
 export function signRefreshToken(payload: RefreshTokenPayload) {
-    return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+    return jwt.sign(payload, env.JWT_REFRESH_SECRET, { expiresIn: (env.TTL_REFRESH_TOKEN as ms.StringValue) });
 }
 
 export function verifyRefreshToken(token: string) {
@@ -40,7 +41,7 @@ export type ResetTokenPayload = {
 }
 
 export function signResetToken(payload: ResetTokenPayload) {
-    return jwt.sign(payload, env.JWT_RESET_SECRET, { expiresIn: "15m" })
+    return jwt.sign(payload, env.JWT_RESET_SECRET, { expiresIn: (env.TTL_RESET_TOKEN as ms.StringValue) });
 }
 
 export function verifyResetToken(token: string) {

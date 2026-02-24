@@ -6,11 +6,37 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
+import { log } from "./common/logger/logger.js";
+import { requestIdMiddleware } from "./common/middlewares/requestId.middleware.js";
 
 const app = express();
 
 app.set("trust proxy", 1);
 
+app.use(requestIdMiddleware);
+app.use((req, res, next) => {
+    log.info(
+        {
+            method: req.method,
+            url: req.originalUrl,
+            requestId: req.requestId,
+        },
+        "Incoming request"
+    );
+    next();
+});
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+        const level = res.statusCode >= 500 ? "error" : res.statusCode >= 400 ? "warn" : "info";
+        log[level]({
+            requestId: req.requestId,
+            status: res.statusCode,
+            duration: `${Date.now() - start}ms`
+        }, "Request completed")
+    });
+    next();
+})
 app.use(rateLimitMiddleware);
 app.use(corsMiddleware);
 app.use(express.json({ limit: "1mb" }));
