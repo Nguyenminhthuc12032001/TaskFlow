@@ -8,7 +8,7 @@ declare global {
                 name?: string;
                 email?: string;
             };
-            requestId?: string
+            requestId?: string;
         }
     }
 }

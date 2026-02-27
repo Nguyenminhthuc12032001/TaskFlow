@@ -89,7 +89,7 @@ model Workspace {
   @@map("workspaces")
 }
 
-enum WorkspacesRole {
+enum WorkspaceRole {
   owner
   admin
   member
@@ -97,15 +97,15 @@ enum WorkspacesRole {
 }
 
 model WorkspacesMember {
-  workspacesId String         @map("workspace_id") @db.Uuid
+  workspaceId String         @map("workspace_id") @db.Uuid
   userId       String         @map("user_id") @db.Uuid
-  role         WorkspacesRole @default(member)
+  role         WorkspaceRole @default(member)
   joinedAt     DateTime       @default(now()) @map("joined_at")
 
-  workspace Workspace @relation(fields: [workspacesId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([workspacesId, userId])
+  @@id([workspaceId, userId])
   @@index([userId])
   @@map("workspace_member")
 }
@@ -114,7 +114,7 @@ model Invite {
   id          String         @id @default(uuid()) @db.Uuid
   workspaceId String         @map("workspace_id") @db.Uuid
   email       String
-  role        WorkspacesRole @default(member)
+  role        WorkspaceRole @default(member)
 
   token     String    @unique
   expiresAt DateTime  @map("expired_at")

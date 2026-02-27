@@ -6,10 +6,15 @@ import { sendPasswordResetEmail } from "../mail/mail.service.js";
 import { env } from "../../config/env.js";
 import { randomUUID } from "crypto";
 import { prisma } from "../../db/prisma.js";
+import { log } from "../../common/logger/logger.js";
+import ms from "ms";
 export const authService = {
     async register(data) {
         const existing = await authRepo.findUserByEmail(data.email);
         if (existing) {
+            log.info({
+                emailDomain: data.email?.split("@")[1] ?? "unknown"
+            }, "Register failed: email already exists");
             throw new AppError("Email already exists", 409);
         }
         const result = await prisma.$transaction(async (tx) => {
@@ -30,7 +35,7 @@ export const authService = {
                 jti: randomUUID(),
             };
             const refreshToken = signRefreshToken(refreshTokenPayload);
-            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), tx);
+            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
             const safeUser = {
                 id: user.id,
                 name: user.name,
@@ -43,9 +48,15 @@ export const authService = {
     async login(data) {
         const match = await authRepo.findUserByEmail(data.email);
         if (!match) {
+            log.info({
+                emailDomain: data.email.split("@")[1]
+            }, "Login failed: email not found");
             throw new AppError("Invalid email or password", 401);
         }
         if (!(await compare(data.password, match.passwordHash))) {
+            log.info({
+                userId: match.id,
+            }, "Login failed: invalid password");
             throw new AppError("Invalid email or password", 401);
         }
         const accessTokenPayload = {
@@ -60,7 +71,7 @@ export const authService = {
             jti: randomUUID(),
         };
         const refreshToken = signRefreshToken(refreshTokenPayload);
-        await authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+        await authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)));
         const safeUser = {
             id: match.id,
             name: match.name,
@@ -93,10 +104,14 @@ export const authService = {
             payload = verifyRefreshToken(refreshToken);
         }
         catch (error) {
+            log.warn("Refresh token failed: invalid or expired token");
             throw new AppError("Invalid or expired refresh token", 401);
         }
         const token = await authRepo.findRefreshToken(payload.jti);
         if (!token) {
+            log.warn({
+                jti: payload.jti,
+            }, "Refresh token failed: token not found");
             throw new AppError("Refresh token not found or expired", 401);
         }
         if (!(await compare(refreshToken, token.tokenHash))) {
@@ -116,7 +131,7 @@ export const authService = {
                 jti: randomUUID()
             };
             const refreshToken = signRefreshToken(refreshTokenPayload);
-            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), tx);
+            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
             return refreshToken;
         });
         const accessTokenPayload = {
@@ -139,9 +154,10 @@ export const authService = {
             email: user.email,
         };
         const resetToken = signResetToken(resetTokenPayload);
-        await authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hash(resetToken), new Date(Date.now() + 15 * 60 * 1000));
+        await authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hash(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN)));
         const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
         await sendPasswordResetEmail(user.email, resetLink);
+        log.info({ userId: user.id }, "Password reset email sent");
     },
     async resetPassword(data) {
         let payLoad;
@@ -149,6 +165,7 @@ export const authService = {
             payLoad = verifyResetToken(data.resetToken);
         }
         catch (error) {
+            log.warn("Reset password failed: invalid or expired token");
             throw new AppError("Invalid or expired reset token", 401);
         }
         const token = await authRepo.findResetToken(payLoad.jti);
@@ -165,6 +182,7 @@ export const authService = {
             }
             await authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
             await authRepo.updatePassword(payLoad.id, await hash(data.newPassword), tx);
+            log.info({ userId: payLoad.id }, "Password reset successful, all refresh tokens revoked");
         });
     },
     async changePassword(userId, data) {
@@ -176,9 +194,11 @@ export const authService = {
             throw new AppError("New password must be different", 400);
         }
         if (!(await compare(data.currentPassword, user.passwordHash))) {
+            log.warn({ userId }, "Change password failed: invalid current password");
             throw new AppError("Invalid current password", 401);
         }
         await authRepo.updatePassword(userId, await hash(data.newPassword));
+        log.info({ userId }, "Password change successfully");
     },
     async me(userId) {
         const user = await authRepo.findUserById(userId);

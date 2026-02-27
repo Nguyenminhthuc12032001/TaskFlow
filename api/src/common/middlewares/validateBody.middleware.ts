@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodType, z } from "zod";
-import { fail } from "../utils/response/format.js";
+import { AppError } from "../errors/AppError.js";
 
 export function validateBody<T extends ZodType>(schema: T) {
     return ( req: Request, res: Response, next: NextFunction ) => {
         const result = schema.safeParse(req.body);
 
         if (!result.success) {
-            return res.status(400).json(fail("Validation failed", z.treeifyError(result.error)))
+            throw new AppError("Invalid request body", 400, "VALIDATION_ERROR", z.treeifyError(result.error));
         }
 
         req.body = result.data;

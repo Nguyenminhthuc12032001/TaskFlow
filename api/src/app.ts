@@ -2,7 +2,10 @@ import express, { type Request, type Response } from "express";
 import { corsMiddleware } from "./config/cors.js";
 import { rateLimitMiddleware } from "./common/middlewares/rateLimit.middleware.js";
 import { errorMiddleware } from "./common/middlewares/error.middleware.js";
+
 import authRoutes from "./modules/auth/auth.routes.js";
+import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
+
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
@@ -52,6 +55,8 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
 })
 
 app.use("/api/auth", authRoutes);
+app.use("/api/workspace", workSpaceRoutes);
+
 setupSwagger(app);
 
 app.use((req: Request, res: Response) => {

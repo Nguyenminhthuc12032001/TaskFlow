@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { AppError } from "../errors/AppError.js";
 import { fail } from "../utils/response/format.js";
 import { log } from "../logger/logger.js";
-import path from "node:path";
 
 export function errorMiddleware (
     err: any,

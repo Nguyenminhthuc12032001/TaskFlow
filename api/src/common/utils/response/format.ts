@@ -46,8 +46,9 @@ export const created = <T>(data: T): Created<T> => ({
     data,
 });
 
-export const fail = (message: string, details?: unknown): Fail => ({
+export const fail = (message: string, code?: string, details?: unknown): Fail => ({
     ok: false,
     message,
+    ...(code ? { code } : {}),
     ...(details === undefined ? {} : { details }),
 });

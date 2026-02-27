@@ -9,14 +9,14 @@
 * 🟢 You can import this file directly.
 */
 
-export const WorkspacesRole = {
+export const WorkspaceRole = {
   owner: 'owner',
   admin: 'admin',
   member: 'member',
   viewer: 'viewer'
 } as const
 
-export type WorkspacesRole = (typeof WorkspacesRole)[keyof typeof WorkspacesRole]
+export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole]
 
 
 export const TaskPriority = {

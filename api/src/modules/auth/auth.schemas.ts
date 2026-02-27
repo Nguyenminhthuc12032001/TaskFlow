@@ -71,6 +71,7 @@ export const logoutBodySchema = z.undefined()
 export const meBodySchema = z.undefined()
     .or(z.object({}).strict());
 
+
 // ========== RESSPONSE ==========
 
 // SafeUser

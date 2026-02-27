@@ -18,12 +18,10 @@ const router = Router();
 
 // PUBLIC
 router.post("/register",
-    csrfProtection,
     validateBody(registerBodySchema),
     authController.register);
 
 router.post("/login",
-    csrfProtection,
     validateBody(loginBodySchema),
     authController.login);
 
@@ -33,19 +31,17 @@ router.post("/refresh",
     authController.refresh);
 
 router.post("/forgot-password",
-    csrfProtection,
     validateBody(forgotPasswordBodySchema),
     authController.forgotPassword);
 
 router.post("/reset-password",
-    csrfProtection,
     validateBody(resetPasswordBodySchema),
     authController.resetPassword);
 
 // PROTECTED
 router.post("/logout",
-    authMiddleware,
     csrfProtection,
+    authMiddleware,
     validateBody(logoutBodySchema),
     authController.logout);
 
@@ -55,7 +51,6 @@ router.get("/me",
     authController.me);
 
 router.post("/change-password",
-    csrfProtection,
     authMiddleware,
     validateBody(changePasswordBodySchema),
     authController.changePassword);

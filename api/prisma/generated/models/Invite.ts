@@ -28,7 +28,7 @@ export type InviteMinAggregateOutputType = {
   id: string | null
   workspaceId: string | null
   email: string | null
-  role: $Enums.WorkspacesRole | null
+  role: $Enums.WorkspaceRole | null
   token: string | null
   expiresAt: Date | null
   usedAt: Date | null
@@ -40,7 +40,7 @@ export type InviteMaxAggregateOutputType = {
   id: string | null
   workspaceId: string | null
   email: string | null
-  role: $Enums.WorkspacesRole | null
+  role: $Enums.WorkspaceRole | null
   token: string | null
   expiresAt: Date | null
   usedAt: Date | null
@@ -175,7 +175,7 @@ export type InviteGroupByOutputType = {
   id: string
   workspaceId: string
   email: string
-  role: $Enums.WorkspacesRole
+  role: $Enums.WorkspaceRole
   token: string
   expiresAt: Date
   usedAt: Date | null
@@ -208,7 +208,7 @@ export type InviteWhereInput = {
   id?: Prisma.UuidFilter<"Invite"> | string
   workspaceId?: Prisma.UuidFilter<"Invite"> | string
   email?: Prisma.StringFilter<"Invite"> | string
-  role?: Prisma.EnumWorkspacesRoleFilter<"Invite"> | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFilter<"Invite"> | $Enums.WorkspaceRole
   token?: Prisma.StringFilter<"Invite"> | string
   expiresAt?: Prisma.DateTimeFilter<"Invite"> | Date | string
   usedAt?: Prisma.DateTimeNullableFilter<"Invite"> | Date | string | null
@@ -240,7 +240,7 @@ export type InviteWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.InviteWhereInput | Prisma.InviteWhereInput[]
   workspaceId?: Prisma.UuidFilter<"Invite"> | string
   email?: Prisma.StringFilter<"Invite"> | string
-  role?: Prisma.EnumWorkspacesRoleFilter<"Invite"> | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFilter<"Invite"> | $Enums.WorkspaceRole
   expiresAt?: Prisma.DateTimeFilter<"Invite"> | Date | string
   usedAt?: Prisma.DateTimeNullableFilter<"Invite"> | Date | string | null
   createdBy?: Prisma.UuidFilter<"Invite"> | string
@@ -271,7 +271,7 @@ export type InviteScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"Invite"> | string
   workspaceId?: Prisma.UuidWithAggregatesFilter<"Invite"> | string
   email?: Prisma.StringWithAggregatesFilter<"Invite"> | string
-  role?: Prisma.EnumWorkspacesRoleWithAggregatesFilter<"Invite"> | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleWithAggregatesFilter<"Invite"> | $Enums.WorkspaceRole
   token?: Prisma.StringWithAggregatesFilter<"Invite"> | string
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"Invite"> | Date | string
   usedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invite"> | Date | string | null
@@ -282,7 +282,7 @@ export type InviteScalarWhereWithAggregatesInput = {
 export type InviteCreateInput = {
   id?: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -295,7 +295,7 @@ export type InviteUncheckedCreateInput = {
   id?: string
   workspaceId: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -306,7 +306,7 @@ export type InviteUncheckedCreateInput = {
 export type InviteUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -319,7 +319,7 @@ export type InviteUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -331,7 +331,7 @@ export type InviteCreateManyInput = {
   id?: string
   workspaceId: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -342,7 +342,7 @@ export type InviteCreateManyInput = {
 export type InviteUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -353,7 +353,7 @@ export type InviteUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -494,7 +494,7 @@ export type InviteUncheckedUpdateManyWithoutWorkspaceNestedInput = {
 export type InviteCreateWithoutCreatorInput = {
   id?: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -506,7 +506,7 @@ export type InviteUncheckedCreateWithoutCreatorInput = {
   id?: string
   workspaceId: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -546,7 +546,7 @@ export type InviteScalarWhereInput = {
   id?: Prisma.UuidFilter<"Invite"> | string
   workspaceId?: Prisma.UuidFilter<"Invite"> | string
   email?: Prisma.StringFilter<"Invite"> | string
-  role?: Prisma.EnumWorkspacesRoleFilter<"Invite"> | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFilter<"Invite"> | $Enums.WorkspaceRole
   token?: Prisma.StringFilter<"Invite"> | string
   expiresAt?: Prisma.DateTimeFilter<"Invite"> | Date | string
   usedAt?: Prisma.DateTimeNullableFilter<"Invite"> | Date | string | null
@@ -557,7 +557,7 @@ export type InviteScalarWhereInput = {
 export type InviteCreateWithoutWorkspaceInput = {
   id?: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -568,7 +568,7 @@ export type InviteCreateWithoutWorkspaceInput = {
 export type InviteUncheckedCreateWithoutWorkspaceInput = {
   id?: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -606,7 +606,7 @@ export type InviteCreateManyCreatorInput = {
   id?: string
   workspaceId: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -616,7 +616,7 @@ export type InviteCreateManyCreatorInput = {
 export type InviteUpdateWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -628,7 +628,7 @@ export type InviteUncheckedUpdateWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -639,7 +639,7 @@ export type InviteUncheckedUpdateManyWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -649,7 +649,7 @@ export type InviteUncheckedUpdateManyWithoutCreatorInput = {
 export type InviteCreateManyWorkspaceInput = {
   id?: string
   email: string
-  role?: $Enums.WorkspacesRole
+  role?: $Enums.WorkspaceRole
   token: string
   expiresAt: Date | string
   usedAt?: Date | string | null
@@ -660,7 +660,7 @@ export type InviteCreateManyWorkspaceInput = {
 export type InviteUpdateWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -671,7 +671,7 @@ export type InviteUpdateWithoutWorkspaceInput = {
 export type InviteUncheckedUpdateWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -682,7 +682,7 @@ export type InviteUncheckedUpdateWithoutWorkspaceInput = {
 export type InviteUncheckedUpdateManyWithoutWorkspaceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumWorkspacesRoleFieldUpdateOperationsInput | $Enums.WorkspacesRole
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   token?: Prisma.StringFieldUpdateOperationsInput | string
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -770,7 +770,7 @@ export type $InvitePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: string
     workspaceId: string
     email: string
-    role: $Enums.WorkspacesRole
+    role: $Enums.WorkspaceRole
     token: string
     expiresAt: Date
     usedAt: Date | null
@@ -1204,7 +1204,7 @@ export interface InviteFieldRefs {
   readonly id: Prisma.FieldRef<"Invite", 'String'>
   readonly workspaceId: Prisma.FieldRef<"Invite", 'String'>
   readonly email: Prisma.FieldRef<"Invite", 'String'>
-  readonly role: Prisma.FieldRef<"Invite", 'WorkspacesRole'>
+  readonly role: Prisma.FieldRef<"Invite", 'WorkspaceRole'>
   readonly token: Prisma.FieldRef<"Invite", 'String'>
   readonly expiresAt: Prisma.FieldRef<"Invite", 'DateTime'>
   readonly usedAt: Prisma.FieldRef<"Invite", 'DateTime'>
