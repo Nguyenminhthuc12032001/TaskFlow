@@ -36,12 +36,12 @@ export const Sql = runtime.Sql;
 export const Decimal = runtime.Decimal;
 export const getExtensionContext = runtime.Extensions.getExtensionContext;
 /**
- * Prisma Client JS version: 7.3.0
- * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+ * Prisma Client JS version: 7.4.1
+ * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
  */
 export const prismaVersion = {
-    client: "7.3.0",
-    engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
+    client: "7.4.1",
+    engine: "55ae170b1ced7fc6ed07a15f110549408c501bb3"
 };
 export const NullTypes = {
     DbNull: runtime.NullTypes.DbNull,
@@ -71,7 +71,7 @@ export const ModelName = {
     RefreshToken: 'RefreshToken',
     PasswordResetToken: 'PasswordResetToken',
     Workspace: 'Workspace',
-    WorkspacesMember: 'WorkspacesMember',
+    WorkspaceMember: 'WorkspaceMember',
     Invite: 'Invite',
     Project: 'Project',
     Column: 'Column',
@@ -126,8 +126,8 @@ export const WorkspaceScalarFieldEnum = {
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'
 };
-export const WorkspacesMemberScalarFieldEnum = {
-    workspacesId: 'workspacesId',
+export const WorkspaceMemberScalarFieldEnum = {
+    workspaceId: 'workspaceId',
     userId: 'userId',
     role: 'role',
     joinedAt: 'joinedAt'

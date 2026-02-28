@@ -193,7 +193,7 @@ export type UserWhereInput = {
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   passwordResetToken?: Prisma.PasswordResetTokenListRelationFilter
   workspacesCreated?: Prisma.WorkspaceListRelationFilter
-  memberships?: Prisma.WorkspacesMemberListRelationFilter
+  memberships?: Prisma.WorkspaceMemberListRelationFilter
   invitesCreated?: Prisma.InviteListRelationFilter
   projectsCreated?: Prisma.ProjectListRelationFilter
   tasksCreated?: Prisma.TaskListRelationFilter
@@ -213,7 +213,7 @@ export type UserOrderByWithRelationInput = {
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   passwordResetToken?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
   workspacesCreated?: Prisma.WorkspaceOrderByRelationAggregateInput
-  memberships?: Prisma.WorkspacesMemberOrderByRelationAggregateInput
+  memberships?: Prisma.WorkspaceMemberOrderByRelationAggregateInput
   invitesCreated?: Prisma.InviteOrderByRelationAggregateInput
   projectsCreated?: Prisma.ProjectOrderByRelationAggregateInput
   tasksCreated?: Prisma.TaskOrderByRelationAggregateInput
@@ -236,7 +236,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   passwordResetToken?: Prisma.PasswordResetTokenListRelationFilter
   workspacesCreated?: Prisma.WorkspaceListRelationFilter
-  memberships?: Prisma.WorkspacesMemberListRelationFilter
+  memberships?: Prisma.WorkspaceMemberListRelationFilter
   invitesCreated?: Prisma.InviteListRelationFilter
   projectsCreated?: Prisma.ProjectListRelationFilter
   tasksCreated?: Prisma.TaskListRelationFilter
@@ -280,7 +280,7 @@ export type UserCreateInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -300,7 +300,7 @@ export type UserUncheckedCreateInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -320,7 +320,7 @@ export type UserUpdateInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -340,7 +340,7 @@ export type UserUncheckedUpdateInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -587,7 +587,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   updateAt?: Date | string
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -606,7 +606,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   updateAt?: Date | string
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -641,7 +641,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -660,7 +660,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -679,7 +679,7 @@ export type UserCreateWithoutPasswordResetTokenInput = {
   updateAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -698,7 +698,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokenInput = {
   updateAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -733,7 +733,7 @@ export type UserUpdateWithoutPasswordResetTokenInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -752,7 +752,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokenInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -771,7 +771,7 @@ export type UserCreateWithoutWorkspacesCreatedInput = {
   updateAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -790,7 +790,7 @@ export type UserUncheckedCreateWithoutWorkspacesCreatedInput = {
   updateAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -825,7 +825,7 @@ export type UserUpdateWithoutWorkspacesCreatedInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -844,7 +844,7 @@ export type UserUncheckedUpdateWithoutWorkspacesCreatedInput = {
   updateAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -956,7 +956,7 @@ export type UserCreateWithoutInvitesCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeCreateNestedManyWithoutUserInput
@@ -975,7 +975,7 @@ export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedCreateNestedManyWithoutUserInput
@@ -1010,7 +1010,7 @@ export type UserUpdateWithoutInvitesCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUpdateManyWithoutUserNestedInput
@@ -1029,7 +1029,7 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedUpdateManyWithoutUserNestedInput
@@ -1048,7 +1048,7 @@ export type UserCreateWithoutProjectsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeCreateNestedManyWithoutUserInput
@@ -1067,7 +1067,7 @@ export type UserUncheckedCreateWithoutProjectsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedCreateNestedManyWithoutUserInput
@@ -1102,7 +1102,7 @@ export type UserUpdateWithoutProjectsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUpdateManyWithoutUserNestedInput
@@ -1121,7 +1121,7 @@ export type UserUncheckedUpdateWithoutProjectsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedUpdateManyWithoutUserNestedInput
@@ -1140,7 +1140,7 @@ export type UserCreateWithoutTasksCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeCreateNestedManyWithoutUserInput
@@ -1159,7 +1159,7 @@ export type UserUncheckedCreateWithoutTasksCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedCreateNestedManyWithoutUserInput
@@ -1194,7 +1194,7 @@ export type UserUpdateWithoutTasksCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUpdateManyWithoutUserNestedInput
@@ -1213,7 +1213,7 @@ export type UserUncheckedUpdateWithoutTasksCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   assassignedTasks?: Prisma.TaskAssigneeUncheckedUpdateManyWithoutUserNestedInput
@@ -1232,7 +1232,7 @@ export type UserCreateWithoutAssassignedTasksInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -1251,7 +1251,7 @@ export type UserUncheckedCreateWithoutAssassignedTasksInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -1286,7 +1286,7 @@ export type UserUpdateWithoutAssassignedTasksInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -1305,7 +1305,7 @@ export type UserUncheckedUpdateWithoutAssassignedTasksInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1324,7 +1324,7 @@ export type UserCreateWithoutCommentsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -1343,7 +1343,7 @@ export type UserUncheckedCreateWithoutCommentsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -1378,7 +1378,7 @@ export type UserUpdateWithoutCommentsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -1397,7 +1397,7 @@ export type UserUncheckedUpdateWithoutCommentsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1416,7 +1416,7 @@ export type UserCreateWithoutLeadsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -1435,7 +1435,7 @@ export type UserUncheckedCreateWithoutLeadsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -1470,7 +1470,7 @@ export type UserUpdateWithoutLeadsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -1489,7 +1489,7 @@ export type UserUncheckedUpdateWithoutLeadsCreatedInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1508,7 +1508,7 @@ export type UserCreateWithoutActivitiesInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskCreateNestedManyWithoutCreatorInput
@@ -1527,7 +1527,7 @@ export type UserUncheckedCreateWithoutActivitiesInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   workspacesCreated?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutCreatorInput
-  memberships?: Prisma.WorkspacesMemberUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
   invitesCreated?: Prisma.InviteUncheckedCreateNestedManyWithoutCreatorInput
   projectsCreated?: Prisma.ProjectUncheckedCreateNestedManyWithoutCreatorInput
   tasksCreated?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatorInput
@@ -1562,7 +1562,7 @@ export type UserUpdateWithoutActivitiesInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUpdateManyWithoutCreatorNestedInput
@@ -1581,7 +1581,7 @@ export type UserUncheckedUpdateWithoutActivitiesInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   passwordResetToken?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   workspacesCreated?: Prisma.WorkspaceUncheckedUpdateManyWithoutCreatorNestedInput
-  memberships?: Prisma.WorkspacesMemberUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
   invitesCreated?: Prisma.InviteUncheckedUpdateManyWithoutCreatorNestedInput
   projectsCreated?: Prisma.ProjectUncheckedUpdateManyWithoutCreatorNestedInput
   tasksCreated?: Prisma.TaskUncheckedUpdateManyWithoutCreatorNestedInput
@@ -1658,7 +1658,7 @@ export type UserCountOutputTypeCountWorkspacesCreatedArgs<ExtArgs extends runtim
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.WorkspacesMemberWhereInput
+  where?: Prisma.WorkspaceMemberWhereInput
 }
 
 /**
@@ -1783,7 +1783,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     passwordResetToken: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
     workspacesCreated: Prisma.$WorkspacePayload<ExtArgs>[]
-    memberships: Prisma.$WorkspacesMemberPayload<ExtArgs>[]
+    memberships: Prisma.$WorkspaceMemberPayload<ExtArgs>[]
     invitesCreated: Prisma.$InvitePayload<ExtArgs>[]
     projectsCreated: Prisma.$ProjectPayload<ExtArgs>[]
     tasksCreated: Prisma.$TaskPayload<ExtArgs>[]
@@ -2196,7 +2196,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordResetToken<T extends Prisma.User$passwordResetTokenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workspacesCreated<T extends Prisma.User$workspacesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workspacesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  memberships<T extends Prisma.User$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspacesMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  memberships<T extends Prisma.User$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitesCreated<T extends Prisma.User$invitesCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invitesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projectsCreated<T extends Prisma.User$projectsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$projectsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tasksCreated<T extends Prisma.User$tasksCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tasksCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2703,23 +2703,23 @@ export type User$workspacesCreatedArgs<ExtArgs extends runtime.Types.Extensions.
  */
 export type User$membershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the WorkspacesMember
+   * Select specific fields to fetch from the WorkspaceMember
    */
-  select?: Prisma.WorkspacesMemberSelect<ExtArgs> | null
+  select?: Prisma.WorkspaceMemberSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the WorkspacesMember
+   * Omit specific fields from the WorkspaceMember
    */
-  omit?: Prisma.WorkspacesMemberOmit<ExtArgs> | null
+  omit?: Prisma.WorkspaceMemberOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.WorkspacesMemberInclude<ExtArgs> | null
-  where?: Prisma.WorkspacesMemberWhereInput
-  orderBy?: Prisma.WorkspacesMemberOrderByWithRelationInput | Prisma.WorkspacesMemberOrderByWithRelationInput[]
-  cursor?: Prisma.WorkspacesMemberWhereUniqueInput
+  include?: Prisma.WorkspaceMemberInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceMemberWhereInput
+  orderBy?: Prisma.WorkspaceMemberOrderByWithRelationInput | Prisma.WorkspaceMemberOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceMemberWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.WorkspacesMemberScalarFieldEnum | Prisma.WorkspacesMemberScalarFieldEnum[]
+  distinct?: Prisma.WorkspaceMemberScalarFieldEnum | Prisma.WorkspaceMemberScalarFieldEnum[]
 }
 
 /**

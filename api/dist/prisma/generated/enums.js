@@ -7,7 +7,7 @@
 *
 * 🟢 You can import this file directly.
 */
-export const WorkspacesRole = {
+export const WorkspaceRole = {
     owner: 'owner',
     admin: 'admin',
     member: 'member',

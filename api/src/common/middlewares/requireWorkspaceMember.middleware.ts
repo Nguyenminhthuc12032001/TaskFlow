@@ -21,7 +21,7 @@ export function requireWorkspaceMember(minRole: WorkspaceRole = "viewer") {
 
         const workspaceId = req.params.workspaceId;
 
-        const mebership = await prisma.workspacesMember.findUnique({
+        const mebership = await prisma.workspaceMember.findUnique({
             where: {
                 workspaceId_userId: { workspaceId, userId },
             },

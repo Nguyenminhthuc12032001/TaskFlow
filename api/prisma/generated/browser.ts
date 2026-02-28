@@ -38,10 +38,10 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  */
 export type Workspace = Prisma.WorkspaceModel
 /**
- * Model WorkspacesMember
+ * Model WorkspaceMember
  * 
  */
-export type WorkspacesMember = Prisma.WorkspacesMemberModel
+export type WorkspaceMember = Prisma.WorkspaceMemberModel
 /**
  * Model Invite
  * 

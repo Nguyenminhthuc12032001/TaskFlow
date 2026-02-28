@@ -25,8 +25,9 @@ export const created = (data) => ({
     created: true,
     data,
 });
-export const fail = (message, details) => ({
+export const fail = (message, code, details) => ({
     ok: false,
     message,
+    ...(code ? { code } : {}),
     ...(details === undefined ? {} : { details }),
 });

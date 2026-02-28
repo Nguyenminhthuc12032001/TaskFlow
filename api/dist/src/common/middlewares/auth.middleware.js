@@ -1,9 +1,9 @@
 import { verifyAccessToken } from "../utils/jwt.js";
-import { fail } from "../utils/response/format.js";
+import { AppError } from "../errors/AppError.js";
 export function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json(fail("Unauthorized", { code: "ACCESS_TOKEN_MISSING" }));
+        throw new AppError("Unauthorized", 401);
     }
     const token = authHeader.slice("Bearer ".length).trim();
     try {
@@ -15,7 +15,7 @@ export function authMiddleware(req, res, next) {
         };
     }
     catch (error) {
-        return res.status(401).json(fail("Invalid or expired token", { code: "ACCESS_TOKEN_INVALID" }));
+        throw new AppError("Invalid or expired token", 401);
     }
     next();
 }

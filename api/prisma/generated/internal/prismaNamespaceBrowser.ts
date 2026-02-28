@@ -55,7 +55,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
   Workspace: 'Workspace',
-  WorkspacesMember: 'WorkspacesMember',
+  WorkspaceMember: 'WorkspaceMember',
   Invite: 'Invite',
   Project: 'Project',
   Column: 'Column',
@@ -134,14 +134,14 @@ export const WorkspaceScalarFieldEnum = {
 export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
-export const WorkspacesMemberScalarFieldEnum = {
+export const WorkspaceMemberScalarFieldEnum = {
   workspaceId: 'workspaceId',
   userId: 'userId',
   role: 'role',
   joinedAt: 'joinedAt'
 } as const
 
-export type WorkspacesMemberScalarFieldEnum = (typeof WorkspacesMemberScalarFieldEnum)[keyof typeof WorkspacesMemberScalarFieldEnum]
+export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
 
 
 export const InviteScalarFieldEnum = {
@@ -149,7 +149,8 @@ export const InviteScalarFieldEnum = {
   workspaceId: 'workspaceId',
   email: 'email',
   role: 'role',
-  token: 'token',
+  tokenHash: 'tokenHash',
+  jti: 'jti',
   expiresAt: 'expiresAt',
   usedAt: 'usedAt',
   createdBy: 'createdBy',

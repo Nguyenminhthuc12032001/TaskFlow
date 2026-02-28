@@ -12,6 +12,7 @@ const envSchema = z.object({
     JWT_ACCESS_SECRET: z.string().min(16, "JWT_ACCESS_SECRET should be at least 16 chars"),
     JWT_REFRESH_SECRET: z.string().min(16, "JWT_REFRESH_SECRET should be at least 16 chars"),
     JWT_RESET_SECRET: z.string().min(16, "JWT_RESET_SECRET should be at least 16 chars"),
+    JWT_INVITE_SECRET: z.string().min(16, "JWT_INVITE_SECRET should be at least 16 chars"),
     INVITE_TOKEN_SECRET: z.string().min(16, "INVITE_TOKEN_SECRET should be at least 16 chars"),
 
     EMAIL_USER: z.email("EMAIL_USER must be a valid email"),
@@ -24,6 +25,7 @@ const envSchema = z.object({
     TTL_ACCESS_TOKEN: ttl.default("15m"),
     TTL_REFRESH_TOKEN: ttl.default("7d"),
     TTL_RESET_TOKEN: ttl.default("15m"),
+    TTL_INVITE_TOKEN: ttl.default("7d"),
 });
 
 export type Env = z.infer<typeof envSchema>;

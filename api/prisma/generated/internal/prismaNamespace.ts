@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.3.0
- * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+ * Prisma Client JS version: 7.4.1
+ * Query Engine version: 55ae170b1ced7fc6ed07a15f110549408c501bb3
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.3.0",
-  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
+  client: "7.4.1",
+  engine: "55ae170b1ced7fc6ed07a15f110549408c501bb3"
 }
 
 /**
@@ -388,7 +388,7 @@ export const ModelName = {
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
   Workspace: 'Workspace',
-  WorkspacesMember: 'WorkspacesMember',
+  WorkspaceMember: 'WorkspaceMember',
   Invite: 'Invite',
   Project: 'Project',
   Column: 'Column',
@@ -413,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "passwordResetToken" | "workspace" | "workspacesMember" | "invite" | "project" | "column" | "task" | "taskAssignee" | "comment" | "lead" | "leadTaskLink" | "activityLog"
+    modelProps: "user" | "refreshToken" | "passwordResetToken" | "workspace" | "workspaceMember" | "invite" | "project" | "column" | "task" | "taskAssignee" | "comment" | "lead" | "leadTaskLink" | "activityLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -713,77 +713,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    WorkspacesMember: {
-      payload: Prisma.$WorkspacesMemberPayload<ExtArgs>
-      fields: Prisma.WorkspacesMemberFieldRefs
+    WorkspaceMember: {
+      payload: Prisma.$WorkspaceMemberPayload<ExtArgs>
+      fields: Prisma.WorkspaceMemberFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.WorkspacesMemberFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload> | null
+          args: Prisma.WorkspaceMemberFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.WorkspacesMemberFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         findFirst: {
-          args: Prisma.WorkspacesMemberFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload> | null
+          args: Prisma.WorkspaceMemberFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.WorkspacesMemberFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         findMany: {
-          args: Prisma.WorkspacesMemberFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>[]
+          args: Prisma.WorkspaceMemberFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>[]
         }
         create: {
-          args: Prisma.WorkspacesMemberCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         createMany: {
-          args: Prisma.WorkspacesMemberCreateManyArgs<ExtArgs>
+          args: Prisma.WorkspaceMemberCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.WorkspacesMemberCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>[]
+          args: Prisma.WorkspaceMemberCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>[]
         }
         delete: {
-          args: Prisma.WorkspacesMemberDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         update: {
-          args: Prisma.WorkspacesMemberUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         deleteMany: {
-          args: Prisma.WorkspacesMemberDeleteManyArgs<ExtArgs>
+          args: Prisma.WorkspaceMemberDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.WorkspacesMemberUpdateManyArgs<ExtArgs>
+          args: Prisma.WorkspaceMemberUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.WorkspacesMemberUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>[]
+          args: Prisma.WorkspaceMemberUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>[]
         }
         upsert: {
-          args: Prisma.WorkspacesMemberUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspacesMemberPayload>
+          args: Prisma.WorkspaceMemberUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceMemberPayload>
         }
         aggregate: {
-          args: Prisma.WorkspacesMemberAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspacesMember>
+          args: Prisma.WorkspaceMemberAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspaceMember>
         }
         groupBy: {
-          args: Prisma.WorkspacesMemberGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.WorkspacesMemberGroupByOutputType>[]
+          args: Prisma.WorkspaceMemberGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceMemberGroupByOutputType>[]
         }
         count: {
-          args: Prisma.WorkspacesMemberCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.WorkspacesMemberCountAggregateOutputType> | number
+          args: Prisma.WorkspaceMemberCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceMemberCountAggregateOutputType> | number
         }
       }
     }
@@ -1543,14 +1543,14 @@ export const WorkspaceScalarFieldEnum = {
 export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
 
 
-export const WorkspacesMemberScalarFieldEnum = {
+export const WorkspaceMemberScalarFieldEnum = {
   workspaceId: 'workspaceId',
   userId: 'userId',
   role: 'role',
   joinedAt: 'joinedAt'
 } as const
 
-export type WorkspacesMemberScalarFieldEnum = (typeof WorkspacesMemberScalarFieldEnum)[keyof typeof WorkspacesMemberScalarFieldEnum]
+export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
 
 
 export const InviteScalarFieldEnum = {
@@ -1558,7 +1558,8 @@ export const InviteScalarFieldEnum = {
   workspaceId: 'workspaceId',
   email: 'email',
   role: 'role',
-  token: 'token',
+  tokenHash: 'tokenHash',
+  jti: 'jti',
   expiresAt: 'expiresAt',
   usedAt: 'usedAt',
   createdBy: 'createdBy',
@@ -1942,7 +1943,7 @@ export type GlobalOmitConfig = {
   refreshToken?: Prisma.RefreshTokenOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   workspace?: Prisma.WorkspaceOmit
-  workspacesMember?: Prisma.WorkspacesMemberOmit
+  workspaceMember?: Prisma.WorkspaceMemberOmit
   invite?: Prisma.InviteOmit
   project?: Prisma.ProjectOmit
   column?: Prisma.ColumnOmit

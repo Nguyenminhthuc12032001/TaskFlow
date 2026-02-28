@@ -1,4 +1,4 @@
-export const workspaceController = {
+export const workSpaceController = {
     create: async (req, res) => {
         // TODO
     },
@@ -12,6 +12,9 @@ export const workspaceController = {
         // TODO
     },
     remove: async (req, res) => {
+        // TODO
+    },
+    invinte: async (req, res) => {
         // TODO
     }
 };

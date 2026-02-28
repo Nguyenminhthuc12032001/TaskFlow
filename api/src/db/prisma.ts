@@ -4,7 +4,7 @@ import { Pool } from 'pg';
 import { env } from '../config/env.js';
 
 const SOFT_DELETE_MODELS = new Set([
-    'workdspace',
+    'workspace',
     'project',
     'task',
     'comment',
@@ -59,7 +59,7 @@ export const prisma = db.$extends({
                 }
 
                 if (operation === 'deleteMany') {
-                    return (db as any)[model].update({
+                    return (db as any)[model].updateMany({
                         where: { ...(args?.where ?? {}), deletedAt: null },
                         data: { deletedAt: new Date() }
                     })
@@ -70,5 +70,10 @@ export const prisma = db.$extends({
         }
     }
 })
+
+type InteractiveTransactionCallback = Parameters<typeof prisma.$transaction>[0];
+export type TxClient = InteractiveTransactionCallback extends (tx: infer T) => unknown ? T : never;
+export type DbClient = typeof prisma;
+export type DbOrTxClient = DbClient | TxClient;
 
 export { db };

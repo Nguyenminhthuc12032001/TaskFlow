@@ -22,4 +22,17 @@ export async function sendPasswordResetEmail(email: string, resetLink: string) {
         <a href="${resetLink}">${resetLink}</a>
         `
     });
-}
+};
+
+export async function sendInviteEmail(email: string, workspaceName: string, inviteLink: string) {
+    await transporter.sendMail({
+        from: env.EMAIL_FROM,
+        to: email,
+        subject: `You are invited to join workspace: ${workspaceName}`,
+        html: `
+        <p>You have been invited to join the workspace: <strong>${workspaceName}</strong></p>
+        <p>Click the link below to accept the invitation:</p>
+        <a href="${inviteLink}">${inviteLink}</a>
+        `
+    });
+};

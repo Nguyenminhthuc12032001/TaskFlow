@@ -19,5 +19,9 @@ export const workSpaceController = {
 
     remove: async (req: Request, res: Response) => {
         // TODO
+    },
+
+    invinte: async (req: Request, res: Response) => {
+        // TODO
     }
 }

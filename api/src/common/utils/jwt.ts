@@ -47,3 +47,19 @@ export function signResetToken(payload: ResetTokenPayload) {
 export function verifyResetToken(token: string) {
     return jwt.verify(token, env.JWT_RESET_SECRET) as ResetTokenPayload
 }
+
+// =========== INVITE ============
+export type InviteTokenPayload = {
+    id: string;
+    jti: string;
+    email: string;
+    workspaceId: string;
+}
+
+export function signInviteToken(payload: InviteTokenPayload) {
+    return jwt.sign(payload, env.JWT_INVITE_SECRET, { expiresIn: (env.TTL_INVITE_TOKEN as ms.StringValue) });
+}
+
+export function verifyInviteToken(token: string) {
+    return jwt.verify(token, env.JWT_INVITE_SECRET) as InviteTokenPayload
+}
