@@ -194,7 +194,7 @@ export type WorkspaceWhereInput = {
   invites?: Prisma.InviteListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
   leads?: Prisma.LeadListRelationFilter
-  activites?: Prisma.ActivityLogListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -209,7 +209,7 @@ export type WorkspaceOrderByWithRelationInput = {
   invites?: Prisma.InviteOrderByRelationAggregateInput
   projects?: Prisma.ProjectOrderByRelationAggregateInput
   leads?: Prisma.LeadOrderByRelationAggregateInput
-  activites?: Prisma.ActivityLogOrderByRelationAggregateInput
+  activities?: Prisma.ActivityLogOrderByRelationAggregateInput
   creator?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -227,7 +227,7 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   invites?: Prisma.InviteListRelationFilter
   projects?: Prisma.ProjectListRelationFilter
   leads?: Prisma.LeadListRelationFilter
-  activites?: Prisma.ActivityLogListRelationFilter
+  activities?: Prisma.ActivityLogListRelationFilter
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -265,7 +265,7 @@ export type WorkspaceCreateInput = {
   invites?: Prisma.InviteCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
@@ -280,7 +280,7 @@ export type WorkspaceUncheckedCreateInput = {
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUpdateInput = {
@@ -293,7 +293,7 @@ export type WorkspaceUpdateInput = {
   invites?: Prisma.InviteUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
@@ -308,7 +308,7 @@ export type WorkspaceUncheckedUpdateInput = {
   invites?: Prisma.InviteUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyInput = {
@@ -477,18 +477,18 @@ export type WorkspaceUpdateOneRequiredWithoutLeadsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutLeadsInput, Prisma.WorkspaceUpdateWithoutLeadsInput>, Prisma.WorkspaceUncheckedUpdateWithoutLeadsInput>
 }
 
-export type WorkspaceCreateNestedOneWithoutActivitesInput = {
-  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitesInput>
-  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutActivitesInput
+export type WorkspaceCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitiesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutActivitiesInput
   connect?: Prisma.WorkspaceWhereUniqueInput
 }
 
-export type WorkspaceUpdateOneRequiredWithoutActivitesNestedInput = {
-  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitesInput>
-  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutActivitesInput
-  upsert?: Prisma.WorkspaceUpsertWithoutActivitesInput
+export type WorkspaceUpdateOneRequiredWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitiesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.WorkspaceUpsertWithoutActivitiesInput
   connect?: Prisma.WorkspaceWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutActivitesInput, Prisma.WorkspaceUpdateWithoutActivitesInput>, Prisma.WorkspaceUncheckedUpdateWithoutActivitesInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutActivitiesInput, Prisma.WorkspaceUpdateWithoutActivitiesInput>, Prisma.WorkspaceUncheckedUpdateWithoutActivitiesInput>
 }
 
 export type WorkspaceCreateWithoutCreatorInput = {
@@ -501,7 +501,7 @@ export type WorkspaceCreateWithoutCreatorInput = {
   invites?: Prisma.InviteCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutCreatorInput = {
@@ -514,7 +514,7 @@ export type WorkspaceUncheckedCreateWithoutCreatorInput = {
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutCreatorInput = {
@@ -564,7 +564,7 @@ export type WorkspaceCreateWithoutMembersInput = {
   invites?: Prisma.InviteCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
@@ -578,7 +578,7 @@ export type WorkspaceUncheckedCreateWithoutMembersInput = {
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutMembersInput = {
@@ -606,7 +606,7 @@ export type WorkspaceUpdateWithoutMembersInput = {
   invites?: Prisma.InviteUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
@@ -620,7 +620,7 @@ export type WorkspaceUncheckedUpdateWithoutMembersInput = {
   invites?: Prisma.InviteUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutInvitesInput = {
@@ -632,7 +632,7 @@ export type WorkspaceCreateWithoutInvitesInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
@@ -646,7 +646,7 @@ export type WorkspaceUncheckedCreateWithoutInvitesInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutInvitesInput = {
@@ -674,7 +674,7 @@ export type WorkspaceUpdateWithoutInvitesInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
@@ -688,7 +688,7 @@ export type WorkspaceUncheckedUpdateWithoutInvitesInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutProjectsInput = {
@@ -700,7 +700,7 @@ export type WorkspaceCreateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   invites?: Prisma.InviteCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
@@ -714,7 +714,7 @@ export type WorkspaceUncheckedCreateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutWorkspaceInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutProjectsInput = {
@@ -742,7 +742,7 @@ export type WorkspaceUpdateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   invites?: Prisma.InviteUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
@@ -756,7 +756,7 @@ export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutLeadsInput = {
@@ -768,7 +768,7 @@ export type WorkspaceCreateWithoutLeadsInput = {
   members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
   invites?: Prisma.InviteCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogCreateNestedManyWithoutWorkspaceInput
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
@@ -782,7 +782,7 @@ export type WorkspaceUncheckedCreateWithoutLeadsInput = {
   members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutWorkspaceInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
-  activites?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
+  activities?: Prisma.ActivityLogUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutLeadsInput = {
@@ -810,7 +810,7 @@ export type WorkspaceUpdateWithoutLeadsInput = {
   members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
   invites?: Prisma.InviteUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
@@ -824,10 +824,10 @@ export type WorkspaceUncheckedUpdateWithoutLeadsInput = {
   members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
-export type WorkspaceCreateWithoutActivitesInput = {
+export type WorkspaceCreateWithoutActivitiesInput = {
   id?: string
   name: string
   createdAt?: Date | string
@@ -840,7 +840,7 @@ export type WorkspaceCreateWithoutActivitesInput = {
   creator: Prisma.UserCreateNestedOneWithoutWorkspacesCreatedInput
 }
 
-export type WorkspaceUncheckedCreateWithoutActivitesInput = {
+export type WorkspaceUncheckedCreateWithoutActivitiesInput = {
   id?: string
   name: string
   createdBy: string
@@ -853,23 +853,23 @@ export type WorkspaceUncheckedCreateWithoutActivitesInput = {
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
-export type WorkspaceCreateOrConnectWithoutActivitesInput = {
+export type WorkspaceCreateOrConnectWithoutActivitiesInput = {
   where: Prisma.WorkspaceWhereUniqueInput
-  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitesInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitiesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitiesInput>
 }
 
-export type WorkspaceUpsertWithoutActivitesInput = {
-  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutActivitesInput, Prisma.WorkspaceUncheckedUpdateWithoutActivitesInput>
-  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitesInput>
+export type WorkspaceUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutActivitiesInput, Prisma.WorkspaceUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutActivitiesInput, Prisma.WorkspaceUncheckedCreateWithoutActivitiesInput>
   where?: Prisma.WorkspaceWhereInput
 }
 
-export type WorkspaceUpdateToOneWithWhereWithoutActivitesInput = {
+export type WorkspaceUpdateToOneWithWhereWithoutActivitiesInput = {
   where?: Prisma.WorkspaceWhereInput
-  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutActivitesInput, Prisma.WorkspaceUncheckedUpdateWithoutActivitesInput>
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutActivitiesInput, Prisma.WorkspaceUncheckedUpdateWithoutActivitiesInput>
 }
 
-export type WorkspaceUpdateWithoutActivitesInput = {
+export type WorkspaceUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -882,7 +882,7 @@ export type WorkspaceUpdateWithoutActivitesInput = {
   creator?: Prisma.UserUpdateOneRequiredWithoutWorkspacesCreatedNestedInput
 }
 
-export type WorkspaceUncheckedUpdateWithoutActivitesInput = {
+export type WorkspaceUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
@@ -913,7 +913,7 @@ export type WorkspaceUpdateWithoutCreatorInput = {
   invites?: Prisma.InviteUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutCreatorInput = {
@@ -926,7 +926,7 @@ export type WorkspaceUncheckedUpdateWithoutCreatorInput = {
   invites?: Prisma.InviteUncheckedUpdateManyWithoutWorkspaceNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutWorkspaceNestedInput
-  activites?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activities?: Prisma.ActivityLogUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateManyWithoutCreatorInput = {
@@ -947,7 +947,7 @@ export type WorkspaceCountOutputType = {
   invites: number
   projects: number
   leads: number
-  activites: number
+  activities: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -955,7 +955,7 @@ export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   invites?: boolean | WorkspaceCountOutputTypeCountInvitesArgs
   projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
   leads?: boolean | WorkspaceCountOutputTypeCountLeadsArgs
-  activites?: boolean | WorkspaceCountOutputTypeCountActivitesArgs
+  activities?: boolean | WorkspaceCountOutputTypeCountActivitiesArgs
 }
 
 /**
@@ -999,7 +999,7 @@ export type WorkspaceCountOutputTypeCountLeadsArgs<ExtArgs extends runtime.Types
 /**
  * WorkspaceCountOutputType without action
  */
-export type WorkspaceCountOutputTypeCountActivitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type WorkspaceCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ActivityLogWhereInput
 }
 
@@ -1015,7 +1015,7 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   invites?: boolean | Prisma.Workspace$invitesArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   leads?: boolean | Prisma.Workspace$leadsArgs<ExtArgs>
-  activites?: boolean | Prisma.Workspace$activitesArgs<ExtArgs>
+  activities?: boolean | Prisma.Workspace$activitiesArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspace"]>
@@ -1055,7 +1055,7 @@ export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   invites?: boolean | Prisma.Workspace$invitesArgs<ExtArgs>
   projects?: boolean | Prisma.Workspace$projectsArgs<ExtArgs>
   leads?: boolean | Prisma.Workspace$leadsArgs<ExtArgs>
-  activites?: boolean | Prisma.Workspace$activitesArgs<ExtArgs>
+  activities?: boolean | Prisma.Workspace$activitiesArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1073,7 +1073,7 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     invites: Prisma.$InvitePayload<ExtArgs>[]
     projects: Prisma.$ProjectPayload<ExtArgs>[]
     leads: Prisma.$LeadPayload<ExtArgs>[]
-    activites: Prisma.$ActivityLogPayload<ExtArgs>[]
+    activities: Prisma.$ActivityLogPayload<ExtArgs>[]
     creator: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1481,7 +1481,7 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   invites<T extends Prisma.Workspace$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projects<T extends Prisma.Workspace$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   leads<T extends Prisma.Workspace$leadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$leadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  activites<T extends Prisma.Workspace$activitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$activitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Workspace$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2010,9 +2010,9 @@ export type Workspace$leadsArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Workspace.activites
+ * Workspace.activities
  */
-export type Workspace$activitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Workspace$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the ActivityLog
    */

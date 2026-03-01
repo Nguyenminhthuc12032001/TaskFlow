@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { ActivityAction, type Prisma, type WorkspaceRole } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
-import { signInviteToken } from "../../common/utils/jwt.js";
+import { signInviteToken, verifyInviteToken, type InviteTokenPayload } from "../../common/utils/jwt.js";
 import { prisma } from "../../db/prisma.js";
 import { activityService } from "../activity/activity.service.js";
 import { workspaceRepo } from "./workspace.repo.js";
@@ -53,7 +53,7 @@ export const workspaceService = {
         return result;
     },
 
-    async getById(workspaceId: string, userId: string) {
+    async getById(workspaceId: string) {
         const workspace = await workspaceRepo.findById(workspaceId);
         if (!workspace) {
             throw new AppError("Workspace not found or access denied", 404);
@@ -107,10 +107,11 @@ export const workspaceService = {
             const tokenJti = randomUUID();
 
             const token = signInviteToken({
-                id: inviteeId,
+                inviteeId: inviteeId,
                 jti: tokenJti,
                 email: existInvitee.email,
                 workspaceId: workspace.id,
+                role: role
             });
 
             const data: Prisma.InviteCreateInput = {
@@ -135,8 +136,64 @@ export const workspaceService = {
         return result.invite;
     },
 
-    async removeMember(workspaceId: string, memberId: string) {
+    async acceptInvite(token: string, userId: string) {
+        let payload: InviteTokenPayload
+
+        try {
+            payload = verifyInviteToken(token);
+
+        } catch (error) {
+            throw new AppError("Invalid invite token", 401)
+        }
+
+        if (payload.inviteeId !== userId) {
+            throw new AppError("Invalid invite token", 403)
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
+            const invite = await workspaceRepo.findInviteByJti(payload.jti, tx);
+            if (!invite) {
+                throw new AppError("Invite not found or already used", 404);
+            }
+
+            const existMembership = await workspaceRepo.findMembership(payload.workspaceId, userId, tx);
+            if (existMembership) {
+                throw new AppError("You are already a member", 400);
+            }
+
+            const newMembershipDate: Prisma.WorkspaceMemberCreateInput = {
+                role: invite.role,
+                joinedAt: new Date(),
+                workspace: { connect: { id: invite.workspaceId } },
+                user: { connect: { id: userId } }
+            }
+
+            const newMembership = await workspaceRepo.createMembership(newMembershipDate, tx);
+
+            const markInviteUsed = await workspaceRepo.markInviteUsed(payload.jti, tx);
+            if (markInviteUsed.count === 0) {
+                throw new AppError("Invite already used or expired", 400);
+            }
+
+            return newMembership;
+        })
+
+        return result;
+    },
+
+    async removeMember(workspaceId: string, memberId: string, actorId: string) {
+        if (actorId !== memberId) {
+            const actor = await workspaceRepo.findMembership(workspaceId, actorId);
+            if (!actor) {
+                throw new AppError("Workspace not found or access denied", 404);
+            }
+
+            if (!["admin", "owner"].includes(actor.role)) {
+                throw new AppError("Forbidden", 403);
+            }
+        }
+
         const result = await workspaceRepo.deleteMembership(workspaceId, memberId);
         return result;
-    }
+    },
 }

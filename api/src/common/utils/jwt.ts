@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
 import ms from "ms";
+import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
 // ============ ACCESS ============
 export type AccessTokenPayload = {
@@ -50,10 +51,11 @@ export function verifyResetToken(token: string) {
 
 // =========== INVITE ============
 export type InviteTokenPayload = {
-    id: string;
+    inviteeId: string;
     jti: string;
     email: string;
     workspaceId: string;
+    role: WorkspaceRole
 }
 
 export function signInviteToken(payload: InviteTokenPayload) {

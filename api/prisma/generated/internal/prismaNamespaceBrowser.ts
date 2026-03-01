@@ -89,7 +89,7 @@ export const UserScalarFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash',
   createdAt: 'createdAt',
-  updateAt: 'updateAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -138,7 +138,8 @@ export const WorkspaceMemberScalarFieldEnum = {
   workspaceId: 'workspaceId',
   userId: 'userId',
   role: 'role',
-  joinedAt: 'joinedAt'
+  joinedAt: 'joinedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
@@ -179,7 +180,8 @@ export const ColumnScalarFieldEnum = {
   projectId: 'projectId',
   name: 'name',
   position: 'position',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type ColumnScalarFieldEnum = (typeof ColumnScalarFieldEnum)[keyof typeof ColumnScalarFieldEnum]
@@ -190,7 +192,7 @@ export const TaskScalarFieldEnum = {
   projectId: 'projectId',
   columnId: 'columnId',
   title: 'title',
-  descripton: 'descripton',
+  description: 'description',
   priority: 'priority',
   dueDate: 'dueDate',
   position: 'position',

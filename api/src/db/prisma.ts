@@ -5,7 +5,9 @@ import { env } from '../config/env.js';
 
 const SOFT_DELETE_MODELS = new Set([
     'workspace',
+    'workspace_member',
     'project',
+    'columns',
     'task',
     'comment',
     'lead',

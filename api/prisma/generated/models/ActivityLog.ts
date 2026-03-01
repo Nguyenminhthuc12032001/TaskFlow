@@ -283,7 +283,7 @@ export type ActivityLogCreateInput = {
   meta?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   deletedAt?: Date | string | null
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutActivitesInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutActivitiesInput
   actor?: Prisma.UserCreateNestedOneWithoutActivitiesInput
 }
 
@@ -307,7 +307,7 @@ export type ActivityLogUpdateInput = {
   meta?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutActivitesNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutActivitiesNestedInput
   actor?: Prisma.UserUpdateOneWithoutActivitiesNestedInput
 }
 
@@ -497,7 +497,7 @@ export type ActivityLogCreateWithoutActorInput = {
   meta?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   deletedAt?: Date | string | null
-  workspace: Prisma.WorkspaceCreateNestedOneWithoutActivitesInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutActivitiesInput
 }
 
 export type ActivityLogUncheckedCreateWithoutActorInput = {
@@ -619,7 +619,7 @@ export type ActivityLogUpdateWithoutActorInput = {
   meta?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutActivitesNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
 export type ActivityLogUncheckedUpdateWithoutActorInput = {

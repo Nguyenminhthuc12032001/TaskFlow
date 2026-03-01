@@ -1,4 +1,4 @@
-import type { Prisma } from "../../../prisma/generated/client.js";
+import { Prisma } from "../../../prisma/generated/client.js";
 import { prisma, type DbOrTxClient } from "../../db/prisma.js";
 
 export const workspaceRepo = {
@@ -39,7 +39,7 @@ export const workspaceRepo = {
         workspaceId: string,
         db: DbOrTxClient = prisma
     ) {
-        return db.workspace.findFirst({
+        return db.workspace.findUnique({
             where: {
                 id: workspaceId,
             }
@@ -107,6 +107,39 @@ export const workspaceRepo = {
         })
     },
 
+    async findInviteByJti(
+        jti: string,
+        db: DbOrTxClient = prisma
+    ) {
+        return db.invite.findFirst({
+            where: {
+                jti,
+                expiresAt:{
+                    gt: new Date(),
+                },
+                usedAt: null,
+            },
+        })
+    },
+
+    async markInviteUsed(
+        jti: string,
+        db: DbOrTxClient = prisma
+    ) {
+        return db.invite.updateMany({
+            where: {
+                jti,
+                expiresAt: {
+                    gt: new Date()
+                },
+                usedAt: null
+            },
+            data: {
+                usedAt: new Date(),
+            }
+        })
+    },
+
     async deleteMembership(
         workspaceId: string,
         userId: string,
@@ -118,7 +151,7 @@ export const workspaceRepo = {
                     workspaceId,
                     userId,
                 },
-                
+
             }
         })
     }

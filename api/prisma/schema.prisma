@@ -16,7 +16,7 @@ model User {
   passwordHash String @map("password_hash")
 
   createdAt DateTime @default(now()) @map("created_at")
-  updateAt  DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   refreshTokens      RefreshToken[]
   passwordResetToken PasswordResetToken[]
@@ -62,7 +62,8 @@ model PasswordResetToken {
 
   user User @relation(fields: [userId], references: [id])
 
-  @@index([userId])
+  @@index([userId, deletedAt])
+  @@index([deletedAt])
   @@map("password_reset_token")
 }
 
@@ -76,16 +77,16 @@ model Workspace {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  members   WorkspaceMember[]
-  invites   Invite[]
-  projects  Project[]
-  leads     Lead[]
-  activites ActivityLog[]
+  members    WorkspaceMember[]
+  invites    Invite[]
+  projects   Project[]
+  leads      Lead[]
+  activities ActivityLog[]
 
   creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
-  @@index([createdBy])
-  @@index(deletedAt)
+  @@index([createdBy, id])
+  @@index([deletedAt])
   @@map("workspaces")
 }
 
@@ -101,12 +102,15 @@ model WorkspaceMember {
   userId      String        @map("user_id") @db.Uuid
   role        WorkspaceRole @default(member)
   joinedAt    DateTime      @default(now()) @map("joined_at")
+  deletedAt   DateTime?     @map("deleted_at")
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([workspaceId, userId])
-  @@index([userId])
+  @@index([workspaceId, userId, deletedAt])
+  @@index([workspaceId, deletedAt])
+  @@index([userId, deletedAt])
   @@map("workspace_member")
 }
 
@@ -115,8 +119,8 @@ model Invite {
   workspaceId String        @map("workspace_id") @db.Uuid
   email       String
   role        WorkspaceRole @default(member)
-  tokenHash     String    @unique @map("token_hash")
-  jti           String    @unique
+  tokenHash   String        @unique @map("token_hash")
+  jti         String        @unique
 
   expiresAt DateTime  @map("expired_at")
   usedAt    DateTime? @map("used_at")
@@ -151,24 +155,25 @@ model Project {
   columns Column[]
   tasks   Task[]
 
-  @@index([workspaceId])
-  @@index([createdBy])
-  @@index(deletedAt)
+  @@index([workspaceId, deletedAt])
+  @@index([createdBy, deletedAt])
+  @@index([deletedAt])
   @@map("projects")
 }
 
 model Column {
-  id        String   @id @default(uuid()) @db.Uuid
-  projectId String   @map("project_id") @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
+  projectId String    @map("project_id") @db.Uuid
   name      String
-  position  Int      @default(0)
-  createdAt DateTime @default(now())
+  position  Int       @default(0)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime? @map("deleted_at")
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks   Task[]
 
   @@unique([projectId, position])
-  @@index([projectId])
+  @@index([projectId, deletedAt])
   @@map("columns")
 }
 
@@ -184,10 +189,10 @@ model Task {
   projectId String @map("project_id") @db.Uuid
   columnId  String @map("column_id") @db.Uuid
 
-  title      String
-  descripton String?
-  priority   TaskPriority @default(medium)
-  dueDate    DateTime?    @map("due_date")
+  title       String
+  description String?
+  priority    TaskPriority @default(medium)
+  dueDate     DateTime?    @map("due_date")
 
   position Int @default(0)
 
@@ -204,10 +209,10 @@ model Task {
   comments  Comment[]
   leadsLink LeadTaskLink[]
 
-  @@index([projectId])
-  @@index([columnId])
-  @@index([createdBy])
-  @@index([dueDate])
+  @@index([projectId, deletedAt])
+  @@index([columnId, deletedAt])
+  @@index([createdBy, deletedAt])
+  @@index([dueDate, deletedAt])
   @@index(deletedAt)
   @@map("tasks")
 }
@@ -235,8 +240,8 @@ model Comment {
   task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  @@index([taskId])
-  @@index([authorId])
+  @@index([taskId, deletedAt])
+  @@index([authorId, deletedAt])
   @@index(deletedAt)
   @@map("comments")
 }
@@ -269,10 +274,10 @@ model Lead {
 
   taskLinks LeadTaskLink[]
 
-  @@index([workspaceId])
-  @@index([createdBy])
-  @@index([stage])
-  @@index([workspaceId, stage])
+  @@index([workspaceId, deletedAt])
+  @@index([createdBy, deletedAt])
+  @@index([stage, deletedAt])
+  @@index([workspaceId, stage, deletedAt])
   @@index(deletedAt)
   @@map("leads")
 }
@@ -322,10 +327,10 @@ model ActivityLog {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   actor     User?     @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
 
-  @@index([workspaceId])
-  @@index([actorId])
-  @@index([action])
-  @@index([entityType, entityId])
+  @@index([workspaceId, deletedAt])
+  @@index([actorId, deletedAt])
+  @@index([action, deletedAt])
+  @@index([entityType, entityId, deletedAt])
   @@index(deletedAt)
   @@map("activity_logs")
 }
