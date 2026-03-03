@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
-import { authService } from "./auth.service.js";
 import { loginResponseSchema, refreshResponseSchema, registerResponseSchema, safeUserSchema, type ChangePasswordBody, type ForgotPasswordBody, type LoginBody, type LoginResponse, type RefreshResponse, type RegisterBody, type RegisterResponse, type ResetPasswordBody, type SafeUserResponse } from "./auth.schemas.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { env } from "../../config/env.js";
 import { validateResponse } from "../../common/utils/response/validate.js";
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from "../../common/utils/response/format.js";
+import type { AuthService } from "./auth.service.js";
 
-export const authController = {
-    register: async (req: Request<{}, {}, RegisterBody>, res: Response) => {
-        const result = await authService.register(req.body);
+export class AuthController {
+    constructor(
+        private authService: AuthService,
+    ) {}
+    register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
+        const result = await this.authService.register(req.body);
 
         res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
@@ -26,10 +29,10 @@ export const authController = {
         const validatedEnvelope = validateResponse(createdEnvelopeSchema(registerResponseSchema))(envelope);
 
         return res.status(201).json(validatedEnvelope);
-    },
+    }
 
-    login: async (req: Request<{}, {}, LoginBody>, res: Response) => {
-        const result = await authService.login(req.body);
+    login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
+        const result = await this.authService.login(req.body);
 
         res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
@@ -47,13 +50,13 @@ export const authController = {
         const validatedEnvelope = validateResponse(okEnvelopeSchema(loginResponseSchema))(envelope);
 
         return res.status(200).json(validatedEnvelope);
-    },
+    }
 
-    logout: async (req: Request, res: Response) => {
+    logout = async (req: Request, res: Response) => {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) return res.sendStatus(204);
 
-        await authService.logout(refreshToken);
+        await this.authService.logout(refreshToken);
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
@@ -63,15 +66,15 @@ export const authController = {
         })
 
         return res.sendStatus(204);
-    },
+    }
 
-    refresh: async (req: Request, res: Response) => {
+    refresh = async (req: Request, res: Response) => {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
             throw new AppError("Refresh token missing", 401);
         }
 
-        const result = await authService.refresh(refreshToken);
+        const result = await this.authService.refresh(refreshToken);
 
         res.cookie("refreshToken", result.refreshToken, {
             httpOnly: true,
@@ -88,22 +91,22 @@ export const authController = {
         const validatedEnvelope = validateResponse(okEnvelopeSchema(refreshResponseSchema))(envelope);
 
         return res.status(200).json(validatedEnvelope);
-    },
+    }
 
-    forgotPassword: async (req: Request<{}, {}, ForgotPasswordBody>, res: Response) => {
-        await authService.forgotPassword(req.body);
-
-        return res.sendStatus(204);
-    },
-
-    resetPassword: async (req: Request<{}, {}, ResetPasswordBody>, res: Response) => {
-        await authService.resetPassword(req.body);
+    forgotPassword = async (req: Request<{}, {}, ForgotPasswordBody>, res: Response) => {
+        await this.authService.forgotPassword(req.body);
 
         return res.sendStatus(204);
-    },
+    }
 
-    changePassword: async (req: Request<{}, {}, ChangePasswordBody>, res: Response) => {
-        await authService.changePassword(req.user!.id, req.body);
+    resetPassword = async (req: Request<{}, {}, ResetPasswordBody>, res: Response) => {
+        await this.authService.resetPassword(req.body);
+
+        return res.sendStatus(204);
+    }
+
+    changePassword = async (req: Request<{}, {}, ChangePasswordBody>, res: Response) => {
+        await this.authService.changePassword(req.user!.id, req.body);
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
@@ -113,10 +116,10 @@ export const authController = {
         })
 
         return res.sendStatus(204);
-    },
+    }
 
-    me: async (req: Request, res: Response) => {
-        const meResponse: SafeUserResponse = await authService.me(req.user!.id);
+    me = async (req: Request, res: Response) => {
+        const meResponse: SafeUserResponse = await this.authService.me(req.user!.id);
 
         const envelope = ok(meResponse);
         const validatedEnvelope = validateResponse(okEnvelopeSchema(safeUserSchema))(envelope);

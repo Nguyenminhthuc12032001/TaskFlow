@@ -2,42 +2,40 @@ import { randomUUID } from "node:crypto";
 import { ActivityAction, type Prisma, type WorkspaceRole } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { signInviteToken, verifyInviteToken, type InviteTokenPayload } from "../../common/utils/jwt.js";
-import { prisma } from "../../db/prisma.js";
-import { activityService } from "../activity/activity.service.js";
-import { workspaceRepo } from "./workspace.repo.js";
+import { type DbClient, type DbOrTxClient } from "../../db/prisma.js";
+import { WorkspaceRepo } from "./workspace.repo.js";
 import type { CreateWorkspaceBody, SafeWorkspaceResponse, UpdateWorkspaceBody } from "./workspace.schemas.js";
-import { authRepo } from "../auth/auth.repo.js";
+import { AuthRepo } from "../auth/auth.repo.js";
 import { env } from "../../config/env.js";
 import ms from "ms";
-import { sendInviteEmail } from "../mail/mail.service.js";
 import { log } from "../../common/logger/logger.js";
-import { hash } from "../../common/utils/crypto.js";
+import { hashValue, verifyHash } from "../../common/utils/crypto.js";
+import type { IEmailService } from "../mail/mail.interface.js";
+import type { ActivityService } from "../activity/activity.service.js";
 
-export const workspaceService = {
-    async create(workspaceData: CreateWorkspaceBody, userId: string) {
-        const result = await prisma.$transaction(async (tx) => {
+export class WorkspaceService {
+    constructor(
+        private emailService: IEmailService,
+        private workspaceRepo: WorkspaceRepo,
+        private authRepo: AuthRepo,
+        private activityService: ActivityService,
+        private prisma: DbClient
+    ) { }
+
+    async create(workspaceData: CreateWorkspaceBody, actorId: string) {
+        const result = await this.prisma.$transaction(async (tx) => {
             const newWorkspace: Prisma.WorkspaceCreateInput = {
                 name: workspaceData.name,
-                creator: { connect: { id: userId } }
+                creator: { connect: { id: actorId } }
             }
-            const workspace = await workspaceRepo.create(newWorkspace, tx);
+            const workspace = await this.workspaceRepo.create(newWorkspace, tx);
 
             const newWorkspaceMember: Prisma.WorkspaceMemberCreateInput = {
-                user: { connect: { id: userId } },
+                user: { connect: { id: actorId } },
                 workspace: { connect: { id: workspace.id } },
                 role: "owner"
             }
-            await workspaceRepo.createMembership(newWorkspaceMember, tx);
-
-            await activityService.logActivity(
-                workspace.id,
-                ActivityAction.CREATE_WORKSPACE,
-                "workspace",
-                userId,
-                workspace.id,
-                { name: workspace.name },
-                tx
-            )
+            await this.workspaceRepo.createMembership(newWorkspaceMember, tx);
 
             const safeWorkspace: SafeWorkspaceResponse = {
                 id: workspace.id,
@@ -47,61 +45,114 @@ export const workspaceService = {
                 updatedAt: workspace.updatedAt.toISOString(),
             }
 
+            await this.activityService.logActivity(
+                workspace.id,
+                ActivityAction.CREATE_WORKSPACE,
+                "workspace",
+                actorId,
+                workspace.id,
+                { name: workspace.name },
+                tx
+            )
+
             return safeWorkspace;
         });
 
         return result;
-    },
+    }
 
-    async getById(workspaceId: string) {
-        const workspace = await workspaceRepo.findById(workspaceId);
+    async getById(workspaceId: string, actorId: string) {
+        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
+        if (!actor) {
+            throw new AppError("Workspace not found or access denied", 404);
+        }
+
+        const workspace = await this.workspaceRepo.findById(workspaceId);
         if (!workspace) {
             throw new AppError("Workspace not found or access denied", 404);
         }
 
         return workspace;
-    },
+    }
 
     async getByUserId(userId: string) {
-        const workspaces = await workspaceRepo.findByUserId(userId);
+        return await this.workspaceRepo.findByUserId(userId);
+    }
 
-        if (workspaces.length === 0) {
-            throw new AppError("No workspaces found for the user", 404);
+    async listMembers(workspaceId: string, actorId: string) {
+        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
+        if (!actor) {
+            throw new AppError("Workspace not found or access denied", 404)
         }
 
-        return workspaces;
-    },
+        return await this.workspaceRepo.findMembers(workspaceId);
+    }
 
-    async update(workspaceId: string, workspaceData: UpdateWorkspaceBody) {
-        const workspace = await workspaceRepo.update(workspaceId, workspaceData);
-        return workspace;
-    },
+    async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) {
+        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
+        if (!actor) {
+            throw new AppError("Workspace not found or access denied", 404)
+        }
 
-    async delete(workspaceId: string) {
-        await workspaceRepo.delete(workspaceId);
-    },
+        if (!["admin", "owner"].includes(actor.role)) {
+            throw new AppError("Forbidden", 403)
+        }
 
-    async inviteMember(workspaceId: string, inviteeId: string, role: WorkspaceRole, userId: string) {
-        const result = await prisma.$transaction(async (tx) => {
+        return await this.workspaceRepo.update(workspaceId, workspaceData);
+    }
 
-            const existInvitee = await authRepo.findUserById(inviteeId, tx);
+    async delete(workspaceId: string, actorId: string) {
+        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
+
+        if (!actor) {
+            throw new AppError("Workspace not found or access denied", 404);
+        }
+
+        if (!["owner"].includes(actor.role)) {
+            throw new AppError("Forbidden", 403)
+        }
+
+        await this.workspaceRepo.delete(workspaceId);
+    }
+
+    async inviteMember(workspaceId: string, inviteeId: string, role: WorkspaceRole, actorId: string) {
+        const result = await this.prisma.$transaction(async (tx) => {
+
+            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
+            if (!actor) {
+                throw new AppError("Workspace not found or access denied", 404);
+            }
+
+            if (!["admin", "owner"].includes(actor.role)) {
+                throw new AppError("Forbidden", 403);
+            }
+
+            const existInvitee = await this.authRepo.findUserById(inviteeId, tx);
             if (!existInvitee) {
                 throw new AppError("Invitee with the provided ID does not exist", 404);
             }
 
-            const existingMembership = await workspaceRepo.findMembership(workspaceId, inviteeId, tx);
+            const existingMembership = await this.workspaceRepo.findMembership(workspaceId, inviteeId, tx);
             if (existingMembership) {
                 throw new AppError("User is already a member of the workspace", 400);
             }
 
-            const existingInvite = await workspaceRepo.findInviteByEmail(workspaceId, existInvitee.email, tx);
+            const existingInvite = await this.workspaceRepo.findInviteByEmail(workspaceId, existInvitee.email, tx);
             if (existingInvite) {
                 throw new AppError("An invite has already been sent to this email for the workspace", 400);
             }
 
-            const workspace = await workspaceRepo.findById(workspaceId, tx);
+            const workspace = await this.workspaceRepo.findById(workspaceId, tx);
             if (!workspace) {
                 throw new AppError("Workspace not found", 404);
+            }
+
+            if (role === "owner") {
+                throw new AppError("Cannot invite owner", 400);
+            }
+
+            if (actor.role === "admin" && role === "admin") {
+                throw new AppError("Forbidden", 403);
             }
 
             const tokenJti = randomUUID();
@@ -117,26 +168,36 @@ export const workspaceService = {
             const data: Prisma.InviteCreateInput = {
                 email: existInvitee.email,
                 role: role,
-                tokenHash: await hash(token),
+                tokenHash: await hashValue(token),
                 jti: tokenJti,
                 expiresAt: new Date(Date.now() + ms(env.TTL_INVITE_TOKEN as ms.StringValue)),
                 workspace: { connect: { id: workspace.id } },
-                creator: { connect: { id: userId } },
+                creator: { connect: { id: actorId } },
             }
 
-            const invite = await workspaceRepo.inviteMembership(data, tx);
+            const invite = await this.workspaceRepo.inviteMembership(data, tx);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.INVITE_MEMBER,
+                "invite",
+                actorId,
+                invite.id,
+                { email: invite.email, role: invite.role },
+                tx
+            )
 
             return { invite, token, workspace };
         })
 
         const inviteLink = `${env.FRONTEND_URL}/invite?token=${encodeURIComponent(result.token)}`;
-        await sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
+        await this.emailService.sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
         log.info(`Invite email sent to ${result.invite.email}`);
 
         return result.invite;
-    },
+    }
 
-    async acceptInvite(token: string, userId: string) {
+    async acceptInvite(token: string, actorId: string) {
         let payload: InviteTokenPayload
 
         try {
@@ -146,17 +207,21 @@ export const workspaceService = {
             throw new AppError("Invalid invite token", 401)
         }
 
-        if (payload.inviteeId !== userId) {
+        if (payload.inviteeId !== actorId) {
             throw new AppError("Invalid invite token", 403)
         }
 
-        const result = await prisma.$transaction(async (tx) => {
-            const invite = await workspaceRepo.findInviteByJti(payload.jti, tx);
+        const result = await this.prisma.$transaction(async (tx) => {
+            const invite = await this.workspaceRepo.findInviteByJti(payload.jti, tx);
             if (!invite) {
                 throw new AppError("Invite not found or already used", 404);
             }
 
-            const existMembership = await workspaceRepo.findMembership(payload.workspaceId, userId, tx);
+            if (!(await verifyHash(token, invite.tokenHash))) {
+                throw new AppError("Invalid invite token", 401);
+            }
+
+            const existMembership = await this.workspaceRepo.findMembership(payload.workspaceId, actorId, tx);
             if (existMembership) {
                 throw new AppError("You are already a member", 400);
             }
@@ -165,25 +230,35 @@ export const workspaceService = {
                 role: invite.role,
                 joinedAt: new Date(),
                 workspace: { connect: { id: invite.workspaceId } },
-                user: { connect: { id: userId } }
+                user: { connect: { id: actorId } }
             }
 
-            const newMembership = await workspaceRepo.createMembership(newMembershipDate, tx);
+            const newMembership = await this.workspaceRepo.createMembership(newMembershipDate, tx);
 
-            const markInviteUsed = await workspaceRepo.markInviteUsed(payload.jti, tx);
+            const markInviteUsed = await this.workspaceRepo.markInviteUsed(payload.jti, tx);
             if (markInviteUsed.count === 0) {
                 throw new AppError("Invite already used or expired", 400);
             }
+
+            await this.activityService.logActivity(
+                invite.workspaceId,
+                ActivityAction.ACCEPT_INVITE,
+                "invite",
+                actorId,
+                invite.id,
+                { email: invite.email, role: invite.role },
+                tx
+            )
 
             return newMembership;
         })
 
         return result;
-    },
+    }
 
     async removeMember(workspaceId: string, memberId: string, actorId: string) {
         if (actorId !== memberId) {
-            const actor = await workspaceRepo.findMembership(workspaceId, actorId);
+            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
             if (!actor) {
                 throw new AppError("Workspace not found or access denied", 404);
             }
@@ -193,7 +268,7 @@ export const workspaceService = {
             }
         }
 
-        const result = await workspaceRepo.deleteMembership(workspaceId, memberId);
+        const result = await this.workspaceRepo.deleteMembership(workspaceId, memberId);
         return result;
-    },
+    }
 }

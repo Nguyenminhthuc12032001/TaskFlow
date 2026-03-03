@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { authController } from "./auth.controller.js";
 import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
 import {
     registerBodySchema,
@@ -13,8 +12,21 @@ import {
 } from "./auth.schemas.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
 import { csrfProtection } from "../../common/middlewares/csrf.middleware.js";
+import { AuthController } from "./auth.controller.js";
+import { AuthService } from "./auth.service.js";
+import { AuthRepo } from "./auth.repo.js";
+import { EmailService } from "../mail/mail.service.js";
+import { prisma } from "../../db/prisma.js";
 
 const router = Router();
+
+const authController = new AuthController(
+    new AuthService(
+        new EmailService(),
+        new AuthRepo(),
+        prisma
+    )
+)
 
 // PUBLIC
 router.post("/register",

@@ -1,6 +1,7 @@
 import { prisma, type DbOrTxClient } from "../../db/prisma.js";
 
-export const authRepo = {
+export class AuthRepo {
+
     async findUserById(
         userId: string,
         db: DbOrTxClient = prisma
@@ -8,7 +9,7 @@ export const authRepo = {
         return db.user.findUnique({
             where: { id: userId }
         });
-    },
+    }
 
     async findUserByEmail(
         email: string,
@@ -17,14 +18,14 @@ export const authRepo = {
         return db.user.findUnique({
             where: { email }
         });
-    },
+    }
 
     async createUser(
         data: { email: string; name: string; passwordHash: string },
         db: DbOrTxClient = prisma
     ) {
         return db.user.create({ data });
-    },
+    }
 
     async updatePassword(
         userId: string, passwordHash: string,
@@ -34,7 +35,7 @@ export const authRepo = {
             where: { id: userId },
             data: { passwordHash }
         })
-    },
+    }
 
     async saveRefreshToken(
         userId: string,
@@ -51,7 +52,7 @@ export const authRepo = {
                 expiresAt,
             }
         })
-    },
+    }
 
     async findRefreshToken(
         jti: string,
@@ -64,7 +65,7 @@ export const authRepo = {
                 expiresAt: { gt: new Date() }
             }
         })
-    },
+    }
 
     async revokeAllRefreshTokenByUser(
         userId: string,
@@ -74,7 +75,7 @@ export const authRepo = {
             where: { userId, revokedAt: null },
             data: { revokedAt: new Date() }
         })
-    },
+    }
 
     async revokeRefreshToken(
         jti: string,
@@ -88,7 +89,7 @@ export const authRepo = {
             },
             data: { revokedAt: new Date() }
         })
-    },
+    }
 
     async saveResetToken(
         userId: string,
@@ -105,7 +106,7 @@ export const authRepo = {
                 expiresAt,
             }
         })
-    },
+    }
 
     async findResetToken(
         jti: string,
@@ -118,7 +119,7 @@ export const authRepo = {
                 expiresAt: { gt: new Date() }
             }
         })
-    },
+    }
 
     async markResetToken(
         jti: string,

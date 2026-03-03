@@ -1,8 +1,12 @@
 import type { ActivityAction } from "../../../prisma/generated/enums.js";
 import type { DbOrTxClient } from "../../db/prisma.js";
-import { activityRepo } from "./activity.repo.js";
+import type { ActivityRepo } from "./activity.repo.js";
 
-export const activityService = {
+export class ActivityService {
+    constructor(
+        private activityRepo: ActivityRepo
+    ) {}
+
     async logActivity(
         workspaceId: string,
         action: ActivityAction,
@@ -12,7 +16,7 @@ export const activityService = {
         meta?: unknown,
         db: DbOrTxClient | undefined = undefined
     ) {
-        await activityRepo.log({
+        await this.activityRepo.log({
             action,
             entityType,
             entityId,

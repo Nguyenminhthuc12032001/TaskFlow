@@ -7,20 +7,26 @@ import {
     type RegisterBody,
 } from "./auth.schemas.js";
 
-import { authRepo } from "./auth.repo.js";
-import { hash, compare } from "../../common/utils/crypto.js";
+import { hashValue, verifyHash } from "../../common/utils/crypto.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { AccessTokenPayload, RefreshTokenPayload, signAccessToken, signRefreshToken, signResetToken, verifyRefreshToken, verifyResetToken, type ResetTokenPayload } from "../../common/utils/jwt.js";
-import { sendPasswordResetEmail } from "../mail/mail.service.js";
 import { env } from "../../config/env.js";
 import { randomUUID } from "crypto";
-import { prisma } from "../../db/prisma.js";
 import { log } from "../../common/logger/logger.js";
 import ms from "ms";
+import type { IEmailService } from "../mail/mail.interface.js";
+import type { AuthRepo } from "./auth.repo.js";
+import type { DbClient } from "../../db/prisma.js";
 
-export const authService = {
+export class AuthService {
+    constructor(
+        private emailService: IEmailService,
+        private authRepo: AuthRepo,
+        private prisma: DbClient
+    ) {}
+
     async register(data: RegisterBody) {
-        const existing = await authRepo.findUserByEmail(data.email);
+        const existing = await this.authRepo.findUserByEmail(data.email);
         if (existing) {
             log.info(
                 {
@@ -31,11 +37,11 @@ export const authService = {
             throw new AppError("Email already exists", 409);
         }
 
-        const result = await prisma.$transaction(async (tx) => {
-            const user = await authRepo.createUser({
+        const result = await this.prisma.$transaction(async (tx) => {
+            const user = await this.authRepo.createUser({
                 email: data.email,
                 name: data.name,
-                passwordHash: await hash(data.password),
+                passwordHash: await hashValue(data.password),
             }, tx);
 
             const accessTokenPayload: AccessTokenPayload = {
@@ -51,7 +57,7 @@ export const authService = {
                 jti: randomUUID(),
             }
             const refreshToken = signRefreshToken(refreshTokenPayload);
-            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)), tx);
+            await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)), tx);
 
             const safeUser: SafeUserResponse = {
                 id: user.id,
@@ -63,10 +69,10 @@ export const authService = {
         });
 
         return result;
-    },
+    }
 
     async login(data: LoginBody) {
-        const match = await authRepo.findUserByEmail(data.email);
+        const match = await this.authRepo.findUserByEmail(data.email);
         if (!match) {
             log.info(
                 {
@@ -77,7 +83,7 @@ export const authService = {
             throw new AppError("Invalid email or password", 401);
         }
 
-        if (!(await compare(data.password, match.passwordHash))) {
+        if (!(await verifyHash(data.password, match.passwordHash))) {
             log.info(
                 {
                     userId: match.id,
@@ -101,7 +107,7 @@ export const authService = {
         }
         const refreshToken = signRefreshToken(refreshTokenPayload);
 
-        await authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)));
+        await this.authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)));
 
         const safeUser: SafeUserResponse = {
             id: match.id,
@@ -110,7 +116,7 @@ export const authService = {
         }
 
         return { safeUser, accessToken, refreshToken };
-    },
+    }
 
     async logout(refreshToken: string) {
         let payload;
@@ -120,18 +126,18 @@ export const authService = {
             throw new AppError("Invalid or expired refresh token", 401);
         }
 
-        const token = await authRepo.findRefreshToken(payload.jti);
+        const token = await this.authRepo.findRefreshToken(payload.jti);
         if (!token) {
             throw new AppError("Refresh token not found or expired", 401);
         }
 
-        if (!(await compare(refreshToken, token.tokenHash))) {
+        if (!(await verifyHash(refreshToken, token.tokenHash))) {
             throw new AppError("Invalid token", 401);
         }
 
-        const result = await authRepo.revokeRefreshToken(payload.jti)
+        const result = await this.authRepo.revokeRefreshToken(payload.jti)
         if (result.count === 0) throw new AppError("Refresh token not found or expired", 401);
-    },
+    }
 
     async refresh(refreshToken: string) {
         let payload;
@@ -142,7 +148,7 @@ export const authService = {
             throw new AppError("Invalid or expired refresh token", 401);
         }
 
-        const token = await authRepo.findRefreshToken(payload.jti);
+        const token = await this.authRepo.findRefreshToken(payload.jti);
 
         if (!token) {
             log.warn(
@@ -154,17 +160,17 @@ export const authService = {
             throw new AppError("Refresh token not found or expired", 401);
         }
 
-        if (!(await compare(refreshToken, token.tokenHash))) {
+        if (!(await verifyHash(refreshToken, token.tokenHash))) {
             throw new AppError("Invalid token", 401)
         }
 
-        const user = await authRepo.findUserById(payload.id);
+        const user = await this.authRepo.findUserById(payload.id);
         if (!user) {
             throw new AppError("User not found, cannot refresh token", 401);
         }
 
-        const newRefreshToken = await prisma.$transaction(async (tx) => {
-            const revoke = await authRepo.revokeRefreshToken(payload.jti, tx);
+        const newRefreshToken = await this.prisma.$transaction(async (tx) => {
+            const revoke = await this.authRepo.revokeRefreshToken(payload.jti, tx);
             if (revoke.count === 0) {
                 throw new AppError("Refresh token not found or expired", 401);
             }
@@ -174,7 +180,7 @@ export const authService = {
                 jti: randomUUID()
             }
             const refreshToken = signRefreshToken(refreshTokenPayload);
-            await authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hash(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)), tx);
+            await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN as ms.StringValue)), tx);
 
             return refreshToken;
         });
@@ -188,10 +194,10 @@ export const authService = {
         const accessToken = signAccessToken(accessTokenPayload);
 
         return { accessToken, refreshToken: newRefreshToken };
-    },
+    }
 
     async forgotPassword(data: ForgotPasswordBody) {
-        const user = await authRepo.findUserByEmail(data.email);
+        const user = await this.authRepo.findUserByEmail(data.email);
         if (!user) {
             return;
         }
@@ -203,15 +209,15 @@ export const authService = {
         }
 
         const resetToken = signResetToken(resetTokenPayload);
-        await authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hash(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN as ms.StringValue)));
+        await this.authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hashValue(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN as ms.StringValue)));
 
         const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
-        await sendPasswordResetEmail(user.email, resetLink);
+        await this.emailService.sendPasswordResetEmail(user.email, resetLink);
         log.info(
             { userId: user.id },
             "Password reset email sent"
         )
-    },
+    }
 
     async resetPassword(data: ResetPasswordBody) {
         let payLoad;
@@ -222,34 +228,34 @@ export const authService = {
             throw new AppError("Invalid or expired reset token", 401);
         }
 
-        const token = await authRepo.findResetToken(payLoad.jti);
+        const token = await this.authRepo.findResetToken(payLoad.jti);
         if (!token) {
             throw new AppError("Invalid or expired reset token", 401);
         }
 
-        if (!(await compare(data.resetToken, token.tokenHash))) {
+        if (!(await verifyHash(data.resetToken, token.tokenHash))) {
             throw new AppError("Invalid or expired reset token", 401);
         }
 
-        await prisma.$transaction(async (tx) => {
-            const result = await authRepo.markResetToken(payLoad.jti, tx);
+        await this.prisma.$transaction(async (tx) => {
+            const result = await this.authRepo.markResetToken(payLoad.jti, tx);
             if (result.count === 0) {
                 throw new AppError("Invalid or expired reset token", 401);
             }
 
-            await authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
+            await this.authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
 
-            await authRepo.updatePassword(payLoad.id, await hash(data.newPassword), tx);
+            await this.authRepo.updatePassword(payLoad.id, await hashValue(data.newPassword), tx);
             
             log.info(
                 { userId: payLoad.id },
                 "Password reset successful, all refresh tokens revoked"
             )
         });
-    },
+    }
 
     async changePassword(userId: string, data: ChangePasswordBody) {
-        const user = await authRepo.findUserById(userId);
+        const user = await this.authRepo.findUserById(userId);
         if (!user) {
             throw new AppError("User not found", 404);
         }
@@ -258,7 +264,7 @@ export const authService = {
             throw new AppError("New password must be different", 400);
         }
 
-        if (!(await compare(data.currentPassword, user.passwordHash))) {
+        if (!(await verifyHash(data.currentPassword, user.passwordHash))) {
             log.warn(
                 { userId },
                 "Change password failed: invalid current password"
@@ -266,15 +272,15 @@ export const authService = {
             throw new AppError("Invalid current password", 401);
         }
 
-        await authRepo.updatePassword(userId, await hash(data.newPassword));
+        await this.authRepo.updatePassword(userId, await hashValue(data.newPassword));
         log.info(
             { userId },
             "Password change successfully"
         )
-    },
+    }
 
     async me(userId: string) {
-        const user = await authRepo.findUserById(userId);
+        const user = await this.authRepo.findUserById(userId);
         if (!user) {
             throw new AppError("User not found", 404);
         }
@@ -286,5 +292,5 @@ export const authService = {
         }
 
         return safeUser;
-    },
+    }
 }

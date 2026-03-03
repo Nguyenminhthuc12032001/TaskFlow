@@ -1,7 +1,7 @@
 import { Prisma } from "../../../prisma/generated/client.js";
 import { prisma, type DbOrTxClient } from "../../db/prisma.js";
 
-export const workspaceRepo = {
+export class WorkspaceRepo {
     async create(
         workspaceData: Prisma.WorkspaceCreateInput,
         db: DbOrTxClient = prisma
@@ -9,7 +9,7 @@ export const workspaceRepo = {
         return db.workspace.create({
             data: workspaceData,
         });
-    },
+    }
 
     async createMembership(
         workspaceMemberData: Prisma.WorkspaceMemberCreateInput,
@@ -18,7 +18,7 @@ export const workspaceRepo = {
         return db.workspaceMember.create({
             data: workspaceMemberData
         })
-    },
+    }
 
     async findMembership(
         workspaceId: string,
@@ -33,7 +33,18 @@ export const workspaceRepo = {
                 }
             }
         })
-    },
+    }
+
+    async findMembers(
+        workspaceId: string,
+        db: DbOrTxClient = prisma
+    ) {
+        return db.workspaceMember.findMany({
+            where: {
+                workspaceId,
+            }
+        })
+    }
 
     async findById(
         workspaceId: string,
@@ -44,7 +55,7 @@ export const workspaceRepo = {
                 id: workspaceId,
             }
         })
-    },
+    }
 
     async findByUserId(
         userId: string,
@@ -57,7 +68,7 @@ export const workspaceRepo = {
                 }
             }
         })
-    },
+    }
 
     async update(
         workspaceId: string,
@@ -70,7 +81,7 @@ export const workspaceRepo = {
             },
             data,
         })
-    },
+    }
 
     async delete(
         workspaceId: string,
@@ -79,7 +90,7 @@ export const workspaceRepo = {
         return db.workspace.delete({
             where: { id: workspaceId }
         })
-    },
+    }
 
     async inviteMembership(
         inviteData: Prisma.InviteCreateInput,
@@ -88,8 +99,8 @@ export const workspaceRepo = {
         return db.invite.create({
             data: inviteData
         })
-    },
-
+    }
+    
     async findInviteByEmail(
         workspaceId: string,
         email: string,
@@ -105,7 +116,7 @@ export const workspaceRepo = {
                 usedAt: null,
             }
         })
-    },
+    }
 
     async findInviteByJti(
         jti: string,
@@ -120,7 +131,7 @@ export const workspaceRepo = {
                 usedAt: null,
             },
         })
-    },
+    }
 
     async markInviteUsed(
         jti: string,
@@ -138,7 +149,7 @@ export const workspaceRepo = {
                 usedAt: new Date(),
             }
         })
-    },
+    }
 
     async deleteMembership(
         workspaceId: string,

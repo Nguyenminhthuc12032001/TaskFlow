@@ -1,27 +1,32 @@
 import { Request, Response } from 'express';
+import type { WorkspaceService } from './workspace.service.js';
 
-export const workSpaceController = {
-    create: async (req: Request, res: Response) => {
+export class WorkspaceController {
+    constructor(
+        workspaceService: WorkspaceService
+    ) {}
+
+    create = async (req: Request, res: Response) => {
         // TODO
-    },
+    }
 
-    list: async (req: Request, res: Response) => {
+    list = async (req: Request, res: Response) => {
         // TODO
-    },
+    }
 
-    getById: async (req: Request, res: Response) => {
+    getById = async (req: Request, res: Response) => {
         // TODO
-    },
+    }
 
-    update: async (req: Request, res: Response) => {
+    update = async (req: Request, res: Response) => {
         // TODO
-    },
+    }
 
-    remove: async (req: Request, res: Response) => {
+    remove = async (req: Request, res: Response) => {
         // TODO
-    },
+    }
 
-    invinte: async (req: Request, res: Response) => {
+    invinte = async (req: Request, res: Response) => {
         // TODO
     }
 }
