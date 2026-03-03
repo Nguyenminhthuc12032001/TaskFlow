@@ -41,8 +41,8 @@ export class WorkspaceService {
                 id: workspace.id,
                 name: workspace.name,
                 createdBy: workspace.createdBy,
-                createdAt: workspace.createdAt.toISOString(),
-                updatedAt: workspace.updatedAt.toISOString(),
+                createdAt: workspace.createdAt,
+                updatedAt: workspace.updatedAt,
             }
 
             await this.activityService.logActivity(

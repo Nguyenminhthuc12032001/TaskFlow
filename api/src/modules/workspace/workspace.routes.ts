@@ -25,7 +25,7 @@ const workspaceController = new WorkspaceController(
 )
 
 router.post('/create', authMiddleware, workspaceController.create);
-router.get("/list", authMiddleware, requireWorkspaceMember, workspaceController.list);
+router.get("/list", authMiddleware, requireWorkspaceMember, workspaceController.getByUserId);
 router.get("/:id", authMiddleware, requireWorkspaceMember, workspaceController.getById);
 router.put("/:id", authMiddleware, requireWorkspaceMember("admin"), workspaceController.update);
 router.delete("/:id", authMiddleware, requireWorkspaceMember("admin"), workspaceController.remove);

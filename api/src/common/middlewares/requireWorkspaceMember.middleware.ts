@@ -3,7 +3,7 @@ import { prisma } from "../../db/prisma.js";
 import { AppError } from "../errors/AppError.js";
 import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
-type WorkspaceParams = { workspaceId: string };
+export type WorkspaceParams = { workspaceId: string };
 
 const rank: Record<WorkspaceRole, number> = {
     owner: 4,

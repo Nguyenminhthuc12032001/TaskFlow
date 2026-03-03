@@ -39,14 +39,14 @@ export const createResponseSchema = z.object({
     id: z.string(),
     name: z.string(),
     createdBy: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
 });
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
 // Get workspace
 export const getByUserIdResponseSchema = z.array(createResponseSchema);
-export type GetWorkspacesByUserIdResponse = z.infer<typeof getByUserIdResponseSchema>;
+export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
 // Get workspace/:workspaceId
 export const getByIdResponseSchema = createResponseSchema;
