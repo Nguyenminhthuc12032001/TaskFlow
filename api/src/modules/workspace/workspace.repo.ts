@@ -42,6 +42,11 @@ export class WorkspaceRepo {
         return db.workspaceMember.findMany({
             where: {
                 workspaceId,
+            },
+            include: {
+                user: {
+                    select: { id: true, name: true, email: true }
+                }
             }
         })
     }

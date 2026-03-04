@@ -1,4 +1,6 @@
 import z from "zod";
+import { safeUserSchema } from "../auth/auth.schemas.js";
+import { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
 // ========= REQUEST ==========
 
@@ -11,15 +13,19 @@ export const createBodySchema = z.object({
 });
 export type CreateWorkspaceBody = z.infer<typeof createBodySchema>;
 
-// Get workspace
+// Get workspace/list
 export const getByUserIdBodySchema = z.undefined()
     .or(z.object({}).strict());
 
-// Get workspace/:workspaceId
+// Get workspace/:id
 export const getByIdBodySchema = z.undefined()
     .or(z.object({}).strict());
 
-//  Put workspace/:workspaceId
+// GET workspace/members/:workspaceId
+export const getMembersBodySchema = z.undefined()
+    .or(z.object({}).strict())
+
+// Put workspace/:id
 export const updateBodySchema = z.object({
     name: z.string()
         .trim()
@@ -30,6 +36,23 @@ export type UpdateWorkspaceBody = z.infer<typeof updateBodySchema>;
 
 // DELETE workspace/:workspaceId
 export const deleteBodySchema = z.undefined()
+    .or(z.object({}).strict());
+
+// POST workspace/invite/:id
+export const inviteBodySchema = z.object({
+    inviteeId: z.uuid(),
+    role: z.enum(WorkspaceRole)
+});
+export type InviteBody = z.infer<typeof inviteBodySchema>;
+
+// POST workspace/accept_invite
+export const acceptBodySchema = z.object({
+    token: z.string()
+});
+export type AcceptBody = z.infer<typeof acceptBodySchema>;
+
+// DELETE workspace/remove_member/:workspaceId/:memberId
+export const removeMemberBodySchema = z.undefined()
     .or(z.object({}).strict());
 
 // ========= RESPONSE ==========
@@ -44,7 +67,7 @@ export const createResponseSchema = z.object({
 });
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
-// Get workspace
+// Get workspace/list
 export const getByUserIdResponseSchema = z.array(createResponseSchema);
 export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
@@ -53,3 +76,50 @@ export const getByIdResponseSchema = createResponseSchema;
 
 // Put workspace/:workspaceId
 export const updateResponseSchema = createResponseSchema;
+
+// DELETE workspace/:workspaceId
+export const deleteResponseSchema = createResponseSchema;
+
+export const safeMemberResponseSchema = z.object({
+    user: safeUserSchema,
+    role: z.enum(WorkspaceRole),
+    joinedAt: z.date()
+});
+export type SafeMemberResponse = z.infer<typeof safeMemberResponseSchema>;
+
+// GET workspace/members/:workspaceId
+export const membersResponseSchema = z.array(safeMemberResponseSchema);
+export type SafeMembersResponse = z.infer<typeof membersResponseSchema>;
+
+// POST workspace/invite/:workspaceId
+export const inviteResponseSchema = z.object({
+    id: z.string(),
+    workspaceId: z.uuid(),
+    email: z.string(),
+    role: z.enum(WorkspaceRole),
+    jti: z.string(),
+    tokenHash: z.string(),
+    createdAt: z.date(),
+    createdBy: z.uuid(),
+});
+export type InviteResponse = z.infer<typeof inviteResponseSchema>;
+
+
+// POST workspace/accept_invite
+export const acceptResponseSchema = z.object({
+    role: z.enum(WorkspaceRole),
+    userId: z.uuid(),
+    workspaceId: z.uuid(),
+    joinedAt: z.date(),
+});
+export type AcceptResponse = z.infer<typeof acceptResponseSchema>;
+
+// DELETE workspace/remove_member/:workspaceId/:memberId
+export const removeMemberResponseSchema = z.object({
+    userId: z.uuid(),
+    deletedAt: z.date(),
+    workspaceId: z.uuid(),
+    role: z.enum(WorkspaceRole),
+    joinedAt: z.date()
+});
+export type RemoveMemberResponse = z.infer<typeof removeMemberResponseSchema>;

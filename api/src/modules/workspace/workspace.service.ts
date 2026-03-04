@@ -37,14 +37,6 @@ export class WorkspaceService {
             }
             await this.workspaceRepo.createMembership(newWorkspaceMember, tx);
 
-            const safeWorkspace: SafeWorkspaceResponse = {
-                id: workspace.id,
-                name: workspace.name,
-                createdBy: workspace.createdBy,
-                createdAt: workspace.createdAt,
-                updatedAt: workspace.updatedAt,
-            }
-
             await this.activityService.logActivity(
                 workspace.id,
                 ActivityAction.CREATE_WORKSPACE,
@@ -55,7 +47,7 @@ export class WorkspaceService {
                 tx
             )
 
-            return safeWorkspace;
+            return workspace;
         });
 
         return result;
@@ -75,8 +67,8 @@ export class WorkspaceService {
         return workspace;
     }
 
-    async getByUserId(userId: string) {
-        return await this.workspaceRepo.findByUserId(userId);
+    async getByUserId(actorId: string) {
+        return await this.workspaceRepo.findByUserId(actorId);
     }
 
     async listMembers(workspaceId: string, actorId: string) {
@@ -112,7 +104,7 @@ export class WorkspaceService {
             throw new AppError("Forbidden", 403)
         }
 
-        await this.workspaceRepo.delete(workspaceId);
+        return await this.workspaceRepo.delete(workspaceId);
     }
 
     async inviteMember(workspaceId: string, inviteeId: string, role: WorkspaceRole, actorId: string) {
