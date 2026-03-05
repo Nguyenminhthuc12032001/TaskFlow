@@ -38,7 +38,7 @@ router.get("/:workspaceId",
     authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceMember,
     workspaceController.getById);
 
-router.get("/workspace/members/:workspaceId",
+router.get("/members/:workspaceId",
     authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceMember,
     workspaceController.getMembersById);
 

@@ -23,4 +23,5 @@ registry.registerPath({
     }
 });
 
-import "../modules/auth/auth.openApi.js"
+import "../modules/auth/auth.openApi.js";
+import "../modules/workspace/workspace.openApi.js";

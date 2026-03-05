@@ -5,7 +5,7 @@ import ms from "ms";
 const ttl = z.string().default("15m").refine(val => ms(val as ms.StringValue) !== undefined, "Invalid TTL format");
 
 const envSchema = z.object({
-    PORT: z.number().default(4000),
+    PORT: z.coerce.number().default(4000),
     DATABASE_URL: z.url(),
     CORS_ORIGIN: z.string().default("*"),
 
