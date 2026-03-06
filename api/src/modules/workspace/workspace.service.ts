@@ -90,7 +90,23 @@ export class WorkspaceService {
             throw new AppError("Forbidden", 403)
         }
 
-        return await this.workspaceRepo.update(workspaceId, workspaceData);
+        const result = await this.prisma.$transaction(async (tx) => {
+            const workspace = await this.workspaceRepo.update(workspaceId, workspaceData, tx);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.UPDATE_WORKSPACE,
+                "workspace",
+                actorId,
+                workspaceId,
+                { name: workspaceData.name },
+                tx
+            )
+
+            return workspace;
+        })
+
+        return result;
     }
 
     async delete(workspaceId: string, actorId: string) {
@@ -104,7 +120,23 @@ export class WorkspaceService {
             throw new AppError("Forbidden", 403)
         }
 
-        return await this.workspaceRepo.delete(workspaceId);
+        const result = await this.prisma.$transaction(async (tx) => {
+            const workspace = await this.workspaceRepo.delete(workspaceId, tx);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.DELETE_WORKSPACE,
+                "workspace",
+                actorId,
+                workspaceId,
+                { name: workspace.name },
+                tx
+            )
+
+            return workspace;
+        })
+
+        return result;
     }
 
     async inviteMember(workspaceId: string, inviteeId: string, role: WorkspaceRole, actorId: string) {
@@ -183,8 +215,38 @@ export class WorkspaceService {
         })
 
         const inviteLink = `${env.FRONTEND_URL}/invite?token=${encodeURIComponent(result.token)}`;
+
+        try {
+            
         await this.emailService.sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
-        log.info(`Invite email sent to ${result.invite.email}`);
+        log.info(
+            {
+                workspaceId,
+                inviteId: result.invite.id,
+                inviteeEmail: result.invite.email,
+                actorId,
+            },
+            "Invite email sent"
+        );
+        } catch (error) {
+            log.error(
+                {
+                    workspaceId,
+                    inviteId: result.invite.id,
+                    inviteeEmail: result.invite.email,
+                    actorId,
+                    err: error
+                },
+                "Failed to send invite email"
+            );
+
+            throw error;
+        }
+
+        log.info(
+            { inviteeId },
+            "Invited member for workspace successfully"
+        )
 
         return result.invite;
     }
@@ -196,7 +258,8 @@ export class WorkspaceService {
             payload = verifyInviteToken(token);
 
         } catch (error) {
-            throw new AppError("Invalid invite token", 401)
+            log.warn({ actorId }, "Accept invite failed: invalid token");
+            throw new AppError("Invalid invite token", 401);
         }
 
         if (payload.inviteeId !== actorId) {
@@ -243,7 +306,12 @@ export class WorkspaceService {
             )
 
             return newMembership;
-        })
+        });
+
+        log.info(
+            { id: result.userId, role: result.role },
+            "Accepted member successfully"
+        )
 
         return result;
     }
@@ -260,7 +328,26 @@ export class WorkspaceService {
             }
         }
 
-        const result = await this.workspaceRepo.deleteMembership(workspaceId, memberId);
+        const result = await this.prisma.$transaction(async (tx) => {
+            const member = await this.workspaceRepo.deleteMembership(workspaceId, memberId, tx);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.REMOVE_MEMBER,
+                "workspace_member",
+                actorId,
+                memberId,
+                { memberId: member.userId, role: member.role },
+                tx
+            )
+            return member;
+        });
+
+        log.info(
+            { id: result.userId, role: result.role },
+            "Removed member successfully"
+        )
+
         return result;
     }
 }

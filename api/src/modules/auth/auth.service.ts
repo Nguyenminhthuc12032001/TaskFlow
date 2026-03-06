@@ -23,7 +23,7 @@ export class AuthService {
         private emailService: IEmailService,
         private authRepo: AuthRepo,
         private prisma: DbClient
-    ) {}
+    ) { }
 
     async register(data: RegisterBody) {
         const existing = await this.authRepo.findUserByEmail(data.email);
@@ -246,7 +246,7 @@ export class AuthService {
             await this.authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
 
             await this.authRepo.updatePassword(payLoad.id, await hashValue(data.newPassword), tx);
-            
+
             log.info(
                 { userId: payLoad.id },
                 "Password reset successful, all refresh tokens revoked"
@@ -272,11 +272,20 @@ export class AuthService {
             throw new AppError("Invalid current password", 401);
         }
 
-        await this.authRepo.updatePassword(userId, await hashValue(data.newPassword));
-        log.info(
-            { userId },
-            "Password change successfully"
-        )
+        const result = await this.prisma.$transaction(async (tx) => {
+
+            await this.authRepo.revokeAllRefreshTokenByUser(userId, tx)
+
+            const user = await this.authRepo.updatePassword(userId, await hashValue(data.newPassword), tx);
+            log.info(
+                { userId },
+                "Password change successfully"
+            )
+
+            return user;
+        })
+
+        return { id: user.id, name: user.name, updatedAt: user.updatedAt };
     }
 
     async me(userId: string) {
