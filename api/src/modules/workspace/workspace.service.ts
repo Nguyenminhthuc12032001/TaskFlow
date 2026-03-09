@@ -22,7 +22,7 @@ export class WorkspaceService {
         private prisma: DbClient
     ) { }
 
-    async create(workspaceData: CreateWorkspaceBody, actorId: string) {
+    create = async (workspaceData: CreateWorkspaceBody, actorId: string) => {
         const result = await this.prisma.$transaction(async (tx) => {
             const newWorkspace: Prisma.WorkspaceCreateInput = {
                 name: workspaceData.name,
@@ -53,7 +53,7 @@ export class WorkspaceService {
         return result;
     }
 
-    async getById(workspaceId: string, actorId: string) {
+    getById = async (workspaceId: string, actorId: string) => {
         const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
         if (!actor) {
             throw new AppError("Workspace not found or access denied", 404);
@@ -67,11 +67,11 @@ export class WorkspaceService {
         return workspace;
     }
 
-    async getByUserId(actorId: string) {
+    getByUserId = async (actorId: string) => {
         return await this.workspaceRepo.findByUserId(actorId);
     }
 
-    async listMembers(workspaceId: string, actorId: string) {
+    listMembers = async (workspaceId: string, actorId: string) => {
         const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
         if (!actor) {
             throw new AppError("Workspace not found or access denied", 404)
@@ -80,7 +80,7 @@ export class WorkspaceService {
         return await this.workspaceRepo.findMembers(workspaceId);
     }
 
-    async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) {
+    update = async (workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) => {
         const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
         if (!actor) {
             throw new AppError("Workspace not found or access denied", 404)
@@ -109,7 +109,7 @@ export class WorkspaceService {
         return result;
     }
 
-    async delete(workspaceId: string, actorId: string) {
+    delete = async (workspaceId: string, actorId: string) => {
         const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
 
         if (!actor) {
@@ -121,7 +121,6 @@ export class WorkspaceService {
         }
 
         const result = await this.prisma.$transaction(async (tx) => {
-            const workspace = await this.workspaceRepo.delete(workspaceId, tx);
 
             await this.activityService.logActivity(
                 workspaceId,
@@ -129,9 +128,11 @@ export class WorkspaceService {
                 "workspace",
                 actorId,
                 workspaceId,
-                { name: workspace.name },
+                { id: workspaceId },
                 tx
             )
+
+            const workspace = await this.workspaceRepo.delete(workspaceId, tx);
 
             return workspace;
         })
@@ -139,7 +140,7 @@ export class WorkspaceService {
         return result;
     }
 
-    async inviteMember(workspaceId: string, inviteeId: string, role: WorkspaceRole, actorId: string) {
+    inviteMember = async (workspaceId: string, inviteeId: string, role: WorkspaceRole, actorId: string) => {
         const result = await this.prisma.$transaction(async (tx) => {
 
             const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
@@ -217,17 +218,17 @@ export class WorkspaceService {
         const inviteLink = `${env.FRONTEND_URL}/invite?token=${encodeURIComponent(result.token)}`;
 
         try {
-            
-        await this.emailService.sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
-        log.info(
-            {
-                workspaceId,
-                inviteId: result.invite.id,
-                inviteeEmail: result.invite.email,
-                actorId,
-            },
-            "Invite email sent"
-        );
+
+            await this.emailService.sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
+            log.info(
+                {
+                    workspaceId,
+                    inviteId: result.invite.id,
+                    inviteeEmail: result.invite.email,
+                    actorId,
+                },
+                "Invite email sent"
+            );
         } catch (error) {
             log.error(
                 {
@@ -251,7 +252,7 @@ export class WorkspaceService {
         return result.invite;
     }
 
-    async acceptInvite(token: string, actorId: string) {
+    acceptInvite = async (token: string, actorId: string) => {
         let payload: InviteTokenPayload
 
         try {
@@ -316,7 +317,7 @@ export class WorkspaceService {
         return result;
     }
 
-    async removeMember(workspaceId: string, memberId: string, actorId: string) {
+    removeMember = async (workspaceId: string, memberId: string, actorId: string) => {
         if (actorId !== memberId) {
             const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
             if (!actor) {

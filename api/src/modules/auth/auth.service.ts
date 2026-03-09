@@ -25,7 +25,7 @@ export class AuthService {
         private prisma: DbClient
     ) { }
 
-    async register(data: RegisterBody) {
+    register = async (data: RegisterBody) => {
         const existing = await this.authRepo.findUserByEmail(data.email);
         if (existing) {
             log.info(
@@ -71,7 +71,7 @@ export class AuthService {
         return result;
     }
 
-    async login(data: LoginBody) {
+    login = async (data: LoginBody) => {
         const match = await this.authRepo.findUserByEmail(data.email);
         if (!match) {
             log.info(
@@ -118,7 +118,7 @@ export class AuthService {
         return { safeUser, accessToken, refreshToken };
     }
 
-    async logout(refreshToken: string) {
+    logout = async (refreshToken: string) => {
         let payload;
         try {
             payload = verifyRefreshToken(refreshToken);
@@ -139,7 +139,7 @@ export class AuthService {
         if (result.count === 0) throw new AppError("Refresh token not found or expired", 401);
     }
 
-    async refresh(refreshToken: string) {
+    refresh = async (refreshToken: string) => {
         let payload;
         try {
             payload = verifyRefreshToken(refreshToken);
@@ -196,7 +196,7 @@ export class AuthService {
         return { accessToken, refreshToken: newRefreshToken };
     }
 
-    async forgotPassword(data: ForgotPasswordBody) {
+    forgotPassword = async (data: ForgotPasswordBody) => {
         const user = await this.authRepo.findUserByEmail(data.email);
         if (!user) {
             return;
@@ -219,7 +219,7 @@ export class AuthService {
         )
     }
 
-    async resetPassword(data: ResetPasswordBody) {
+    resetPassword = async (data: ResetPasswordBody) => {
         let payLoad;
         try {
             payLoad = verifyResetToken(data.resetToken);
@@ -254,7 +254,7 @@ export class AuthService {
         });
     }
 
-    async changePassword(userId: string, data: ChangePasswordBody) {
+    changePassword = async (userId: string, data: ChangePasswordBody) => {
         const user = await this.authRepo.findUserById(userId);
         if (!user) {
             throw new AppError("User not found", 404);
@@ -288,7 +288,7 @@ export class AuthService {
         return { id: user.id, name: user.name, updatedAt: user.updatedAt };
     }
 
-    async me(userId: string) {
+    me = async (userId: string) => {
         const user = await this.authRepo.findUserById(userId);
         if (!user) {
             throw new AppError("User not found", 404);

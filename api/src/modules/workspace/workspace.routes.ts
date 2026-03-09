@@ -26,20 +26,20 @@ const workspaceController = new WorkspaceController(
     )
 )
 
-router.post('/create',
+router.post("/create",
     authMiddleware, validateBody(createBodySchema),
     workspaceController.create);
 
 router.get("/list",
-    authMiddleware, validateBody(getByUserIdBodySchema), requireWorkspaceMember,
+    authMiddleware, validateBody(getByUserIdBodySchema),
     workspaceController.getByUserId);
 
 router.get("/:workspaceId",
-    authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceMember,
+    authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceMember(),
     workspaceController.getById);
 
 router.get("/members/:workspaceId",
-    authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceMember,
+    authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceMember(),
     workspaceController.getMembersById);
 
 router.put("/:workspaceId",

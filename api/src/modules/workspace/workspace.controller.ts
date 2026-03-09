@@ -138,7 +138,7 @@ export class WorkspaceController {
             tokenHash: result.tokenHash,
             createdAt: result.createdAt,
             createdBy: result.createdBy
-        }
+        };
 
         const envelop = ok(inviteResponse);
         const envelopShcema = okEnvelopeSchema(inviteResponseSchema);
@@ -155,7 +155,7 @@ export class WorkspaceController {
             userId: result.userId,
             workspaceId: result.workspaceId,
             joinedAt: result.joinedAt
-        }
+        };
 
         const envelop = created(acceptResponse);
         const envelopSchema = createdEnvelopeSchema(acceptResponseSchema);
@@ -176,7 +176,7 @@ export class WorkspaceController {
             workspaceId: result.workspaceId,
             role: result.role,
             joinedAt: result.joinedAt
-        }
+        };
 
         const envelop = ok(removeMemberResponse);
         const envelopSchema = okEnvelopeSchema(removeMemberResponseSchema);

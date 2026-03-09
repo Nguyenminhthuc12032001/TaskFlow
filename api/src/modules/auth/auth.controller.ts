@@ -10,6 +10,7 @@ export class AuthController {
     constructor(
         private authService: AuthService,
     ) {}
+    
     register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
         const result = await this.authService.register(req.body);
 

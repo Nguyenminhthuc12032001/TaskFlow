@@ -97,7 +97,7 @@ export const UserScalarFieldEnum = {
     email: 'email',
     passwordHash: 'passwordHash',
     createdAt: 'createdAt',
-    updateAt: 'updateAt'
+    updatedAt: 'updatedAt'
 };
 export const RefreshTokenScalarFieldEnum = {
     id: 'id',
@@ -130,14 +130,16 @@ export const WorkspaceMemberScalarFieldEnum = {
     workspaceId: 'workspaceId',
     userId: 'userId',
     role: 'role',
-    joinedAt: 'joinedAt'
+    joinedAt: 'joinedAt',
+    deletedAt: 'deletedAt'
 };
 export const InviteScalarFieldEnum = {
     id: 'id',
     workspaceId: 'workspaceId',
     email: 'email',
     role: 'role',
-    token: 'token',
+    tokenHash: 'tokenHash',
+    jti: 'jti',
     expiresAt: 'expiresAt',
     usedAt: 'usedAt',
     createdBy: 'createdBy',
@@ -158,14 +160,15 @@ export const ColumnScalarFieldEnum = {
     projectId: 'projectId',
     name: 'name',
     position: 'position',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    deletedAt: 'deletedAt'
 };
 export const TaskScalarFieldEnum = {
     id: 'id',
     projectId: 'projectId',
     columnId: 'columnId',
     title: 'title',
-    descripton: 'descripton',
+    description: 'description',
     priority: 'priority',
     dueDate: 'dueDate',
     position: 'position',

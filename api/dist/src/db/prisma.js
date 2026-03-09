@@ -3,12 +3,14 @@ import { PrismaClient } from '../../prisma/generated/client.js';
 import { Pool } from 'pg';
 import { env } from '../config/env.js';
 const SOFT_DELETE_MODELS = new Set([
-    'workspace',
-    'project',
-    'task',
-    'comment',
-    'lead',
-    'activityLog'
+    'Workspace',
+    'WorkspaceMember',
+    'Project',
+    'Column',
+    'Task',
+    'Comment',
+    'Lead',
+    'ActivityLog'
 ]);
 const db = new PrismaClient({
     adapter: new PrismaPg(new Pool({

@@ -5,6 +5,7 @@ import { errorMiddleware } from "./common/middlewares/error.middleware.js";
 
 import authRoutes from "./modules/auth/auth.routes.js";
 import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
+import projectRoutes from "./modules/project/project.routes.js";
 
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -17,6 +18,7 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(requestIdMiddleware);
+
 app.use((req, res, next) => {
     log.info(
         {
@@ -28,6 +30,7 @@ app.use((req, res, next) => {
     );
     next();
 });
+
 app.use((req, res, next) => {
     const start = Date.now();
     res.on("finish", () => {
@@ -39,7 +42,8 @@ app.use((req, res, next) => {
         }, "Request completed")
     });
     next();
-})
+});
+
 app.use(rateLimitMiddleware);
 app.use(corsMiddleware);
 app.use(express.json({ limit: "1mb" }));
@@ -56,6 +60,7 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/workspace", workSpaceRoutes);
+app.use("/api/project", projectRoutes);
 
 setupSwagger(app);
 

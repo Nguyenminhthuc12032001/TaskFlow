@@ -102,10 +102,21 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspace/:workspaceId",
+    path: "/api/workspace/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get workspace by ID",
     security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     responses: {
         200: ok200(getByIdResponseSchema),
         400: fail400,
@@ -118,10 +129,21 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspace/members/:workspaceId",
+    path: "/api/workspace/members/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get members by workspace ID",
-    security: [{ bearer: [] }],
+    security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     responses: {
         200: ok200(membersResponseSchema),
         400: fail400,
@@ -134,10 +156,21 @@ registry.registerPath({
 
 registry.registerPath({
     method: "put",
-    path: "/api/workspace/:workspaceId",
+    path: "/api/workspace/{workspaceId}",
     tags: ["Workspace"],
     summary: "Update workspace name",
     security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     request: {
         body: {
             content: { "application/json": { schema: updateBodySchema } }
@@ -155,10 +188,21 @@ registry.registerPath({
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspace/:workspaceId",
+    path: "/api/workspace/{workspaceId}",
     tags: ["Workspace"],
     summary: "Delete workspace by ID",
     security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     responses: {
         200: ok200(deleteResponseSchema),
         400: fail400,
@@ -171,10 +215,21 @@ registry.registerPath({
 
 registry.registerPath({
     method: "post",
-    path: "/api//workspace/invite/:workspaceId",
+    path: "/api/workspace/invite/{workspaceId}",
     tags: ["Workspace"],
     summary: "Invite member for workspace",
     security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     request: {
         body: {
             content: { "application/json": { schema: inviteBodySchema } }
@@ -213,10 +268,30 @@ registry.registerPath({
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspace/remove_member/:workspaceId/:memberId",
+    path: "/api/workspace/remove_member/{workspaceId}/{memberId}",
     tags: ["Workspace"],
     summary: "Remove member",
     security: [{ bearerAuth: [] }],
+    parameters: [
+        {
+            name: "workspaceId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        },
+        {
+            name: "memberId",
+            in: "path",
+            required: true,
+            schema: {
+                type: "string",
+                format: "uuid"
+            }
+        }
+    ],
     responses: {
         200: ok200(removeMemberResponseSchema),
         400: fail400,

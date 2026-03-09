@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-export async function hash(password) {
-    return bcrypt.hash(password, 12);
+export async function hashValue(plaintext) {
+    return bcrypt.hash(plaintext, 12);
 }
-export async function compare(plain, hashed) {
+export async function verifyHash(plain, hashed) {
     return bcrypt.compare(plain, hashed);
 }

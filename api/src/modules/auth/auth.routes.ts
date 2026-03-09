@@ -26,7 +26,7 @@ const authController = new AuthController(
         new AuthRepo(),
         prisma
     )
-)
+);
 
 // PUBLIC
 router.post("/register",

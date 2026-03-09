@@ -2,48 +2,48 @@ import { prisma, type DbOrTxClient } from "../../db/prisma.js";
 
 export class AuthRepo {
 
-    async findUserById(
+    findUserById = async (
         userId: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.user.findUnique({
             where: { id: userId }
         });
     }
 
-    async findUserByEmail(
+    findUserByEmail = async (
         email: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.user.findUnique({
             where: { email }
         });
     }
 
-    async createUser(
+    createUser = async (
         data: { email: string; name: string; passwordHash: string },
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.user.create({ data });
     }
 
-    async updatePassword(
+    updatePassword = async (
         userId: string, passwordHash: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.user.update({
             where: { id: userId },
             data: { passwordHash }
         })
     }
 
-    async saveRefreshToken(
+    saveRefreshToken = async (
         userId: string,
         jti: string,
         tokenHash: string,
         expiresAt: Date,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.refreshToken.create({
             data: {
                 userId,
@@ -54,10 +54,10 @@ export class AuthRepo {
         })
     }
 
-    async findRefreshToken(
+    findRefreshToken = async (
         jti: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.refreshToken.findUnique({
             where: {
                 jti,
@@ -67,20 +67,20 @@ export class AuthRepo {
         })
     }
 
-    async revokeAllRefreshTokenByUser(
+    revokeAllRefreshTokenByUser = async (
         userId: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.refreshToken.updateMany({
             where: { userId, revokedAt: null },
             data: { revokedAt: new Date() }
         })
     }
 
-    async revokeRefreshToken(
+    revokeRefreshToken = async (
         jti: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.refreshToken.updateMany({
             where: {
                 jti,
@@ -91,13 +91,13 @@ export class AuthRepo {
         })
     }
 
-    async saveResetToken(
+    saveResetToken = async (
         userId: string,
         jti: string,
         tokenHash: string,
         expiresAt: Date,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.passwordResetToken.create({
             data: {
                 userId,
@@ -108,10 +108,10 @@ export class AuthRepo {
         })
     }
 
-    async findResetToken(
+    findResetToken = async (
         jti: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.passwordResetToken.findFirst({
             where: {
                 jti,
@@ -121,10 +121,10 @@ export class AuthRepo {
         })
     }
 
-    async markResetToken(
+    markResetToken = async (
         jti: string,
         db: DbOrTxClient = prisma
-    ) {
+    ) => {
         return db.passwordResetToken.updateMany({
             where: {
                 jti,

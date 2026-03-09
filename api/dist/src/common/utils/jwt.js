@@ -18,3 +18,9 @@ export function signResetToken(payload) {
 export function verifyResetToken(token) {
     return jwt.verify(token, env.JWT_RESET_SECRET);
 }
+export function signInviteToken(payload) {
+    return jwt.sign(payload, env.JWT_INVITE_SECRET, { expiresIn: env.TTL_INVITE_TOKEN });
+}
+export function verifyInviteToken(token) {
+    return jwt.verify(token, env.JWT_INVITE_SECRET);
+}

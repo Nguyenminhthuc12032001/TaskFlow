@@ -1,0 +1,23 @@
+import { Router } from "express";
+import { ProjectController } from "./project.controller.js";
+import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
+
+const projectController = new ProjectController(
+    
+);
+
+const router = Router();
+
+router.post("/create", authMiddleware, projectController.create);
+
+router.get("/:Id", authMiddleware, projectController.get);
+
+router.get("/list_by_workspace/:workspaceId", authMiddleware, projectController.listByWorkspace);
+
+router.get("/list_by_user", authMiddleware, projectController.listByUser);
+
+router.put("/update/:Id", authMiddleware, projectController.update);
+
+router.delete("/remove/:Id", authMiddleware, projectController.remove);
+
+export default router;

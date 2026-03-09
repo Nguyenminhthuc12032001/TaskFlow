@@ -1,7 +1,9 @@
-import { activityRepo } from "./activity.repo.js";
-export const activityService = {
+export class ActivityService {
+    constructor(activityRepo) {
+        this.activityRepo = activityRepo;
+    }
     async logActivity(workspaceId, action, entityType, actorId, entityId, meta, db = undefined) {
-        await activityRepo.log({
+        await this.activityRepo.log({
             action,
             entityType,
             entityId,
@@ -10,4 +12,4 @@ export const activityService = {
             actor: actorId ? { connect: { id: actorId } } : undefined,
         }, db);
     }
-};
+}

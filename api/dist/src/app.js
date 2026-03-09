@@ -4,6 +4,7 @@ import { rateLimitMiddleware } from "./common/middlewares/rateLimit.middleware.j
 import { errorMiddleware } from "./common/middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
+import projectRoutes from "./modules/project/project.routes.js";
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
@@ -45,6 +46,7 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/workspace", workSpaceRoutes);
+app.use("/api/project", projectRoutes);
 setupSwagger(app);
 app.use((req, res) => {
     res.status(404).json({
