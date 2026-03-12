@@ -1,10 +1,13 @@
-import { prisma, type DbOrTxClient } from "../../db/prisma.js";
+import { prisma, type DbClient, type DbOrTxClient } from "../../db/prisma.js";
 
 export class AuthRepo {
+    constructor(
+        readonly prisma: DbClient
+    ) {}
 
     findUserById = async (
         userId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.user.findUnique({
             where: { id: userId }
@@ -13,7 +16,7 @@ export class AuthRepo {
 
     findUserByEmail = async (
         email: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.user.findUnique({
             where: { email }
@@ -22,14 +25,14 @@ export class AuthRepo {
 
     createUser = async (
         data: { email: string; name: string; passwordHash: string },
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.user.create({ data });
     }
 
     updatePassword = async (
         userId: string, passwordHash: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.user.update({
             where: { id: userId },
@@ -42,7 +45,7 @@ export class AuthRepo {
         jti: string,
         tokenHash: string,
         expiresAt: Date,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.refreshToken.create({
             data: {
@@ -56,7 +59,7 @@ export class AuthRepo {
 
     findRefreshToken = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.refreshToken.findUnique({
             where: {
@@ -69,7 +72,7 @@ export class AuthRepo {
 
     revokeAllRefreshTokenByUser = async (
         userId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.refreshToken.updateMany({
             where: { userId, revokedAt: null },
@@ -79,7 +82,7 @@ export class AuthRepo {
 
     revokeRefreshToken = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.refreshToken.updateMany({
             where: {
@@ -96,7 +99,7 @@ export class AuthRepo {
         jti: string,
         tokenHash: string,
         expiresAt: Date,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.passwordResetToken.create({
             data: {
@@ -110,7 +113,7 @@ export class AuthRepo {
 
     findResetToken = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.passwordResetToken.findFirst({
             where: {
@@ -123,7 +126,7 @@ export class AuthRepo {
 
     markResetToken = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.passwordResetToken.updateMany({
             where: {

@@ -156,6 +156,7 @@ model Project {
   tasks   Task[]
 
   @@index([workspaceId, deletedAt])
+  @@unique([workspaceId, id])
   @@index([createdBy, deletedAt])
   @@index([deletedAt])
   @@map("projects")
@@ -301,6 +302,8 @@ enum ActivityAction {
   DELETE_WORKSPACE
   REMOVE_MEMBER
   CREATE_PROJECT
+  UPDATE_PROJECT
+  DELETE_PROJECT
   CREATE_TASK
   UPDATE_TASK
   MOVE_TASK

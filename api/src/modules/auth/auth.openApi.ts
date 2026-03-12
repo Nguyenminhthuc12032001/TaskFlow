@@ -1,3 +1,4 @@
+import type { ZodType } from "zod";
 import { createdEnvelopeSchema, failEnvelopeSchema, okEnvelopeSchema } from "../../common/utils/response/format.js";
 import { registry } from "../../docs/openapi.js";
 import { loginBodySchema, loginResponseSchema, refreshResponseSchema, registerBodySchema, registerResponseSchema, safeUserSchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema } from "./auth.schemas.js";
@@ -8,29 +9,72 @@ registry.registerComponent("securitySchemes", "refreshCookie", {
     name: "refreshToken"
 })
 
-const fail400 = {
-    description: "Bad Request / Validation error",
-    content: { "application/json": { schema: failEnvelopeSchema } }
+export const ok200 = (schema: ZodType) => ({
+    description: "Success",
+    content: {
+        "application/json": {
+            schema: okEnvelopeSchema(schema)
+        }
+    }
+});
+
+export const created201 = (schema: ZodType) => ({
+    description: "Created",
+    content: {
+        "application/json": {
+            schema: createdEnvelopeSchema(schema)
+        }
+    }
+});
+
+export const fail400 = {
+    description: "Bad request",
+    content: {
+        "application/json": {
+            schema: failEnvelopeSchema
+        }
+    }
 };
 
-const fail401 = {
+export const fail401 = {
     description: "Unauthorized",
-    content: { "application/json": { schema: failEnvelopeSchema } }
+    content: {
+        "application/json": {
+            schema: failEnvelopeSchema
+        }
+    }
 };
 
-const fail404 = {
+export const fail403 = {
+    description: "Forbidden",
+    content: {
+        "application/json": {
+            schema: failEnvelopeSchema
+        }
+    }
+};
+
+export const fail404 = {
     description: "Not found",
-    content: { "application/json": { schema: failEnvelopeSchema } }
+    content: {
+        "application/json": {
+            schema: failEnvelopeSchema
+        }
+    }
 };
 
-const fail409 = {
+export const fail409 = {
     description: "Conflict",
     content: { "application/json": { schema: failEnvelopeSchema } }
 };
 
-const fail500 = {
-    description: "Internal Server Error",
-    content: { "application/json": { schema: failEnvelopeSchema } }
+export const fail500 = {
+    description: "Internal server error",
+    content: {
+        "application/json": {
+            schema: failEnvelopeSchema
+        }
+    }
 };
 
 // POST /auth/register (public)

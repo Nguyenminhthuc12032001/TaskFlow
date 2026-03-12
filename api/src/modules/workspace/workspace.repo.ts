@@ -1,10 +1,14 @@
 import { Prisma } from "../../../prisma/generated/client.js";
-import { prisma, type DbOrTxClient } from "../../db/prisma.js";
+import { type DbClient, type DbOrTxClient } from "../../db/prisma.js";
 
 export class WorkspaceRepo {
+    constructor(
+        readonly prisma: DbClient
+    ) {}
+
     create = async (
         workspaceData: Prisma.WorkspaceCreateInput,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspace.create({
             data: workspaceData,
@@ -13,7 +17,7 @@ export class WorkspaceRepo {
 
     createMembership = async (
         workspaceMemberData: Prisma.WorkspaceMemberCreateInput,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspaceMember.create({
             data: workspaceMemberData
@@ -23,7 +27,7 @@ export class WorkspaceRepo {
     findMembership = async (
         workspaceId: string,
         userId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspaceMember.findUnique({
             where: {
@@ -37,7 +41,7 @@ export class WorkspaceRepo {
 
     findMembers = async (
         workspaceId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspaceMember.findMany({
             where: {
@@ -53,7 +57,7 @@ export class WorkspaceRepo {
 
     findById = async (
         workspaceId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspace.findUnique({
             where: {
@@ -64,7 +68,7 @@ export class WorkspaceRepo {
 
     findByUserId = async (
         userId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspace.findMany({
             where: {
@@ -78,7 +82,7 @@ export class WorkspaceRepo {
     update = async (
         workspaceId: string,
         data: Prisma.WorkspaceUpdateInput,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspace.update({
             where: {
@@ -90,7 +94,7 @@ export class WorkspaceRepo {
 
     delete = async (
         workspaceId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspace.delete({
             where: { id: workspaceId }
@@ -99,7 +103,7 @@ export class WorkspaceRepo {
 
     inviteMembership = async (
         inviteData: Prisma.InviteCreateInput,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.invite.create({
             data: inviteData
@@ -109,7 +113,7 @@ export class WorkspaceRepo {
     findInviteByEmail = async (
         workspaceId: string,
         email: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.invite.findFirst({
             where: {
@@ -125,7 +129,7 @@ export class WorkspaceRepo {
 
     findInviteByJti = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.invite.findFirst({
             where: {
@@ -140,7 +144,7 @@ export class WorkspaceRepo {
 
     markInviteUsed = async (
         jti: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.invite.updateMany({
             where: {
@@ -159,7 +163,7 @@ export class WorkspaceRepo {
     deleteMembership = async (
         workspaceId: string,
         userId: string,
-        db: DbOrTxClient = prisma
+        db: DbOrTxClient = this.prisma
     ) => {
         return db.workspaceMember.delete({
             where: {

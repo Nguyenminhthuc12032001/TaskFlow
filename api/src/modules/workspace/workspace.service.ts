@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 import { ActivityAction, type Prisma, type WorkspaceRole } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
 import { signInviteToken, verifyInviteToken, type InviteTokenPayload } from "../../common/utils/jwt.js";
-import { type DbClient, type DbOrTxClient } from "../../db/prisma.js";
+import { type DbClient } from "../../db/prisma.js";
 import { WorkspaceRepo } from "./workspace.repo.js";
-import type { CreateWorkspaceBody, SafeWorkspaceResponse, UpdateWorkspaceBody } from "./workspace.schemas.js";
+import type { CreateWorkspaceBody, UpdateWorkspaceBody } from "./workspace.schemas.js";
 import { AuthRepo } from "../auth/auth.repo.js";
 import { env } from "../../config/env.js";
 import ms from "ms";
@@ -12,17 +12,25 @@ import { log } from "../../common/logger/logger.js";
 import { hashValue, verifyHash } from "../../common/utils/crypto.js";
 import type { IEmailService } from "../mail/mail.interface.js";
 import type { ActivityService } from "../activity/activity.service.js";
+import type { ProjectRepo } from "../project/project.repo.js";
 
 export class WorkspaceService {
     constructor(
-        private emailService: IEmailService,
-        private workspaceRepo: WorkspaceRepo,
-        private authRepo: AuthRepo,
-        private activityService: ActivityService,
-        private prisma: DbClient
+        readonly emailService: IEmailService,
+        readonly workspaceRepo: WorkspaceRepo,
+        readonly authRepo: AuthRepo,
+        readonly projectRepo: ProjectRepo,
+        readonly activityService: ActivityService,
+        readonly prisma: DbClient
     ) { }
 
     create = async (workspaceData: CreateWorkspaceBody, actorId: string) => {
+        const workspaces = await this.workspaceRepo.findByUserId(actorId);
+
+        if (workspaces.some((w) => w.name === workspaceData.name)) {
+            throw new AppError("Workspace name already exists", 409)
+        };
+
         const result = await this.prisma.$transaction(async (tx) => {
             const newWorkspace: Prisma.WorkspaceCreateInput = {
                 name: workspaceData.name,
@@ -51,14 +59,9 @@ export class WorkspaceService {
         });
 
         return result;
-    }
+    };
 
-    getById = async (workspaceId: string, actorId: string) => {
-        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-        if (!actor) {
-            throw new AppError("Workspace not found or access denied", 404);
-        }
-
+    getById = async (workspaceId: string) => {
         const workspace = await this.workspaceRepo.findById(workspaceId);
         if (!workspace) {
             throw new AppError("Workspace not found or access denied", 404);
@@ -71,24 +74,17 @@ export class WorkspaceService {
         return await this.workspaceRepo.findByUserId(actorId);
     }
 
-    listMembers = async (workspaceId: string, actorId: string) => {
-        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-        if (!actor) {
-            throw new AppError("Workspace not found or access denied", 404)
-        }
+    listMembers = async (workspaceId: string) => {
 
         return await this.workspaceRepo.findMembers(workspaceId);
     }
 
     update = async (workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) => {
-        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-        if (!actor) {
-            throw new AppError("Workspace not found or access denied", 404)
-        }
+        const workspaces = await this.workspaceRepo.findByUserId(actorId);
 
-        if (!["admin", "owner"].includes(actor.role)) {
-            throw new AppError("Forbidden", 403)
-        }
+        if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
+            throw new AppError("Workspace name already exists", 409);
+        };
 
         const result = await this.prisma.$transaction(async (tx) => {
             const workspace = await this.workspaceRepo.update(workspaceId, workspaceData, tx);
@@ -110,15 +106,6 @@ export class WorkspaceService {
     }
 
     delete = async (workspaceId: string, actorId: string) => {
-        const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-
-        if (!actor) {
-            throw new AppError("Workspace not found or access denied", 404);
-        }
-
-        if (!["owner"].includes(actor.role)) {
-            throw new AppError("Forbidden", 403)
-        }
 
         const result = await this.prisma.$transaction(async (tx) => {
 
@@ -133,6 +120,8 @@ export class WorkspaceService {
             )
 
             const workspace = await this.workspaceRepo.delete(workspaceId, tx);
+
+            await this.projectRepo.removeByWorkspace(workspaceId, actorId, tx);
 
             return workspace;
         })
@@ -159,12 +148,12 @@ export class WorkspaceService {
 
             const existingMembership = await this.workspaceRepo.findMembership(workspaceId, inviteeId, tx);
             if (existingMembership) {
-                throw new AppError("User is already a member of the workspace", 400);
+                throw new AppError("User is already a member of the workspace", 409);
             }
 
             const existingInvite = await this.workspaceRepo.findInviteByEmail(workspaceId, existInvitee.email, tx);
             if (existingInvite) {
-                throw new AppError("An invite has already been sent to this email for the workspace", 400);
+                throw new AppError("An invite has already been sent to this email for the workspace", 409);
             }
 
             const workspace = await this.workspaceRepo.findById(workspaceId, tx);
@@ -279,7 +268,7 @@ export class WorkspaceService {
 
             const existMembership = await this.workspaceRepo.findMembership(payload.workspaceId, actorId, tx);
             if (existMembership) {
-                throw new AppError("You are already a member", 400);
+                throw new AppError("You are already a member", 409);
             }
 
             const newMembershipDate: Prisma.WorkspaceMemberCreateInput = {

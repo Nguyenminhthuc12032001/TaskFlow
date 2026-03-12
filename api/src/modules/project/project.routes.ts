@@ -1,23 +1,52 @@
 import { Router } from "express";
 import { ProjectController } from "./project.controller.js";
 import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
+import { requireWorkspaceRole } from "../../common/middlewares/requireWorkspaceRole.middleware.js";
+import { ProjectService } from "./project.service.js";
+import { ProjectRepo } from "./project.repo.js";
+import { prisma } from "../../db/prisma.js";
+import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
+import { createBodySchema, getBodySchema, listByWorkspaceBodySchema, removeBodySchema, updateBodySchema } from "./project.schemas.js";
+import { ActivityService } from "../activity/activity.service.js";
+import { ActivityRepo } from "../activity/activity.repo.js";
 
 const projectController = new ProjectController(
-    
+    new ProjectService(
+        prisma, // this prisma is use for transaction
+        new ProjectRepo(
+            prisma
+        ),
+        new ActivityService(
+            new ActivityRepo()
+        )
+    )
 );
 
 const router = Router();
 
-router.post("/create", authMiddleware, projectController.create);
+router.post("/:workspaceId/create",
+    authMiddleware,
+    requireWorkspaceRole("admin"),
+    validateBody(createBodySchema), projectController.create);
 
-router.get("/:Id", authMiddleware, projectController.get);
+router.get("/:workspaceId/:projectId",
+    authMiddleware,
+    requireWorkspaceRole(),
+    validateBody(getBodySchema), projectController.get);
 
-router.get("/list_by_workspace/:workspaceId", authMiddleware, projectController.listByWorkspace);
+router.get("/:workspaceId/list_by_workspace",
+    authMiddleware,
+    requireWorkspaceRole(),
+    validateBody(listByWorkspaceBodySchema), projectController.listByWorkspace);
 
-router.get("/list_by_user", authMiddleware, projectController.listByUser);
+router.put("/:workspaceId/update/:projectId",
+    authMiddleware,
+    requireWorkspaceRole("admin"),
+    validateBody(updateBodySchema), projectController.update);
 
-router.put("/update/:Id", authMiddleware, projectController.update);
-
-router.delete("/remove/:Id", authMiddleware, projectController.remove);
+router.delete("/:workspaceId/remove/:projectId",
+    authMiddleware,
+    requireWorkspaceRole("admin"),
+    validateBody(removeBodySchema), projectController.remove);
 
 export default router;

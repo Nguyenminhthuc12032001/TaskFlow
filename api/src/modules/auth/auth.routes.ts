@@ -23,7 +23,9 @@ const router = Router();
 const authController = new AuthController(
     new AuthService(
         new EmailService(),
-        new AuthRepo(),
+        new AuthRepo(
+            prisma
+        ),
         prisma
     )
 );

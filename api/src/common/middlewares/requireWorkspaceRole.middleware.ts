@@ -3,7 +3,7 @@ import { prisma } from "../../db/prisma.js";
 import { AppError } from "../errors/AppError.js";
 import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
-export type WorkspaceParams = { workspaceId: string, memberId?: string };
+export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string };
 
 const rank: Record<WorkspaceRole, number> = {
     owner: 4,
@@ -12,28 +12,42 @@ const rank: Record<WorkspaceRole, number> = {
     viewer: 1,
 }
 
-export function requireWorkspaceMember(minRole: WorkspaceRole = "viewer") {
+export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
     return async (req: Request<WorkspaceParams>, res: Response, next: NextFunction) => {
         const userId = req.user?.id;
         if (!userId) {
             throw new AppError("Unauthorized", 401, "USER_NOT_AUTHENTICATED")
-        }
+        };
 
         const workspaceId = req.params.workspaceId;
 
-        const mebership = await prisma.workspaceMember.findUnique({
+        const membership = await prisma.workspaceMember.findUnique({
             where: {
                 workspaceId_userId: { workspaceId, userId },
             },
             select: { role: true },
-        })
+        });
 
-        if (!mebership) {
+        if (!membership) {
             throw new AppError("Forbidden", 403, "USER_NOT_WORKSPACE_MEMBER")
-        }
+        };
 
-        if (rank[mebership.role] < rank[minRole]) {
+        if (rank[membership.role] < rank[minRole]) {
             throw new AppError("Forbidden", 403, "INSUFFICIENT_WORKSPACE_ROLE")
+        };
+
+        const projectId = req.params.projectId;
+
+        if (projectId) {
+            const projectInWorkspace = await prisma.project.findUnique({
+                where: {
+                    workspaceId_id: { workspaceId, id: projectId }
+                }
+            });
+
+            if (!projectInWorkspace) {
+                throw new AppError("Project not found", 404, "PROJECT_NOT_IN_WORKSPACE")
+            }
         }
 
         next();

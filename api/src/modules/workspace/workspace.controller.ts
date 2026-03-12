@@ -3,7 +3,7 @@ import type { WorkspaceService } from './workspace.service.js';
 import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateResponseSchema, type AcceptBody, type AcceptResponse, type CreateWorkspaceBody, type InviteBody, type InviteResponse, type RemoveMemberResponse, type SafeMemberResponse, type SafeMembersResponse, type SafeWorkspaceResponse, type SafeWorkspacesResponse, type UpdateWorkspaceBody } from './workspace.schemas.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from '../../common/utils/response/format.js';
-import type { WorkspaceParams } from '../../common/middlewares/requireWorkspaceMember.middleware.js';
+import type { WorkspaceParams } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
 
 export class WorkspaceController {
     constructor(
@@ -29,7 +29,7 @@ export class WorkspaceController {
     }
 
     getById = async (req: Request<WorkspaceParams>, res: Response) => {
-        const workspace = await this.workspaceService.getById(req.params.workspaceId, req.user!.id);
+        const workspace = await this.workspaceService.getById(req.params.workspaceId);
 
         const workspaceResponse: SafeWorkspaceResponse = {
             id: workspace.id,
@@ -65,7 +65,7 @@ export class WorkspaceController {
     }
 
     getMembersById = async (req: Request<WorkspaceParams>, res: Response) => {
-        const members = await this.workspaceService.listMembers(req.params.workspaceId, req.user!.id);
+        const members = await this.workspaceService.listMembers(req.params.workspaceId);
 
         const membersResponse: SafeMembersResponse = members.map((m: SafeMemberResponse) => ({
             user: {

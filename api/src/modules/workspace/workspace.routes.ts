@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { WorkspaceController } from './workspace.controller.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
-import { requireWorkspaceMember } from '../../common/middlewares/requireWorkspaceMember.middleware.js';
+import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
 import { WorkspaceService } from './workspace.service.js';
 import { EmailService } from '../mail/mail.service.js';
 import { WorkspaceRepo } from './workspace.repo.js';
@@ -11,14 +11,22 @@ import { prisma } from '../../db/prisma.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
 import { acceptBodySchema, createBodySchema, deleteBodySchema, getByIdBodySchema, getByUserIdBodySchema, getMembersBodySchema, inviteBodySchema, removeMemberBodySchema, updateBodySchema } from './workspace.schemas.js';
+import { ProjectRepo } from '../project/project.repo.js';
 
 const router = Router();
 
 const workspaceController = new WorkspaceController(
     new WorkspaceService(
         new EmailService(),
-        new WorkspaceRepo(),
-        new AuthRepo(),
+        new WorkspaceRepo(
+            prisma
+        ),
+        new AuthRepo(
+            prisma
+        ),
+        new ProjectRepo(
+            prisma
+        ),
         new ActivityService(
             new ActivityRepo
         ),
@@ -35,23 +43,23 @@ router.get("/list",
     workspaceController.getByUserId);
 
 router.get("/:workspaceId",
-    authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceMember(),
+    authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceRole(),
     workspaceController.getById);
 
 router.get("/members/:workspaceId",
-    authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceMember(),
+    authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceRole(),
     workspaceController.getMembersById);
 
 router.put("/:workspaceId",
-    authMiddleware, validateBody(updateBodySchema), requireWorkspaceMember("admin"),
+    authMiddleware, validateBody(updateBodySchema), requireWorkspaceRole("admin"),
     workspaceController.update);
 
 router.delete("/:workspaceId",
-    authMiddleware, validateBody(deleteBodySchema), requireWorkspaceMember("admin"),
+    authMiddleware, validateBody(deleteBodySchema), requireWorkspaceRole("admin"),
     workspaceController.remove);
 
 router.post("/invite/:workspaceId",
-    authMiddleware, validateBody(inviteBodySchema), requireWorkspaceMember("admin"),
+    authMiddleware, validateBody(inviteBodySchema), requireWorkspaceRole("admin"),
     workspaceController.invinte);
 
 router.post("/accept_invite",
@@ -60,7 +68,7 @@ router.post("/accept_invite",
 
 router.delete("/remove_member/:workspaceId/:memberId",
     authMiddleware,
-    validateBody(removeMemberBodySchema), requireWorkspaceMember("member"),
+    validateBody(removeMemberBodySchema), requireWorkspaceRole("member"),
     workspaceController.removeMember);
 
 export default router;

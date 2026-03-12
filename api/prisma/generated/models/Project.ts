@@ -229,6 +229,7 @@ export type ProjectOrderByWithRelationInput = {
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  workspaceId_id?: Prisma.ProjectWorkspaceIdIdCompoundUniqueInput
   AND?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   OR?: Prisma.ProjectWhereInput[]
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
@@ -243,7 +244,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   columns?: Prisma.ColumnListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
-}, "id">
+}, "id" | "workspaceId_id">
 
 export type ProjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -364,6 +365,11 @@ export type ProjectListRelationFilter = {
 
 export type ProjectOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type ProjectWorkspaceIdIdCompoundUniqueInput = {
+  workspaceId: string
+  id: string
 }
 
 export type ProjectCountOrderByAggregateInput = {
