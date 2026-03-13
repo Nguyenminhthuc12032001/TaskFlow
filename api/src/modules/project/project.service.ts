@@ -15,12 +15,12 @@ export class ProjectService {
         readonly activityService: ActivityService
     ) { };
 
-    create = async (data: CreateBodyType, actorId: string) => {
+    create = async (data: CreateBodyType, workspaceId: string, actorId: string) => {
 
         const createData: Prisma.ProjectCreateInput = {
             name: data.name,
             description: data.description,
-            workspace: { connect: { id: data.workspaceId } },
+            workspace: { connect: { id: workspaceId } },
             creator: { connect: { id: actorId } }
         };
 

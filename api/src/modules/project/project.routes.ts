@@ -29,15 +29,15 @@ router.post("/:workspaceId/create",
     requireWorkspaceRole("admin"),
     validateBody(createBodySchema), projectController.create);
 
-router.get("/:workspaceId/:projectId",
-    authMiddleware,
-    requireWorkspaceRole(),
-    validateBody(getBodySchema), projectController.get);
-
 router.get("/:workspaceId/list_by_workspace",
     authMiddleware,
     requireWorkspaceRole(),
     validateBody(listByWorkspaceBodySchema), projectController.listByWorkspace);
+
+router.get("/:workspaceId/:projectId",
+    authMiddleware,
+    requireWorkspaceRole(),
+    validateBody(getBodySchema), projectController.get);
 
 router.put("/:workspaceId/update/:projectId",
     authMiddleware,

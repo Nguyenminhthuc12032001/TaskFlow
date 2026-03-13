@@ -10,9 +10,11 @@ export class ProjectController {
         private readonly projectService: ProjectService
     ) {}
 
-    create = async (req: Request<{}, {}, CreateBodyType, {}, {}>, res: Response) => {
+    create = async (req: Request<WorkspaceParams, {}, CreateBodyType, {}, {}>, res: Response) => {
 
-        const project = await this.projectService.create(req.body, req.user!.id);
+        const workspaceId = req.params.workspaceId;
+
+        const project = await this.projectService.create(req.body, workspaceId, req.user!.id);
 
         const safeProject: SafeProjectResponseType = {
             workspaceId: project.workspaceId,
