@@ -1,17 +1,17 @@
-import { prisma } from "../../db/prisma.js";
 export class WorkspaceRepo {
-    constructor() {
-        this.create = async (workspaceData, db = prisma) => {
+    constructor(prisma) {
+        this.prisma = prisma;
+        this.create = async (workspaceData, db = this.prisma) => {
             return db.workspace.create({
                 data: workspaceData,
             });
         };
-        this.createMembership = async (workspaceMemberData, db = prisma) => {
+        this.createMembership = async (workspaceMemberData, db = this.prisma) => {
             return db.workspaceMember.create({
                 data: workspaceMemberData
             });
         };
-        this.findMembership = async (workspaceId, userId, db = prisma) => {
+        this.findMembership = async (workspaceId, userId, db = this.prisma) => {
             return db.workspaceMember.findUnique({
                 where: {
                     workspaceId_userId: {
@@ -21,7 +21,7 @@ export class WorkspaceRepo {
                 }
             });
         };
-        this.findMembers = async (workspaceId, db = prisma) => {
+        this.findMembers = async (workspaceId, db = this.prisma) => {
             return db.workspaceMember.findMany({
                 where: {
                     workspaceId,
@@ -33,14 +33,14 @@ export class WorkspaceRepo {
                 }
             });
         };
-        this.findById = async (workspaceId, db = prisma) => {
+        this.findById = async (workspaceId, db = this.prisma) => {
             return db.workspace.findUnique({
                 where: {
                     id: workspaceId,
                 }
             });
         };
-        this.findByUserId = async (userId, db = prisma) => {
+        this.findByUserId = async (userId, db = this.prisma) => {
             return db.workspace.findMany({
                 where: {
                     members: {
@@ -49,7 +49,7 @@ export class WorkspaceRepo {
                 }
             });
         };
-        this.update = async (workspaceId, data, db = prisma) => {
+        this.update = async (workspaceId, data, db = this.prisma) => {
             return db.workspace.update({
                 where: {
                     id: workspaceId,
@@ -57,17 +57,17 @@ export class WorkspaceRepo {
                 data,
             });
         };
-        this.delete = async (workspaceId, db = prisma) => {
+        this.delete = async (workspaceId, db = this.prisma) => {
             return db.workspace.delete({
                 where: { id: workspaceId }
             });
         };
-        this.inviteMembership = async (inviteData, db = prisma) => {
+        this.inviteMembership = async (inviteData, db = this.prisma) => {
             return db.invite.create({
                 data: inviteData
             });
         };
-        this.findInviteByEmail = async (workspaceId, email, db = prisma) => {
+        this.findInviteByEmail = async (workspaceId, email, db = this.prisma) => {
             return db.invite.findFirst({
                 where: {
                     workspaceId,
@@ -79,7 +79,7 @@ export class WorkspaceRepo {
                 }
             });
         };
-        this.findInviteByJti = async (jti, db = prisma) => {
+        this.findInviteByJti = async (jti, db = this.prisma) => {
             return db.invite.findFirst({
                 where: {
                     jti,
@@ -90,7 +90,7 @@ export class WorkspaceRepo {
                 },
             });
         };
-        this.markInviteUsed = async (jti, db = prisma) => {
+        this.markInviteUsed = async (jti, db = this.prisma) => {
             return db.invite.updateMany({
                 where: {
                     jti,
@@ -104,7 +104,7 @@ export class WorkspaceRepo {
                 }
             });
         };
-        this.deleteMembership = async (workspaceId, userId, db = prisma) => {
+        this.deleteMembership = async (workspaceId, userId, db = this.prisma) => {
             return db.workspaceMember.delete({
                 where: {
                     workspaceId_userId: {

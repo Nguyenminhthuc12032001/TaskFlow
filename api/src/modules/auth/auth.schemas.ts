@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "../../docs/zod.js";
 
 export const emailSchema = z
     .string()

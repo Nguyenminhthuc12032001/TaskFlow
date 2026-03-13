@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "../../../docs/zod.js";
 export const okEnvelopeSchema = (dataSchema) => z.object({
     ok: z.literal(true),
     data: dataSchema,

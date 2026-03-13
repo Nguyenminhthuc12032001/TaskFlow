@@ -1,4 +1,4 @@
-import z, { ZodType } from "zod";
+import z, { ZodType } from "../../../docs/zod.js";
 import { AppError } from "../../errors/AppError.js";
 
 export function validateResponse<T extends ZodType>(schema: T) {

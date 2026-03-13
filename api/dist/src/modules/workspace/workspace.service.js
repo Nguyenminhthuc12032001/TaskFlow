@@ -7,13 +7,19 @@ import ms from "ms";
 import { log } from "../../common/logger/logger.js";
 import { hashValue, verifyHash } from "../../common/utils/crypto.js";
 export class WorkspaceService {
-    constructor(emailService, workspaceRepo, authRepo, activityService, prisma) {
+    constructor(emailService, workspaceRepo, authRepo, projectRepo, activityService, prisma) {
         this.emailService = emailService;
         this.workspaceRepo = workspaceRepo;
         this.authRepo = authRepo;
+        this.projectRepo = projectRepo;
         this.activityService = activityService;
         this.prisma = prisma;
         this.create = async (workspaceData, actorId) => {
+            const workspaces = await this.workspaceRepo.findByUserId(actorId);
+            if (workspaces.some((w) => w.name === workspaceData.name)) {
+                throw new AppError("Workspace name already exists", 409);
+            }
+            ;
             const result = await this.prisma.$transaction(async (tx) => {
                 const newWorkspace = {
                     name: workspaceData.name,
@@ -31,11 +37,7 @@ export class WorkspaceService {
             });
             return result;
         };
-        this.getById = async (workspaceId, actorId) => {
-            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-            if (!actor) {
-                throw new AppError("Workspace not found or access denied", 404);
-            }
+        this.getById = async (workspaceId) => {
             const workspace = await this.workspaceRepo.findById(workspaceId);
             if (!workspace) {
                 throw new AppError("Workspace not found or access denied", 404);
@@ -45,21 +47,15 @@ export class WorkspaceService {
         this.getByUserId = async (actorId) => {
             return await this.workspaceRepo.findByUserId(actorId);
         };
-        this.listMembers = async (workspaceId, actorId) => {
-            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-            if (!actor) {
-                throw new AppError("Workspace not found or access denied", 404);
-            }
+        this.listMembers = async (workspaceId) => {
             return await this.workspaceRepo.findMembers(workspaceId);
         };
         this.update = async (workspaceId, workspaceData, actorId) => {
-            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-            if (!actor) {
-                throw new AppError("Workspace not found or access denied", 404);
+            const workspaces = await this.workspaceRepo.findByUserId(actorId);
+            if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
+                throw new AppError("Workspace name already exists", 409);
             }
-            if (!["admin", "owner"].includes(actor.role)) {
-                throw new AppError("Forbidden", 403);
-            }
+            ;
             const result = await this.prisma.$transaction(async (tx) => {
                 const workspace = await this.workspaceRepo.update(workspaceId, workspaceData, tx);
                 await this.activityService.logActivity(workspaceId, ActivityAction.UPDATE_WORKSPACE, "workspace", actorId, workspaceId, { name: workspaceData.name }, tx);
@@ -68,16 +64,10 @@ export class WorkspaceService {
             return result;
         };
         this.delete = async (workspaceId, actorId) => {
-            const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
-            if (!actor) {
-                throw new AppError("Workspace not found or access denied", 404);
-            }
-            if (!["owner"].includes(actor.role)) {
-                throw new AppError("Forbidden", 403);
-            }
             const result = await this.prisma.$transaction(async (tx) => {
                 await this.activityService.logActivity(workspaceId, ActivityAction.DELETE_WORKSPACE, "workspace", actorId, workspaceId, { id: workspaceId }, tx);
                 const workspace = await this.workspaceRepo.delete(workspaceId, tx);
+                await this.projectRepo.removeByWorkspace(workspaceId, actorId, tx);
                 return workspace;
             });
             return result;
@@ -97,11 +87,11 @@ export class WorkspaceService {
                 }
                 const existingMembership = await this.workspaceRepo.findMembership(workspaceId, inviteeId, tx);
                 if (existingMembership) {
-                    throw new AppError("User is already a member of the workspace", 400);
+                    throw new AppError("User is already a member of the workspace", 409);
                 }
                 const existingInvite = await this.workspaceRepo.findInviteByEmail(workspaceId, existInvitee.email, tx);
                 if (existingInvite) {
-                    throw new AppError("An invite has already been sent to this email for the workspace", 400);
+                    throw new AppError("An invite has already been sent to this email for the workspace", 409);
                 }
                 const workspace = await this.workspaceRepo.findById(workspaceId, tx);
                 if (!workspace) {
@@ -179,7 +169,7 @@ export class WorkspaceService {
                 }
                 const existMembership = await this.workspaceRepo.findMembership(payload.workspaceId, actorId, tx);
                 if (existMembership) {
-                    throw new AppError("You are already a member", 400);
+                    throw new AppError("You are already a member", 409);
                 }
                 const newMembershipDate = {
                     role: invite.role,

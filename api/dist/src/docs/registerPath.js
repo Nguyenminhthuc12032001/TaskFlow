@@ -1,5 +1,5 @@
 import { registry } from "./openapi.js";
-import z from "zod";
+import z from "./zod.js";
 export const csrfTokenResponseSchema = z.object({
     csrfToken: z.string()
 });
@@ -21,3 +21,4 @@ registry.registerPath({
 });
 import "../modules/auth/auth.openApi.js";
 import "../modules/workspace/workspace.openApi.js";
+import "../modules/project/project.openApi.js";

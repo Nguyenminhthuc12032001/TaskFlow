@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "../../docs/zod.js";
 import { AppError } from "../errors/AppError.js";
 export function validateBody(schema) {
     return (req, res, next) => {

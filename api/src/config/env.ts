@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "../docs/zod.js";
 import "dotenv/config";
 import ms from "ms";
 

@@ -19,7 +19,7 @@ export class WorkspaceController {
             return res.status(201).json(validatedEnvelop);
         };
         this.getById = async (req, res) => {
-            const workspace = await this.workspaceService.getById(req.params.workspaceId, req.user.id);
+            const workspace = await this.workspaceService.getById(req.params.workspaceId);
             const workspaceResponse = {
                 id: workspace.id,
                 name: workspace.name,
@@ -47,7 +47,7 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelop);
         };
         this.getMembersById = async (req, res) => {
-            const members = await this.workspaceService.listMembers(req.params.workspaceId, req.user.id);
+            const members = await this.workspaceService.listMembers(req.params.workspaceId);
             const membersResponse = members.map((m) => ({
                 user: {
                     id: m.user.id,

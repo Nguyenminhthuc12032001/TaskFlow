@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "../../docs/zod.js";
 import { safeUserSchema } from "../auth/auth.schemas.js";
 import { WorkspaceRole } from "../../../prisma/generated/enums.js";
 // ========= REQUEST ==========

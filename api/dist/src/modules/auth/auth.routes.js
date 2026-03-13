@@ -9,7 +9,7 @@ import { AuthRepo } from "./auth.repo.js";
 import { EmailService } from "../mail/mail.service.js";
 import { prisma } from "../../db/prisma.js";
 const router = Router();
-const authController = new AuthController(new AuthService(new EmailService(), new AuthRepo(), prisma));
+const authController = new AuthController(new AuthService(new EmailService(), new AuthRepo(prisma), prisma));
 // PUBLIC
 router.post("/register", validateBody(registerBodySchema), authController.register);
 router.post("/login", validateBody(loginBodySchema), authController.login);

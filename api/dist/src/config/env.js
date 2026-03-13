@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "../docs/zod.js";
 import "dotenv/config";
 import ms from "ms";
 const ttl = z.string().default("15m").refine(val => ms(val) !== undefined, "Invalid TTL format");
