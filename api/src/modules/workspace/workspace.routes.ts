@@ -50,7 +50,7 @@ router.get("/members/:workspaceId",
     authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceRole(),
     workspaceController.getMembersById);
 
-router.put("/:workspaceId",
+router.patch("/:workspaceId",
     authMiddleware, validateBody(updateBodySchema), requireWorkspaceRole("admin"),
     workspaceController.update);
 

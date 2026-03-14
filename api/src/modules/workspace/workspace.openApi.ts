@@ -5,7 +5,7 @@ import z from "../../docs/zod.js";
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspace/create",
+    path: "/api/workspaces/create",
     tags: ["Workspace"],
     summary: "Create new Workspace",
     security: [{ bearerAuth: [] }],
@@ -25,7 +25,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspace/list",
+    path: "/api/workspaces/list",
     tags: ["Workspace"],
     summary: "Get list workspace by user ID",
     security: [{ bearerAuth: [] }],
@@ -40,7 +40,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspace/{workspaceId}",
+    path: "/api/workspaces/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get workspace by ID",
     security: [{ bearerAuth: [] }],
@@ -61,7 +61,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspace/members/{workspaceId}",
+    path: "/api/workspaces/members/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get members by workspace ID",
     security: [{ bearerAuth: [] }],
@@ -81,8 +81,8 @@ registry.registerPath({
 });
 
 registry.registerPath({
-    method: "put",
-    path: "/api/workspace/{workspaceId}",
+    method: "patch",
+    path: "/api/workspaces/{workspaceId}",
     tags: ["Workspace"],
     summary: "Update workspace name",
     security: [{ bearerAuth: [] }],
@@ -107,7 +107,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspace/{workspaceId}",
+    path: "/api/workspaces/{workspaceId}",
     tags: ["Workspace"],
     summary: "Delete workspace by ID",
     security: [{ bearerAuth: [] }],
@@ -128,7 +128,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspace/invite/{workspaceId}",
+    path: "/api/workspaces/invite/{workspaceId}",
     tags: ["Workspace"],
     summary: "Invite member for workspace",
     security: [{ bearerAuth: [] }],
@@ -153,7 +153,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspace/accept_invite",
+    path: "/api/workspaces/accept_invite",
     tags: ["Workspace"],
     summary: "Accept invite",
     security: [{ bearerAuth: [] }],
@@ -175,7 +175,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspace/remove_member/{workspaceId}/{memberId}",
+    path: "/api/workspaces/remove_member/{workspaceId}/{memberId}",
     tags: ["Workspace"],
     summary: "Remove member",
     security: [{ bearerAuth: [] }],

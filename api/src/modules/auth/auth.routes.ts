@@ -64,7 +64,7 @@ router.get("/me",
     validateBody(meBodySchema),
     authController.me);
 
-router.post("/change-password",
+router.patch("/change-password",
     authMiddleware,
     validateBody(changePasswordBodySchema),
     authController.changePassword);

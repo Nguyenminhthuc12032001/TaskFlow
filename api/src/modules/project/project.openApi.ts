@@ -5,7 +5,7 @@ import z from "../../docs/zod.js";
 
 registry.registerPath({
     method: "post",
-    path: "/api/project/{workspaceId}/create",
+    path: "/api/projects/{workspaceId}/create",
     tags: ["Project"],
     summary: "Create new project",
     security: [{ bearerAuth: [] }],
@@ -30,7 +30,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/project/{workspaceId}/{projectId}",
+    path: "/api/projects/{workspaceId}/{projectId}",
     tags: ["Project"],
     summary: "Get project by Id",
     security: [{ bearerAuth: [] }],
@@ -52,7 +52,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "get",
-    path: "/api/project/{workspaceId}/list_by_workspace",
+    path: "/api/projects/{workspaceId}/list_by_workspace",
     tags: ["Project"],
     summary: "List by workspace Id",
     security: [{ bearerAuth: [] }],
@@ -71,8 +71,8 @@ registry.registerPath({
 });
 
 registry.registerPath({
-    method: "put",
-    path: "/api/project/{workspaceId}/update/{projectId}",
+    method: "patch",
+    path: "/api/projects/{workspaceId}/update/{projectId}",
     tags: ["Project"],
     summary: "Update project by Id",
     security: [{ bearerAuth: [] }],
@@ -99,7 +99,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "delete",
-    path: "/api/project/{workspaceId}/remove/{projectId}",
+    path: "/api/projects/{workspaceId}/remove/{projectId}",
     tags: ["Project"],
     summary: "Remove project by Id",
     security: [{ bearerAuth: [] }],

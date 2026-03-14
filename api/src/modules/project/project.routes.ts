@@ -39,7 +39,7 @@ router.get("/:workspaceId/:projectId",
     requireWorkspaceRole(),
     validateBody(getBodySchema), projectController.get);
 
-router.put("/:workspaceId/update/:projectId",
+router.patch("/:workspaceId/update/:projectId",
     authMiddleware,
     requireWorkspaceRole("admin"),
     validateBody(updateBodySchema), projectController.update);
