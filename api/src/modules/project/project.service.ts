@@ -20,7 +20,18 @@ export class ProjectService {
         const createData: Prisma.ProjectCreateInput = {
             name: data.name,
             description: data.description,
-            workspace: { connect: { id: workspaceId } },
+            workspace: {
+                connect: {
+                    id: workspaceId, members: {
+                        some: {
+                            userId: actorId,
+                            role: {
+                                in: ["admin", "owner"]
+                            }
+                        }
+                    }
+                }
+            },
             creator: { connect: { id: actorId } }
         };
 

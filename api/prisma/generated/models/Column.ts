@@ -242,6 +242,7 @@ export type ColumnOrderByWithRelationInput = {
 export type ColumnWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   projectId_position?: Prisma.ColumnProjectIdPositionCompoundUniqueInput
+  projectId_name?: Prisma.ColumnProjectIdNameCompoundUniqueInput
   AND?: Prisma.ColumnWhereInput | Prisma.ColumnWhereInput[]
   OR?: Prisma.ColumnWhereInput[]
   NOT?: Prisma.ColumnWhereInput | Prisma.ColumnWhereInput[]
@@ -252,7 +253,7 @@ export type ColumnWhereUniqueInput = Prisma.AtLeast<{
   deletedAt?: Prisma.DateTimeNullableFilter<"Column"> | Date | string | null
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   tasks?: Prisma.TaskListRelationFilter
-}, "id" | "projectId_position">
+}, "id" | "projectId_position" | "projectId_name">
 
 export type ColumnOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -359,6 +360,11 @@ export type ColumnOrderByRelationAggregateInput = {
 export type ColumnProjectIdPositionCompoundUniqueInput = {
   projectId: string
   position: number
+}
+
+export type ColumnProjectIdNameCompoundUniqueInput = {
+  projectId: string
+  name: string
 }
 
 export type ColumnCountOrderByAggregateInput = {

@@ -93,22 +93,4 @@ export class ProjectRepo {
             }
         })
     };
-
-    removeByWorkspace = async (workspaceId: string, actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.deleteMany({
-            where: {
-                workspaceId: workspaceId,
-                workspace: {
-                    members: {
-                        some: {
-                            userId: actorId,
-                            role: {
-                                in: ["admin", "owner"]
-                            }
-                        }
-                    }
-                }
-            }
-        })
-    };
 }

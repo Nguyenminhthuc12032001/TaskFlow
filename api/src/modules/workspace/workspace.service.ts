@@ -121,8 +121,6 @@ export class WorkspaceService {
 
             const workspace = await this.workspaceRepo.delete(workspaceId, tx);
 
-            await this.projectRepo.removeByWorkspace(workspaceId, actorId, tx);
-
             return workspace;
         })
 
