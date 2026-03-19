@@ -26,7 +26,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(201).json(validatedEnvelop);
-    }
+    };
 
     getById = async (req: Request<WorkspaceParams>, res: Response) => {
         const workspace = await this.workspaceService.getById(req.params.workspaceId);
@@ -44,7 +44,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop);
-    }
+    };
 
     getByUserId = async (req: Request, res: Response) => {
         const workspaces = await this.workspaceService.getByUserId(req.user!.id);
@@ -62,7 +62,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop)
-    }
+    };
 
     getMembersById = async (req: Request<WorkspaceParams>, res: Response) => {
         const members = await this.workspaceService.listMembers(req.params.workspaceId);
@@ -82,7 +82,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop);
-    }
+    };
 
     update = async (req: Request<WorkspaceParams, {}, UpdateWorkspaceBody>, res: Response) => {
         const updateData: UpdateWorkspaceBody = { name: req.body.name };
@@ -101,7 +101,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop);
-    }
+    };
 
     remove = async (req: Request<WorkspaceParams>, res: Response) => {
         const result = await this.workspaceService.delete(req.params.workspaceId, req.user!.id);
@@ -119,7 +119,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop);
-    }
+    };
 
     invinte = async (req: Request<WorkspaceParams, {}, InviteBody>, res: Response) => {
         const result = await this.workspaceService.inviteMember(
@@ -145,7 +145,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopShcema)(envelop);
         
         return res.status(200).json(validatedEnvelop);
-    }
+    };
 
     accept = async (req: Request<{}, {}, AcceptBody>, res: Response) => {
         const result = await this.workspaceService.acceptInvite(req.body.token, req.user!.id);
@@ -162,7 +162,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(201).json(validatedEnvelop);
-    }
+    };
 
     removeMember = async (req: Request<WorkspaceParams>, res: Response) => {
         const result = await this.workspaceService.removeMember(
@@ -183,5 +183,7 @@ export class WorkspaceController {
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
         return res.status(200).json(validatedEnvelop);
-    }
+    };
+
+    changeRole = async (req: Request, res: Response) => {};
 }

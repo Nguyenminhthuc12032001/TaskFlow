@@ -5,6 +5,7 @@ import { errorMiddleware } from "./common/middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
 import projectRoutes from "./modules/project/project.routes.js";
+import columnRoutes from "./modules/column/column.routes.js";
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
@@ -45,8 +46,9 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
 });
 app.use("/api/auth", authRoutes);
-app.use("/api/workspace", workSpaceRoutes);
-app.use("/api/project", projectRoutes);
+app.use("/api/workspaces", workSpaceRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/columns", columnRoutes);
 setupSwagger(app);
 app.use((req, res) => {
     res.status(404).json({

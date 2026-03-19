@@ -38,7 +38,20 @@ export function requireWorkspaceRole(minRole = "viewer") {
             if (!projectInWorkspace) {
                 throw new AppError("Project not found", 404, "PROJECT_NOT_IN_WORKSPACE");
             }
+            const columnId = req.params.columnId;
+            if (columnId) {
+                const columnInProject = await prisma.column.findUnique({
+                    where: {
+                        projectId_id: { projectId, id: columnId }
+                    }
+                });
+                if (!columnInProject) {
+                    throw new AppError("Column not found", 404, "COLUMN_NOT_IN_PROJECT");
+                }
+            }
+            ;
         }
+        ;
         next();
     };
 }

@@ -2,7 +2,6 @@ import z from "zod";
 import { registry } from "../../docs/openapi.js";
 import { createBodySchema, reOrderBodySchema, safeColumnSchema, safeColumnsSchema, updateBodySchema } from "./column.schemas.js";
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";
-
 registry.registerPath({
     method: "post",
     path: "/api/columns/{workspaceId}/{projectId}",
@@ -29,7 +28,6 @@ registry.registerPath({
         500: fail500
     }
 });
-
 registry.registerPath({
     method: "get",
     path: "/api/columns/{workspaceId}/{projectId}",
@@ -51,7 +49,6 @@ registry.registerPath({
         500: fail500
     }
 });
-
 registry.registerPath({
     method: "get",
     path: "/api/columns/{workspaceId}/{projectId}/{columnId}",
@@ -74,7 +71,6 @@ registry.registerPath({
         500: fail500
     }
 });
-
 registry.registerPath({
     method: "patch",
     path: "/api/columns/{workspaceId}/{projectId}/re_order",
@@ -100,7 +96,6 @@ registry.registerPath({
         500: fail500
     }
 });
-
 registry.registerPath({
     method: "patch",
     path: "/api/columns/{workspaceId}/{projectId}/{columnId}",
@@ -127,7 +122,6 @@ registry.registerPath({
         500: fail500
     }
 });
-
 registry.registerPath({
     method: "delete",
     path: "/api/columns/{workspaceId}/{projectId}/{columnId}",

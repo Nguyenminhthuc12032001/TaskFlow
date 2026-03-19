@@ -67,7 +67,6 @@ export class WorkspaceService {
             const result = await this.prisma.$transaction(async (tx) => {
                 await this.activityService.logActivity(workspaceId, ActivityAction.DELETE_WORKSPACE, "workspace", actorId, workspaceId, { id: workspaceId }, tx);
                 const workspace = await this.workspaceRepo.delete(workspaceId, tx);
-                await this.projectRepo.removeByWorkspace(workspaceId, actorId, tx);
                 return workspace;
             });
             return result;

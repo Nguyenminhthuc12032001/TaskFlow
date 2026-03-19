@@ -19,5 +19,5 @@ router.post("/reset-password", validateBody(resetPasswordBodySchema), authContro
 // PROTECTED
 router.post("/logout", csrfProtection, authMiddleware, validateBody(logoutBodySchema), authController.logout);
 router.get("/me", authMiddleware, validateBody(meBodySchema), authController.me);
-router.post("/change-password", authMiddleware, validateBody(changePasswordBodySchema), authController.changePassword);
+router.patch("/change-password", authMiddleware, validateBody(changePasswordBodySchema), authController.changePassword);
 export default router;

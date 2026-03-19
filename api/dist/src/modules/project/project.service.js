@@ -5,11 +5,26 @@ export class ProjectService {
         this.prisma = prisma;
         this.projectRepo = projectRepo;
         this.activityService = activityService;
-        this.create = async (data, actorId) => {
+        this.create = async (data, workspaceId, actorId) => {
+            const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
+            if (projects.some((p) => p.name === data.name)) {
+                throw new AppError("Duplicate name is not allowed", 409);
+            }
             const createData = {
                 name: data.name,
                 description: data.description,
-                workspace: { connect: { id: data.workspaceId } },
+                workspace: {
+                    connect: {
+                        id: workspaceId, members: {
+                            some: {
+                                userId: actorId,
+                                role: {
+                                    in: ["admin", "owner"]
+                                }
+                            }
+                        }
+                    }
+                },
                 creator: { connect: { id: actorId } }
             };
             return await this.prisma.$transaction(async (tx) => {
@@ -32,13 +47,18 @@ export class ProjectService {
         this.listByUser = async (actorId) => {
             return await this.projectRepo.listByUser(actorId);
         };
-        this.update = async (data, id, actorId) => {
+        this.update = async (data, workspaceId, projectId, actorId) => {
+            const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
+            if (projects.some((p) => p.name === data.name && p.id !== projectId)) {
+                throw new AppError("Duplicate name is not allowed", 409);
+            }
+            ;
             const updateData = {
                 name: data.name,
                 description: data.description
             };
             return await this.prisma.$transaction(async (tx) => {
-                const project = await this.projectRepo.update(updateData, id, actorId, tx);
+                const project = await this.projectRepo.update(updateData, workspaceId, projectId, actorId, tx);
                 await this.activityService.logActivity(project.workspaceId, ActivityAction.UPDATE_PROJECT, "project", actorId, project.id, { name: project.name }, tx);
                 return project;
             });

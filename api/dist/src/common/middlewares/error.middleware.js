@@ -3,7 +3,7 @@ import { fail } from "../utils/response/format.js";
 import { log } from "../logger/logger.js";
 export function errorMiddleware(err, req, res, next) {
     if (err instanceof AppError) {
-        return res.status(err.status).json(fail(err.message));
+        return res.status(err.status).json(fail(err.message, err.code, err.detail));
     }
     log.error({
         error: err,

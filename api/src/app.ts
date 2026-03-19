@@ -62,6 +62,7 @@ app.get("/csurf-token", csrfProtection, (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workSpaceRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/columns", columnRoutes);
 
 setupSwagger(app);
 

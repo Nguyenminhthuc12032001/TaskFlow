@@ -5,7 +5,8 @@ export class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
         this.create = async (req, res) => {
-            const project = await this.projectService.create(req.body, req.user.id);
+            const workspaceId = req.params.workspaceId;
+            const project = await this.projectService.create(req.body, workspaceId, req.user.id);
             const safeProject = {
                 workspaceId: project.workspaceId,
                 id: project.id,
@@ -50,7 +51,7 @@ export class ProjectController {
             return res.status(200).json(validatedEnvelop);
         };
         this.update = async (req, res) => {
-            const project = await this.projectService.update(req.body, req.params.projectId, req.user.id);
+            const project = await this.projectService.update(req.body, req.params.workspaceId, req.params.projectId, req.user.id);
             const safeProjectResponse = {
                 workspaceId: project.workspaceId,
                 id: project.id,

@@ -46,11 +46,12 @@ export class ProjectRepo {
                 }
             });
         };
-        this.update = async (data, id, actorId, db = this.prisma) => {
+        this.update = async (data, workspaceId, projectId, actorId, db = this.prisma) => {
             return await db.project.update({
                 where: {
-                    id,
+                    id: projectId,
                     workspace: {
+                        id: workspaceId,
                         members: {
                             some: {
                                 userId: actorId,
@@ -68,23 +69,6 @@ export class ProjectRepo {
             return await db.project.delete({
                 where: {
                     id,
-                    workspace: {
-                        members: {
-                            some: {
-                                userId: actorId,
-                                role: {
-                                    in: ["admin", "owner"]
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        };
-        this.removeByWorkspace = async (workspaceId, actorId, db = this.prisma) => {
-            return await db.project.deleteMany({
-                where: {
-                    workspaceId: workspaceId,
                     workspace: {
                         members: {
                             some: {

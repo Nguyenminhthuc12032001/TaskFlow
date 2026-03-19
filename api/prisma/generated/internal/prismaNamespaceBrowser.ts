@@ -181,7 +181,8 @@ export const ColumnScalarFieldEnum = {
   name: 'name',
   position: 'position',
   createdAt: 'createdAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  type: 'type'
 } as const
 
 export type ColumnScalarFieldEnum = (typeof ColumnScalarFieldEnum)[keyof typeof ColumnScalarFieldEnum]

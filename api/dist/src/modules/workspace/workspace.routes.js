@@ -18,7 +18,7 @@ router.post("/create", authMiddleware, validateBody(createBodySchema), workspace
 router.get("/list", authMiddleware, validateBody(getByUserIdBodySchema), workspaceController.getByUserId);
 router.get("/:workspaceId", authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceRole(), workspaceController.getById);
 router.get("/members/:workspaceId", authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceRole(), workspaceController.getMembersById);
-router.put("/:workspaceId", authMiddleware, validateBody(updateBodySchema), requireWorkspaceRole("admin"), workspaceController.update);
+router.patch("/:workspaceId", authMiddleware, validateBody(updateBodySchema), requireWorkspaceRole("admin"), workspaceController.update);
 router.delete("/:workspaceId", authMiddleware, validateBody(deleteBodySchema), requireWorkspaceRole("admin"), workspaceController.remove);
 router.post("/invite/:workspaceId", authMiddleware, validateBody(inviteBodySchema), requireWorkspaceRole("admin"), workspaceController.invinte);
 router.post("/accept_invite", authMiddleware, validateBody(acceptBodySchema), workspaceController.accept);

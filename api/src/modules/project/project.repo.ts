@@ -57,11 +57,12 @@ export class ProjectRepo {
         })
     };
 
-    update = async (data: Prisma.ProjectUpdateInput, id: string, actorId: string, db: DbOrTxClient = this.prisma) => {
+    update = async (data: Prisma.ProjectUpdateInput, workspaceId: string, projectId: string, actorId: string, db: DbOrTxClient = this.prisma) => {
         return await db.project.update({
             where: {
-                id,
+                id: projectId,
                 workspace: {
+                    id: workspaceId,
                     members: {
                         some: {
                             userId: actorId,

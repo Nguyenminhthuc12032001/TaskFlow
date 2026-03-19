@@ -72,7 +72,7 @@ export class ProjectController {
     };
 
     update = async (req: Request<WorkspaceParams, {}, UpdateBodyType, {}, {}>, res: Response) => {
-        const project = await this.projectService.update(req.body, req.params.projectId!, req.user!.id);
+        const project = await this.projectService.update(req.body, req.params.workspaceId, req.params.projectId!, req.user!.id);
 
         const safeProjectResponse: SafeProjectResponseType = {
             workspaceId: project.workspaceId,

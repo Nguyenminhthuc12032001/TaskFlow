@@ -10,7 +10,7 @@ export function errorMiddleware (
     next: NextFunction
 ) {
     if (err instanceof AppError) {
-        return res.status(err.status).json(fail(err.message))
+        return res.status(err.status).json(fail(err.message, err.code, err.detail))
     }
 
     log.error(
@@ -22,5 +22,5 @@ export function errorMiddleware (
         "Unhandled error"
     )
 
-    res.status(500).json(fail("Internal Server Error"))
+    res.status(500).json(fail(`Internal Server Error: ${err}`))
 }

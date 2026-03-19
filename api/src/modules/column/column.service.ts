@@ -1,27 +1,53 @@
-import type { Prisma } from "../../../prisma/generated/client.js";
+import { ActivityAction, type Prisma } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
 import type { DbClient } from "../../db/prisma.js";
+import type { ActivityService } from "../activity/activity.service.js";
+import type { ResourceContext } from "../task/task.type.js";
 import type { ColumnRepo } from "./column.repo.js";
+import type { CreateBodyType, ReOrderBodyType, UpdateBodyType } from "./column.schemas.js";
 
 export class ColumnService {
     constructor(
         readonly prisma: DbClient,
-        readonly columnRepo: ColumnRepo
+        readonly columnRepo: ColumnRepo,
+        readonly activityService: ActivityService
     ) { };
 
-    create = async (data: any, workspaceId: string, actorId: string) => {
+    create = async (data: CreateBodyType, workspaceId: string, projectId: string, actorId: string) => {
+
+        const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+
+        if (columns.some((c) => c.name === data.name)) {
+            throw new AppError("Duplicate name is not allowed", 409);
+        };
 
         const createData: Prisma.ColumnCreateInput = {
             name: data.name,
             position: data.position,
+            type: data.type,
             project: {
                 connect: {
-                    id: data.projectId
+                    id: projectId
                 }
             }
         };
 
-        return await this.columnRepo.create(createData);
+        return await this.prisma.$transaction(async (tx) => {
+
+            const column = await this.columnRepo.create(createData, tx);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.CREATE_COLUMN,
+                "column",
+                actorId,
+                column.id,
+                { name: column.name },
+                tx
+            )
+
+            return column;
+        });
     };
 
     listByProjectId = async (workspaceId: string, projectId: string, actorId: string) => {
@@ -41,30 +67,95 @@ export class ColumnService {
         return column;
     };
 
-    update = async (data: any, workspaceId: string, projectId: string, columnId: string, actorId: string) => {
+    update = async (data: UpdateBodyType, workspaceId: string, projectId: string, columnId: string, actorId: string) => {
+
+        const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+
+        if (columns.some((c) => c.name === data.name && c.id !== columnId)) {
+            throw new AppError("Duplicate name is not allowed", 409);
+        }
 
         const updateData: Prisma.ColumnUpdateInput = {
             name: data.name
         }
 
-        return await this.columnRepo.update(data, workspaceId, projectId, columnId, actorId);
-    };
+        return await this.prisma.$transaction(async (tx) => {
 
-    reOrder = async (data: { columnId: string; position: number }[], workspaceId: string, projectId: string, actorId: string) => {
+            const column = await this.columnRepo.update(updateData, workspaceId, projectId, columnId, actorId);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.UPDATE_COLUMN,
+                "column",
+                actorId,
+                column.id,
+                {
+                    name: column.name,
+                    position: column.position
+                },
+                tx
+            )
+
+            return column;
+        });
+    };
+    
+    bulkUpdateStatus = async (data: any, ctx: ResourceContext) => { };
+
+    reOrder = async (data: ReOrderBodyType, workspaceId: string, projectId: string, actorId: string) => {
 
         const result = await this.prisma.$transaction(async (tx) => {
 
-            return await Promise.all(
+            const columns = await Promise.all(
                 data.map(async ({ columnId, position }) => {
 
-                    return await this.columnRepo.update({ position }, workspaceId, projectId, columnId, actorId, tx)
+                    return await this.columnRepo.update({ position }, workspaceId, projectId, columnId, actorId, tx);
                 }));
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.UPDATE_COLUMN,
+                "columns",
+                actorId,
+                undefined,
+                {
+                    new_columns: [
+                        columns.map((c) => ({
+                            id: c.id,
+                            name: c.name,
+                            position: c.position
+                        }))
+                    ]
+                },
+                tx
+            )
+
+            return columns;
         });
 
         return result;
     };
 
     remove = async (workspaceId: string, projectId: string, columnId: string, actorId: string) => {
-        return await this.columnRepo.remove(workspaceId, projectId, columnId, actorId);
+
+        return this.prisma.$transaction(async (tx) => {
+
+            const column = await this.columnRepo.remove(workspaceId, projectId, columnId, actorId);
+
+            await this.activityService.logActivity(
+                workspaceId,
+                ActivityAction.DELETE_COLUMN,
+                "column",
+                actorId,
+                column.id,
+                {
+                    name: column.name,
+                    position: column.position
+                },
+                tx
+            )
+
+            return column;
+        });
     };
 }

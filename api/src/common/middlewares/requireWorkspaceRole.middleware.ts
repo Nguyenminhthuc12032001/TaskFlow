@@ -3,7 +3,7 @@ import { prisma } from "../../db/prisma.js";
 import { AppError } from "../errors/AppError.js";
 import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
-export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string };
+export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string, columnId?: string };
 
 const rank: Record<WorkspaceRole, number> = {
     owner: 4,
@@ -37,7 +37,6 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
         };
 
         const projectId = req.params.projectId;
-
         if (projectId) {
             const projectInWorkspace = await prisma.project.findUnique({
                 where: {
@@ -48,7 +47,20 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
             if (!projectInWorkspace) {
                 throw new AppError("Project not found", 404, "PROJECT_NOT_IN_WORKSPACE")
             }
-        }
+
+            const columnId = req.params.columnId;
+            if (columnId) {
+                const columnInProject = await prisma.column.findUnique({
+                    where: {
+                        projectId_id: { projectId, id: columnId }
+                    }
+                })
+
+                if (!columnInProject) {
+                    throw new AppError("Column not found", 404, "COLUMN_NOT_IN_PROJECT")
+                }
+            };
+        };
 
         next();
     }

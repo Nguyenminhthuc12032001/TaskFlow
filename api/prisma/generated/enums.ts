@@ -19,6 +19,16 @@ export const WorkspaceRole = {
 export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole]
 
 
+export const ColumnType = {
+  todo: 'todo',
+  in_process: 'in_process',
+  done: 'done',
+  custom: 'custom'
+} as const
+
+export type ColumnType = (typeof ColumnType)[keyof typeof ColumnType]
+
+
 export const TaskPriority = {
   low: 'low',
   medium: 'medium',

@@ -13,8 +13,8 @@ const projectController = new ProjectController(new ProjectService(prisma, // th
 new ProjectRepo(prisma), new ActivityService(new ActivityRepo())));
 const router = Router();
 router.post("/:workspaceId/create", authMiddleware, requireWorkspaceRole("admin"), validateBody(createBodySchema), projectController.create);
-router.get("/:workspaceId/:projectId", authMiddleware, requireWorkspaceRole(), validateBody(getBodySchema), projectController.get);
 router.get("/:workspaceId/list_by_workspace", authMiddleware, requireWorkspaceRole(), validateBody(listByWorkspaceBodySchema), projectController.listByWorkspace);
-router.put("/:workspaceId/update/:projectId", authMiddleware, requireWorkspaceRole("admin"), validateBody(updateBodySchema), projectController.update);
+router.get("/:workspaceId/:projectId", authMiddleware, requireWorkspaceRole(), validateBody(getBodySchema), projectController.get);
+router.patch("/:workspaceId/update/:projectId", authMiddleware, requireWorkspaceRole("admin"), validateBody(updateBodySchema), projectController.update);
 router.delete("/:workspaceId/remove/:projectId", authMiddleware, requireWorkspaceRole("admin"), validateBody(removeBodySchema), projectController.remove);
 export default router;

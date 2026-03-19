@@ -231,9 +231,9 @@ registry.registerPath({
         500: fail500
     }
 });
-// POST /auth/change-password (bearer)
+// PATCH /auth/change-password (bearer)
 registry.registerPath({
-    method: "post",
+    method: "patch",
     path: "/api/auth/change-password",
     tags: ["Auth"],
     summary: "Change password",
