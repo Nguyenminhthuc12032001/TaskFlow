@@ -1609,7 +1609,8 @@ export const TaskScalarFieldEnum = {
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  isArchiv: 'isArchiv'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -1803,6 +1804,13 @@ export type EnumTaskPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'TaskPriority[]'
  */
 export type ListEnumTaskPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskPriority[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

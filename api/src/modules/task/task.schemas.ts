@@ -103,4 +103,33 @@ export const bulkRemoveBodySchema = z.array(
 export type BulkRemoveBodyType = z.infer<typeof bulkRemoveBodySchema>;
 
 // Response
+export const safeTaskSchema = z.object({
+    id: z.uuid(),
+    projectId: z.uuid(),
+    columnId: z.uuid(),
+    title: z.string().trim()
+        .min(5, "Title must be at least 5 characters long")
+        .max(100, "Title must be at most 100 characters long"),
+    description: z.string().trim()
+        .min(10, "Description must be at least 10 characters long")
+        .max(100, "Description must be at most 100 characters long")
+        .optional(),
+    priority: z.enum(TaskPriority),
+    dueDate: z.date().optional(),
+    position: z.number()
+        .int("Position must be an integer")
+        .min(0, "Position must be a positive number"),
+    createdBy: z.uuid(),
+    createdAt: z.date(),
+    updatedAt: z.date()
+});
+export type SafeTask = z.infer<typeof safeTaskSchema>;
 
+export const safeTasksSchema = z.array(safeTaskSchema);
+export type SafeTasks = z.infer<typeof safeTasksSchema>;
+
+export const safeAssigneeSchema = z.object({
+    taskId: z.uuid(),
+    userId: z.uuid()
+});
+export type SafeAssignee = z.infer<typeof safeAssigneeSchema>;

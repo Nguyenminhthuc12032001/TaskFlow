@@ -210,6 +210,7 @@ model Task {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+  isArchiv Boolean @default(false)
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   column  Column  @relation(fields: [columnId], references: [id], onDelete: Cascade)
@@ -224,6 +225,8 @@ model Task {
   @@index([createdBy, deletedAt])
   @@index([dueDate, deletedAt])
   @@index(deletedAt)
+  @@unique([columnId, position])
+  @@unique([columnId, title])
   @@map("tasks")
 }
 
@@ -318,6 +321,7 @@ enum ActivityAction {
   DELETE_COLUMN
   CREATE_TASK
   UPDATE_TASK
+  DELETE_TASK
   MOVE_TASK
   ASSIGN_TASK
   COMMENT_TASK

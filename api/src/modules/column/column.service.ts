@@ -1,8 +1,8 @@
 import { ActivityAction, type Prisma } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
+import type { ResourceContext } from "../../common/types/common.types.js";
 import type { DbClient } from "../../db/prisma.js";
 import type { ActivityService } from "../activity/activity.service.js";
-import type { ResourceContext } from "../task/task.type.js";
 import type { ColumnRepo } from "./column.repo.js";
 import type { CreateBodyType, ReOrderBodyType, UpdateBodyType } from "./column.schemas.js";
 
@@ -99,12 +99,18 @@ export class ColumnService {
             return column;
         });
     };
-    
+
     bulkUpdateStatus = async (data: any, ctx: ResourceContext) => { };
 
     reOrder = async (data: ReOrderBodyType, workspaceId: string, projectId: string, actorId: string) => {
 
         const result = await this.prisma.$transaction(async (tx) => {
+
+            await Promise.all(
+                data.map(async ({ columnId, position }) => {
+
+                    return await this.columnRepo.update({ position: - ( position + 1 ) }, workspaceId, projectId, columnId, actorId, tx);
+                }));
 
             const columns = await Promise.all(
                 data.map(async ({ columnId, position }) => {

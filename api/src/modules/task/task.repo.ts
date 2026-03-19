@@ -1,26 +1,224 @@
 import type { Prisma } from "../../../prisma/generated/client.js";
-import type { ResourceContext } from "./task.type.js";
+import type { ResourceContext } from "../../common/types/common.types.js";
+import type { DbClient, DbOrTxClient } from "../../db/prisma.js";
 
 export class TaskRepo {
-    constructor() { };
+    constructor(
+        private readonly prisma: DbClient
+    ) { };
 
-    create = async (data: Prisma.TaskCreateInput, ctx: ResourceContext) => { };
+    create = async (
+        data: Prisma.TaskCreateInput,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.create({ data });
+    };
 
-    assign = async (data: Prisma.TaskAssigneeCreateInput, ctx: ResourceContext) => { };
+    isExistAssignee = async (
+        userId: string,
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.taskAssignee.findFirst({
+            where: {
+                task: {
+                    id: ctx.TaskId,
+                    column: {
+                        id: ctx.columnId,
+                        project: {
+                            id: ctx.projectId,
+                            workspace: {
+                                id: ctx.workspaceId,
+                                members: {
+                                    some: {
+                                        userId: ctx.ActorId,
+                                        role: {
+                                            in: ["admin", "owner"]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                userId
+            }
+        })
+    };
 
-    get = async (ctx: ResourceContext) => { };
+    assign = async (
+        data: Prisma.TaskAssigneeCreateInput,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.taskAssignee.create({ data });
+    };
 
-    listByColumn = async (ctx: ResourceContext) => { };
+    get = async (
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.findUnique({
+            where: {
+                id: ctx.TaskId,
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    };
 
-    update = async (data: Prisma.TaskUpdateInput, ctx: ResourceContext) => { };
+    listByColumn = async (
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.findMany({
+            where: {
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    };
 
-    reOrder = async (data: any, ctx: ResourceContext) => { };
+    update = async (
+        data: Prisma.TaskUpdateInput,
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.update({
+            data,
+            where: {
+                id: ctx.TaskId,
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                    role: {
+                                        in: ["admin", "owner"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    };
 
-    archivTask = async (ctx: ResourceContext) => { };
+    archivTask = async (
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.update({
+            where: {
+                id: ctx.TaskId,
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                    role: {
+                                        in: ["admin", "owner"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            data: {
+                isArchiv: true
+            }
+        })
+    };
 
-    restoreTask = async (ctx: ResourceContext) => { };
+    restoreTask = async (
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.update({
+            where: {
+                id: ctx.TaskId,
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                    role: {
+                                        in: ["admin", "owner"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            data: {
+                isArchiv: false
+            }
+        })
+    };
 
-    remove = async (ctx: ResourceContext) => { };
-
-    bulkRemove = async (data: any, ctx: ResourceContext) => { };
+    remove = async (
+        ctx: ResourceContext,
+        db: DbOrTxClient = this.prisma
+    ) => {
+        return await db.task.delete({
+            where: {
+                id: ctx.TaskId,
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                    role: {
+                                        in: ["admin", "owner"]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    };
 }
