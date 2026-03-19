@@ -6,9 +6,10 @@ import { ColumnRepo } from "./column.repo.js";
 import { authMiddleware } from "../../common/middlewares/auth.middleware.js";
 import { requireWorkspaceRole } from "../../common/middlewares/requireWorkspaceRole.middleware.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
-import { createBodySchema, getBodySchema, listBodySchema, removeBodySchema, reOrderBodySchema, updateBodySchema } from "./column.schemas.js";
+import { createBodySchema, reOrderBodySchema, updateBodySchema } from "./column.schemas.js";
 import { ActivityService } from "../activity/activity.service.js";
 import { ActivityRepo } from "../activity/activity.repo.js";
+import { emptyBodySchema } from "../../common/schemas/common.schemas.js";
 
 const columnController = new ColumnController(
     new ColumnService(
@@ -29,11 +30,11 @@ router.post("/:workspaceId/:projectId",
     columnController.create);
 
 router.get("/:workspaceId/:projectId",
-    authMiddleware, requireWorkspaceRole(), validateBody(listBodySchema),
+    authMiddleware, requireWorkspaceRole(), validateBody(emptyBodySchema),
     columnController.listByProject);
 
 router.get("/:workspaceId/:projectId/:columnId",
-    authMiddleware, requireWorkspaceRole(), validateBody(getBodySchema),
+    authMiddleware, requireWorkspaceRole(), validateBody(emptyBodySchema),
     columnController.get);
 
 router.patch("/:workspaceId/:projectId/re_order",
@@ -45,7 +46,7 @@ router.patch("/:workspaceId/:projectId/:columnId",
     columnController.update);
 
 router.delete("/:workspaceId/:projectId/:columnId",
-    authMiddleware, requireWorkspaceRole("admin"), validateBody(removeBodySchema),
+    authMiddleware, requireWorkspaceRole("admin"), validateBody(emptyBodySchema),
     columnController.remove);
 
 export default router;

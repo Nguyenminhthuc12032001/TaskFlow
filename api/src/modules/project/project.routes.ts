@@ -6,9 +6,10 @@ import { ProjectService } from "./project.service.js";
 import { ProjectRepo } from "./project.repo.js";
 import { prisma } from "../../db/prisma.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
-import { createBodySchema, getBodySchema, listByWorkspaceBodySchema, removeBodySchema, updateBodySchema } from "./project.schemas.js";
+import { createBodySchema, updateBodySchema } from "./project.schemas.js";
 import { ActivityService } from "../activity/activity.service.js";
 import { ActivityRepo } from "../activity/activity.repo.js";
+import { emptyBodySchema } from "../../common/schemas/common.schemas.js";
 
 const projectController = new ProjectController(
     new ProjectService(
@@ -32,12 +33,12 @@ router.post("/:workspaceId/create",
 router.get("/:workspaceId/list_by_workspace",
     authMiddleware,
     requireWorkspaceRole(),
-    validateBody(listByWorkspaceBodySchema), projectController.listByWorkspace);
+    validateBody(emptyBodySchema), projectController.listByWorkspace);
 
 router.get("/:workspaceId/:projectId",
     authMiddleware,
     requireWorkspaceRole(),
-    validateBody(getBodySchema), projectController.get);
+    validateBody(emptyBodySchema), projectController.get);
 
 router.patch("/:workspaceId/update/:projectId",
     authMiddleware,
@@ -47,6 +48,6 @@ router.patch("/:workspaceId/update/:projectId",
 router.delete("/:workspaceId/remove/:projectId",
     authMiddleware,
     requireWorkspaceRole("admin"),
-    validateBody(removeBodySchema), projectController.remove);
+    validateBody(emptyBodySchema), projectController.remove);
 
 export default router;

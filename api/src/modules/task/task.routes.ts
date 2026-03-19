@@ -14,8 +14,6 @@ router.get("", taskController.listByColumn);
 
 router.patch("", taskController.update);
 
-router.patch("", taskController.bulkUpdateStatus);
-
 router.patch("", taskController.reOrder);
 
 router.patch("", taskController.archivTask);

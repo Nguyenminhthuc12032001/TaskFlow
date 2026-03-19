@@ -14,12 +14,6 @@ export const createBodySchema = z.object({
 }).strict();
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
-export const listBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-export const getBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
 export const updateBodySchema = z.object({
     name: z.string().trim()
         .min(2, "Name must be at least 2 characters long")
@@ -60,10 +54,6 @@ export const reOrderBodySchema = z.array(
         })
     });
 export type ReOrderBodyType = z.infer<typeof reOrderBodySchema>;
-
-export const removeBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
 
 // RESPONSE
 export const safeColumnSchema = z.object({

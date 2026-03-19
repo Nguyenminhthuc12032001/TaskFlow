@@ -10,8 +10,9 @@ import { ActivityService } from '../activity/activity.service.js';
 import { prisma } from '../../db/prisma.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
-import { acceptBodySchema, createBodySchema, deleteBodySchema, getByIdBodySchema, getByUserIdBodySchema, getMembersBodySchema, inviteBodySchema, removeMemberBodySchema, updateBodySchema } from './workspace.schemas.js';
+import { acceptBodySchema, createBodySchema, inviteBodySchema, removeMemberBodySchema, updateBodySchema } from './workspace.schemas.js';
 import { ProjectRepo } from '../project/project.repo.js';
+import { emptyBodySchema } from '../../common/schemas/common.schemas.js';
 
 const router = Router();
 
@@ -39,15 +40,15 @@ router.post("/create",
     workspaceController.create);
 
 router.get("/list",
-    authMiddleware, validateBody(getByUserIdBodySchema),
+    authMiddleware, validateBody(emptyBodySchema),
     workspaceController.getByUserId);
 
 router.get("/:workspaceId",
-    authMiddleware, validateBody(getByIdBodySchema), requireWorkspaceRole(),
+    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole(),
     workspaceController.getById);
 
 router.get("/members/:workspaceId",
-    authMiddleware, validateBody(getMembersBodySchema), requireWorkspaceRole(),
+    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole(),
     workspaceController.getMembersById);
 
 router.patch("/:workspaceId",
@@ -55,7 +56,7 @@ router.patch("/:workspaceId",
     workspaceController.update);
 
 router.delete("/:workspaceId",
-    authMiddleware, validateBody(deleteBodySchema), requireWorkspaceRole("admin"),
+    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole("admin"),
     workspaceController.remove);
 
 router.post("/invite/:workspaceId",

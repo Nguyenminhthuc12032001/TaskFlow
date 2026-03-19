@@ -13,18 +13,6 @@ export const createBodySchema = z.object({
 });
 export type CreateWorkspaceBody = z.infer<typeof createBodySchema>;
 
-// Get workspace/list
-export const getByUserIdBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-// Get workspace/:id
-export const getByIdBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-// GET workspace/members/:workspaceId
-export const getMembersBodySchema = z.undefined()
-    .or(z.object({}).strict())
-
 // Put workspace/:id
 export const updateBodySchema = z.object({
     name: z.string()
@@ -33,10 +21,6 @@ export const updateBodySchema = z.object({
         .max(100, "Name must be at most 100 characters long"),
 });
 export type UpdateWorkspaceBody = z.infer<typeof updateBodySchema>;
-
-// DELETE workspace/:workspaceId
-export const deleteBodySchema = z.undefined()
-    .or(z.object({}).strict());
 
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
@@ -54,8 +38,6 @@ export type AcceptBody = z.infer<typeof acceptBodySchema>;
 // DELETE workspace/remove_member/:workspaceId/:memberId
 export const removeMemberBodySchema = z.undefined()
     .or(z.object({}).strict());
-
-
     
 // ========= RESPONSE ==========
 

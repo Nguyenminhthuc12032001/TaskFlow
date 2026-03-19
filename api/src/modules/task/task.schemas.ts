@@ -81,15 +81,6 @@ export const reOrderBodySchema = z.array(
     });
 export type ReOrderBodyType = z.infer<typeof reOrderBodySchema>;
 
-export const archivBodySchema = z.undefined()
-    .or(object({}).strict());
-
-export const restoreBodySchema = z.undefined()
-    .or(object({}).strict());
-
-export const removeBodySchema = z.undefined()
-    .or(object({}).strict());
-
 export const bulkRemoveBodySchema = z.array(
     z.object({
         taskId: z.uuid()
@@ -110,4 +101,6 @@ export const bulkRemoveBodySchema = z.array(
         })
     });
 export type BulkRemoveBodyType = z.infer<typeof bulkRemoveBodySchema>;
+
+// Response
 

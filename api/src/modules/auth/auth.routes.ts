@@ -6,9 +6,6 @@ import {
     forgotPasswordBodySchema,
     resetPasswordBodySchema,
     changePasswordBodySchema,
-    refreshBodySchema,
-    logoutBodySchema,
-    meBodySchema,
 } from "./auth.schemas.js";
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
 import { csrfProtection } from "../../common/middlewares/csrf.middleware.js";
@@ -17,6 +14,7 @@ import { AuthService } from "./auth.service.js";
 import { AuthRepo } from "./auth.repo.js";
 import { EmailService } from "../mail/mail.service.js";
 import { prisma } from "../../db/prisma.js";
+import { emptyBodySchema } from "../../common/schemas/common.schemas.js";
 
 const router = Router();
 
@@ -41,7 +39,7 @@ router.post("/login",
 
 router.post("/refresh",
     csrfProtection,
-    validateBody(refreshBodySchema),
+    validateBody(emptyBodySchema),
     authController.refresh);
 
 router.post("/forgot-password",
@@ -56,12 +54,12 @@ router.post("/reset-password",
 router.post("/logout",
     csrfProtection,
     authMiddleware,
-    validateBody(logoutBodySchema),
+    validateBody(emptyBodySchema),
     authController.logout);
 
 router.get("/me",
     authMiddleware,
-    validateBody(meBodySchema),
+    validateBody(emptyBodySchema),
     authController.me);
 
 router.patch("/change-password",

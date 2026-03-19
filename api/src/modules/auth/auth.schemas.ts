@@ -59,19 +59,6 @@ export const changePasswordBodySchema = z.object({
 }).strict();
 export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
 
-// POST auth/refresh
-export const refreshBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-// POST auth/login
-export const logoutBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-// POST auth/me
-export const meBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-
 // ========== RESSPONSE ==========
 
 // SafeUser

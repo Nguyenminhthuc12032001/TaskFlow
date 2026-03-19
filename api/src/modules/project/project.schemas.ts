@@ -13,15 +13,6 @@ export const createBodySchema = z.object({
 });
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
-export const getBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-export const listByWorkspaceBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
-export const listByUserBodySchema = z.undefined()
-    .or(z.object({}).strict());
-
 export const updateBodySchema = z.object({
     name: z.string().trim()
         .min(2, "Name must be at least 2 characters long")
@@ -32,9 +23,6 @@ export const updateBodySchema = z.object({
         .optional(),
 });
 export type UpdateBodyType = z.infer<typeof updateBodySchema>;
-
-export const removeBodySchema = z.undefined()
-    .or(z.object({}).strict());
 
 // RESPONSE
 
