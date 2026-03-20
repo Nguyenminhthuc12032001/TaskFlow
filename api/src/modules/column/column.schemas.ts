@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "../../docs/zod.js";
 import { ColumnType } from "../../../prisma/generated/enums.js";
 
 // REQUEST

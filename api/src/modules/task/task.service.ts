@@ -20,7 +20,7 @@ export class TaskService {
             const tasks = await this.taskRepo.listByColumn(ctx, tx);
 
             if (tasks.some((t) => t.title.toLowerCase() === data.title.toLowerCase())) {
-                throw new AppError("Duplicate task title is not allowed");
+                throw new AppError("Duplicate task title is not allowed", 409);
             }
 
             const createData: Prisma.TaskCreateInput = {
@@ -71,7 +71,7 @@ export class TaskService {
             const existAssignee = await this.taskRepo.isExistAssignee(data.userId, ctx, tx);
 
             if (existAssignee) {
-                throw new AppError("User is already assigned to this task")
+                throw new AppError("User is already assigned to this task", 409)
             };
 
             const assignData: Prisma.TaskAssigneeCreateInput = {
@@ -123,7 +123,7 @@ export class TaskService {
         const tasks = await this.taskRepo.listByColumn(ctx);
 
         if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ""))) {
-            throw new AppError("Duplicate title is not allowed");
+            throw new AppError("Duplicate title is not allowed", 409);
         }
 
         const updateData: Prisma.TaskUpdateInput = {

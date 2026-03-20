@@ -193,4 +193,4 @@ registry.registerPath({
         404: fail404,
         500: fail500
     }
-})
+});

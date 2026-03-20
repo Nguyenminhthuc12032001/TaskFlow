@@ -1,4 +1,4 @@
-import z, { object } from "zod";
+import z from "../../docs/zod.js";
 import { TaskPriority } from "../../../prisma/generated/enums.js";
 
 // REQUEST
@@ -22,12 +22,6 @@ export const assignBodySchema = z.object({
     userId: z.uuid()
 });
 export type AssignBodyType = z.infer<typeof assignBodySchema>;
-
-export const getBodySchema = z.undefined()
-    .or(object({}).strict());
-
-export const listByColumnBodySchema = z.undefined()
-    .or(object({}).strict());
 
 export const updateBodySchema = z.object({
     title: z.string().trim()
