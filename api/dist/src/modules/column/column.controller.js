@@ -11,6 +11,7 @@ export class ColumnController {
                 projectId: column.projectId,
                 name: column.name,
                 position: column.position,
+                type: column.type,
                 createdAt: column.createdAt
             };
             const envelop = created(safeColumn);
@@ -25,6 +26,7 @@ export class ColumnController {
                 projectId: c.projectId,
                 name: c.name,
                 position: c.position,
+                type: c.type,
                 createdAt: c.createdAt
             }));
             const envelop = ok(safeColumns);
@@ -39,6 +41,7 @@ export class ColumnController {
                 projectId: column.projectId,
                 name: column.name,
                 position: column.position,
+                type: column.type,
                 createdAt: column.createdAt
             };
             const envelop = ok(safeColumn);
@@ -53,6 +56,7 @@ export class ColumnController {
                 projectId: column.projectId,
                 name: column.name,
                 position: column.position,
+                type: column.type,
                 createdAt: column.createdAt
             };
             const envelop = ok(safeColumn);
@@ -67,6 +71,7 @@ export class ColumnController {
                 projectId: c.projectId,
                 name: c.name,
                 position: c.position,
+                type: c.type,
                 createdAt: c.createdAt
             }));
             const envelop = ok(safeColumns);
@@ -81,6 +86,7 @@ export class ColumnController {
                 projectId: column.projectId,
                 name: column.projectId,
                 position: column.position,
+                type: column.type,
                 createdAt: column.createdAt
             };
             const envelop = ok(safeColumn);

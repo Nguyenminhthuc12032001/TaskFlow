@@ -1,4 +1,4 @@
-import z from "zod";
+import z from "../../docs/zod.js";
 import { registry } from "../../docs/openapi.js";
 import { createBodySchema, reOrderBodySchema, safeColumnSchema, safeColumnsSchema, updateBodySchema } from "./column.schemas.js";
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";

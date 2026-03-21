@@ -11,7 +11,7 @@ export const createBodySchema = z.object({
         .max(100, "Description must be at most 100 characters long")
         .optional(),
     priority: z.enum(TaskPriority),
-    dueDate: z.date().optional(),
+    dueDate: z.coerce.date().optional(),
     position: z.number()
         .int("Position must be an integer")
         .min(0, "Position must be a positive number")
@@ -33,7 +33,7 @@ export const updateBodySchema = z.object({
         .max(100, "Description must be at most 100 characters long")
         .optional(),
     priority: z.enum(TaskPriority).optional(),
-    dueDate: z.date().optional(),
+    dueDate: z.coerce.date().optional(),
     position: z.number()
         .int("Position must be an integer")
         .min(0, "Position must be a positive number")

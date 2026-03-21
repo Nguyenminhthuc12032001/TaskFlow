@@ -1,4 +1,4 @@
-import { ActivityAction } from "../../../prisma/generated/client.js";
+import { ActivityAction, ColumnType } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
 export class ProjectService {
     constructor(prisma, projectRepo, activityService) {
@@ -15,7 +15,8 @@ export class ProjectService {
                 description: data.description,
                 workspace: {
                     connect: {
-                        id: workspaceId, members: {
+                        id: workspaceId,
+                        members: {
                             some: {
                                 userId: actorId,
                                 role: {
@@ -29,6 +30,13 @@ export class ProjectService {
             };
             return await this.prisma.$transaction(async (tx) => {
                 const project = await this.projectRepo.create(createData, tx);
+                await tx.column.createMany({
+                    data: [
+                        { name: "Todo", position: 1, type: ColumnType.todo, projectId: project.id },
+                        { name: "In Progress", position: 2, type: ColumnType.in_process, projectId: project.id },
+                        { name: "Done", position: 3, type: ColumnType.done, projectId: project.id }
+                    ]
+                });
                 await this.activityService.logActivity(project.workspaceId, ActivityAction.CREATE_PROJECT, "project", actorId, project.id, { name: project.name }, tx);
                 return project;
             });

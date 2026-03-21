@@ -135,5 +135,6 @@ export class WorkspaceController {
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);
             return res.status(200).json(validatedEnvelop);
         };
+        this.changeRole = async (req, res) => { };
     }
 }

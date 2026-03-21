@@ -13,6 +13,12 @@ export const WorkspaceRole = {
     member: 'member',
     viewer: 'viewer'
 };
+export const ColumnType = {
+    todo: 'todo',
+    in_process: 'in_process',
+    done: 'done',
+    custom: 'custom'
+};
 export const TaskPriority = {
     low: 'low',
     medium: 'medium',
@@ -38,6 +44,7 @@ export const ActivityAction = {
     DELETE_COLUMN: 'DELETE_COLUMN',
     CREATE_TASK: 'CREATE_TASK',
     UPDATE_TASK: 'UPDATE_TASK',
+    DELETE_TASK: 'DELETE_TASK',
     MOVE_TASK: 'MOVE_TASK',
     ASSIGN_TASK: 'ASSIGN_TASK',
     COMMENT_TASK: 'COMMENT_TASK',

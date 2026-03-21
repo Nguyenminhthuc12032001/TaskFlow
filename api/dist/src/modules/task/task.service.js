@@ -1,1 +1,134 @@
-export {};
+import { ActivityAction } from "../../../prisma/generated/client.js";
+import { AppError } from "../../common/errors/AppError.js";
+export class TaskService {
+    constructor(prisma, activityService, taskRepo) {
+        this.prisma = prisma;
+        this.activityService = activityService;
+        this.taskRepo = taskRepo;
+        this.create = async (data, ctx) => {
+            const result = await this.prisma.$transaction(async (tx) => {
+                const tasks = await this.taskRepo.listByColumn(ctx, tx);
+                if (tasks.some((t) => t.title.toLowerCase() === data.title.toLowerCase())) {
+                    throw new AppError("Duplicate task title is not allowed", 409);
+                }
+                const createData = {
+                    title: data.title,
+                    priority: data.priority,
+                    position: data.position,
+                    description: data.description ?? "",
+                    dueDate: data.dueDate ?? null,
+                    project: {
+                        connect: {
+                            id: ctx.projectId
+                        }
+                    },
+                    column: {
+                        connect: {
+                            id: ctx.columnId
+                        }
+                    },
+                    creator: {
+                        connect: {
+                            id: ctx.ActorId
+                        }
+                    }
+                };
+                const task = await this.taskRepo.create(createData, tx);
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_TASK, "task", ctx.ActorId, task.id, { title: task.title, position: task.position }, tx);
+                return task;
+            });
+            return result;
+        };
+        this.assign = async (data, ctx) => {
+            const result = await this.prisma.$transaction(async (tx) => {
+                const existAssignee = await this.taskRepo.isExistAssignee(data.userId, ctx, tx);
+                if (existAssignee) {
+                    throw new AppError("User is already assigned to this task", 409);
+                }
+                ;
+                const assignData = {
+                    task: {
+                        connect: {
+                            id: ctx.TaskId
+                        }
+                    },
+                    user: {
+                        connect: {
+                            id: data.userId
+                        }
+                    }
+                };
+                const assignee = await this.taskRepo.assign(assignData, tx);
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.ASSIGN_TASK, "task_assignee", ctx.ActorId, assignee.taskId, { userId: assignee.userId, taskId: assignee.taskId }, tx);
+                return assignee;
+            });
+            return result;
+        };
+        this.get = async (ctx) => {
+            const task = await this.taskRepo.get(ctx);
+            if (!task) {
+                throw new AppError("Task not found", 404);
+            }
+            return task;
+        };
+        this.listByColumn = async (ctx) => {
+            return await this.taskRepo.listByColumn(ctx);
+        };
+        this.update = async (data, ctx) => {
+            const tasks = await this.taskRepo.listByColumn(ctx);
+            if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ""))) {
+                throw new AppError("Duplicate title is not allowed", 409);
+            }
+            const updateData = {
+                ...(data.title !== undefined && { title: data.title }),
+                ...(data.description !== undefined && { description: data.description }),
+                ...(data.priority !== undefined && { priority: data.priority }),
+                ...(data.position !== undefined && { position: data.position }),
+                ...(data.dueDate !== undefined && { dueDate: data.dueDate })
+            };
+            const result = await this.prisma.$transaction(async (tx) => {
+                const task = await this.taskRepo.update(updateData, ctx);
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_TASK, "task", ctx.ActorId, ctx.TaskId, { tasks }, tx);
+                return task;
+            });
+            return result;
+        };
+        this.reOrder = async (data, ctx) => {
+            return await this.prisma.$transaction(async (tx) => {
+                await Promise.all(data.map(async ({ taskId, position }) => {
+                    return await this.taskRepo.update({ position: -(position + 1) }, { ...ctx, TaskId: taskId }, tx);
+                }));
+                const result = await Promise.all(data.map(async ({ taskId, position }) => {
+                    return await this.taskRepo.update({ position }, { ...ctx, TaskId: taskId }, tx);
+                }));
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_TASK, "tasks", ctx.ActorId, undefined, { result }, tx);
+                return result;
+            });
+        };
+        this.archivTask = async (ctx) => {
+            return await this.taskRepo.archivTask(ctx);
+        };
+        this.restoreTask = async (ctx) => {
+            return await this.taskRepo.restoreTask(ctx);
+        };
+        this.remove = async (ctx) => {
+            return await this.prisma.$transaction(async (tx) => {
+                const task = await this.taskRepo.remove(ctx);
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.DELETE_TASK, "task", ctx.ActorId, ctx.TaskId, { task }, tx);
+                return task;
+            });
+        };
+        this.bulkRemove = async (data, ctx) => {
+            const result = await this.prisma.$transaction(async (tx) => {
+                const tasks = await Promise.all(data.map(async ({ taskId }) => {
+                    return await this.taskRepo.remove({ ...ctx, TaskId: taskId }, tx);
+                }));
+                await this.activityService.logActivity(ctx.workspaceId, ActivityAction.DELETE_TASK, "tasks", ctx.ActorId, undefined, { tasks }, tx);
+                return tasks;
+            });
+            return result;
+        };
+    }
+    ;
+}
+;

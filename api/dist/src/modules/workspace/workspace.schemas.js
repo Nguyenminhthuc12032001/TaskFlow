@@ -9,15 +9,6 @@ export const createBodySchema = z.object({
         .min(2, "Name must be at least 2 characters long")
         .max(100, "Name must be at most 100 characters long"),
 });
-// Get workspace/list
-export const getByUserIdBodySchema = z.undefined()
-    .or(z.object({}).strict());
-// Get workspace/:id
-export const getByIdBodySchema = z.undefined()
-    .or(z.object({}).strict());
-// GET workspace/members/:workspaceId
-export const getMembersBodySchema = z.undefined()
-    .or(z.object({}).strict());
 // Put workspace/:id
 export const updateBodySchema = z.object({
     name: z.string()
@@ -25,9 +16,6 @@ export const updateBodySchema = z.object({
         .min(2, "Name must be at least 2 characters long")
         .max(100, "Name must be at most 100 characters long"),
 });
-// DELETE workspace/:workspaceId
-export const deleteBodySchema = z.undefined()
-    .or(z.object({}).strict());
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
     inviteeId: z.uuid(),

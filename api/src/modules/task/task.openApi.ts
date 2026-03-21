@@ -3,7 +3,7 @@ import z, { type ZodType } from "../../docs/zod.js";
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";
 import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, reOrderBodySchema, safeAssigneeSchema, safeTaskSchema, safeTasksSchema, updateBodySchema } from "./task.schemas.js";
 
-const defaultPath = "/api/columns/{workspaceId}/{projectId}/{columnId}";
+const defaultPath = "/api/tasks/{workspaceId}/{projectId}/{columnId}";
 
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -136,7 +136,7 @@ registry.registerPath({
 
 registry.registerPath({
     method: "patch",
-    path: defaultPath + "/taskId/restore",
+    path: defaultPath + "/{taskId}/restore",
     tags: ["Task"],
     summary: "Restore task by Id",
     security: [{ bearerAuth: [] }],

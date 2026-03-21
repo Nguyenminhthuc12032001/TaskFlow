@@ -10,5 +10,5 @@ export function errorMiddleware(err, req, res, next) {
         requestId: req.requestId,
         userId: req.user?.id,
     }, "Unhandled error");
-    res.status(500).json(fail("Internal Server Error"));
+    res.status(500).json(fail(`Internal Server Error: ${err}`));
 }

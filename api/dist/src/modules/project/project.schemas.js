@@ -9,12 +9,6 @@ export const createBodySchema = z.object({
         .max(100, "Description must be at most 100 characters long")
         .optional(),
 });
-export const getBodySchema = z.undefined()
-    .or(z.object({}).strict());
-export const listByWorkspaceBodySchema = z.undefined()
-    .or(z.object({}).strict());
-export const listByUserBodySchema = z.undefined()
-    .or(z.object({}).strict());
 export const updateBodySchema = z.object({
     name: z.string().trim()
         .min(2, "Name must be at least 2 characters long")
@@ -24,8 +18,6 @@ export const updateBodySchema = z.object({
         .max(100, "Description must be at most 100 characters long")
         .optional(),
 });
-export const removeBodySchema = z.undefined()
-    .or(z.object({}).strict());
 // RESPONSE
 export const safeProjectResponseSchema = z.object({
     workspaceId: z.uuid(),

@@ -161,7 +161,8 @@ export const ColumnScalarFieldEnum = {
     name: 'name',
     position: 'position',
     createdAt: 'createdAt',
-    deletedAt: 'deletedAt'
+    deletedAt: 'deletedAt',
+    type: 'type'
 };
 export const TaskScalarFieldEnum = {
     id: 'id',
@@ -175,7 +176,8 @@ export const TaskScalarFieldEnum = {
     createdBy: 'createdBy',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    deletedAt: 'deletedAt'
+    deletedAt: 'deletedAt',
+    isArchiv: 'isArchiv'
 };
 export const TaskAssigneeScalarFieldEnum = {
     taskId: 'taskId',

@@ -1,4 +1,5 @@
-import z from "zod";
+import z from "../../docs/zod.js";
+import { ColumnType } from "../../../prisma/generated/enums.js";
 // REQUEST
 export const createBodySchema = z.object({
     name: z.string().trim()
@@ -6,12 +7,9 @@ export const createBodySchema = z.object({
         .max(100, "Name must be at most 100 characters long"),
     position: z.number()
         .int("Position must be an integer")
-        .min(0, "Position must be greater than or equal to 0")
+        .min(0, "Position must be greater than or equal to 0"),
+    type: z.enum(ColumnType)
 }).strict();
-export const listBodySchema = z.undefined()
-    .or(z.object({}).strict());
-export const getBodySchema = z.undefined()
-    .or(z.object({}).strict());
 export const updateBodySchema = z.object({
     name: z.string().trim()
         .min(2, "Name must be at least 2 characters long")
@@ -47,8 +45,6 @@ export const reOrderBodySchema = z.array(z.object({
         positionSet.add(item.position);
     });
 });
-export const removeBodySchema = z.undefined()
-    .or(z.object({}).strict());
 // RESPONSE
 export const safeColumnSchema = z.object({
     id: z.uuid(),
@@ -59,6 +55,7 @@ export const safeColumnSchema = z.object({
     position: z.number()
         .int("Position must be an integer")
         .min(0, "Position must be greater than or equal to 0"),
+    type: z.enum(ColumnType),
     createdAt: z.date()
 });
 export const safeColumnsSchema = z.array(safeColumnSchema)

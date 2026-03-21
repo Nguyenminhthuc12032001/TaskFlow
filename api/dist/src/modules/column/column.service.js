@@ -14,6 +14,7 @@ export class ColumnService {
             const createData = {
                 name: data.name,
                 position: data.position,
+                type: data.type,
                 project: {
                     connect: {
                         id: projectId
@@ -53,24 +54,11 @@ export class ColumnService {
                 return column;
             });
         };
+        this.bulkUpdateStatus = async (data, ctx) => { };
         this.reOrder = async (data, workspaceId, projectId, actorId) => {
-            const existingColumns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
-            const existingColumnIds = new Set(existingColumns.map((column) => column.id));
-            const requestedColumnIds = new Set(data.map((item) => item.columnId));
-            const untouchedPositions = new Set(existingColumns
-                .filter((column) => !requestedColumnIds.has(column.id))
-                .map((column) => column.position));
-            const missingColumn = data.find(({ columnId }) => !existingColumnIds.has(columnId));
-            if (missingColumn) {
-                throw new AppError(`Column with id: ${missingColumn.columnId} not found`, 404);
-            }
-            const conflictingPosition = data.find(({ position }) => untouchedPositions.has(position));
-            if (conflictingPosition) {
-                throw new AppError(`Position ${conflictingPosition.position} is already used by another column`, 409);
-            }
             const result = await this.prisma.$transaction(async (tx) => {
-                await Promise.all(data.map(async ({ columnId }, index) => {
-                    return await this.columnRepo.update({ position: -(index + 1) }, workspaceId, projectId, columnId, actorId, tx);
+                await Promise.all(data.map(async ({ columnId, position }) => {
+                    return await this.columnRepo.update({ position: -(position + 1) }, workspaceId, projectId, columnId, actorId, tx);
                 }));
                 const columns = await Promise.all(data.map(async ({ columnId, position }) => {
                     return await this.columnRepo.update({ position }, workspaceId, projectId, columnId, actorId, tx);

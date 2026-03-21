@@ -27,3 +27,4 @@ import "../modules/auth/auth.openApi.js";
 import "../modules/workspace/workspace.openApi.js";
 import "../modules/project/project.openApi.js";
 import "../modules/column/column.openApi.js";
+import "../modules/task/task.openApi.js";
