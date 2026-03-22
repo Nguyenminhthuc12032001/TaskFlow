@@ -4,7 +4,7 @@ import type { DbClient, DbOrTxClient } from "../../db/prisma.js";
 
 export class TaskRepo {
     constructor(
-        private readonly prisma: DbClient
+        readonly prisma: DbClient
     ) { };
 
     create = async (

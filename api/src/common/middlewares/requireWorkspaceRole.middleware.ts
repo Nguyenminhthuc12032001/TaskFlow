@@ -3,7 +3,7 @@ import { prisma } from "../../db/prisma.js";
 import { AppError } from "../errors/AppError.js";
 import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
-export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string, columnId?: string, taskId?: string };
+export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string, columnId?: string, taskId?: string, commentId?: string };
 
 const rank: Record<WorkspaceRole, number> = {
     owner: 4,
@@ -54,10 +54,23 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
                     where: {
                         projectId_id: { projectId, id: columnId }
                     }
-                })
+                });
 
                 if (!columnInProject) {
                     throw new AppError("Column not found", 404, "COLUMN_NOT_IN_PROJECT")
+                }
+
+                const taskId = req.params.taskId;
+                if (taskId) {
+                    const taskInColumn = await prisma.task.findUnique({
+                        where: {
+                            columnId_id: { columnId, id: taskId }
+                        }
+                    });
+
+                    if (!taskInColumn) {
+                        throw new AppError("Task not found", 404, "TASK_OT_FOUND")
+                    }
                 }
             };
         };

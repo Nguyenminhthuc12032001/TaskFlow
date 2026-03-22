@@ -312,6 +312,7 @@ export type TaskOrderByWithRelationInput = {
 
 export type TaskWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  columnId_id?: Prisma.TaskColumnIdIdCompoundUniqueInput
   columnId_position?: Prisma.TaskColumnIdPositionCompoundUniqueInput
   columnId_title?: Prisma.TaskColumnIdTitleCompoundUniqueInput
   AND?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
@@ -335,7 +336,7 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   assignees?: Prisma.TaskAssigneeListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   leadsLink?: Prisma.LeadTaskLinkListRelationFilter
-}, "id" | "columnId_position" | "columnId_title">
+}, "id" | "columnId_id" | "columnId_position" | "columnId_title">
 
 export type TaskOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -506,6 +507,11 @@ export type TaskListRelationFilter = {
 
 export type TaskOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type TaskColumnIdIdCompoundUniqueInput = {
+  columnId: string
+  id: string
 }
 
 export type TaskColumnIdPositionCompoundUniqueInput = {

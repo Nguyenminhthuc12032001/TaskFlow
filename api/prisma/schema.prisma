@@ -155,8 +155,8 @@ model Project {
   columns Column[]
   tasks   Task[]
 
-  @@index([workspaceId, deletedAt])
   @@unique([workspaceId, id])
+  @@index([workspaceId, deletedAt])
   @@index([createdBy, deletedAt])
   @@index([deletedAt])
   @@map("projects")
@@ -170,13 +170,13 @@ enum ColumnType {
 }
 
 model Column {
-  id        String    @id @default(uuid()) @db.Uuid
-  projectId String    @map("project_id") @db.Uuid
+  id        String     @id @default(uuid()) @db.Uuid
+  projectId String     @map("project_id") @db.Uuid
   name      String
-  position  Int       @default(0)
-  createdAt DateTime  @default(now())
-  deletedAt DateTime? @map("deleted_at")
-  type ColumnType @default(custom)
+  position  Int        @default(0)
+  createdAt DateTime   @default(now())
+  deletedAt DateTime?  @map("deleted_at")
+  type      ColumnType @default(custom)
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks   Task[]
@@ -204,13 +204,13 @@ model Task {
   description String?
   priority    TaskPriority @default(medium)
   dueDate     DateTime?    @map("due_date")
-  position Int @default(0)
+  position    Int          @default(0)
 
   createdBy String    @map("created_by") @db.Uuid
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
-  isArchiv Boolean @default(false)
+  isArchiv  Boolean   @default(false)
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   column  Column  @relation(fields: [columnId], references: [id], onDelete: Cascade)
@@ -220,13 +220,14 @@ model Task {
   comments  Comment[]
   leadsLink LeadTaskLink[]
 
+  @@unique([columnId, id])
+  @@unique([columnId, position])
+  @@unique([columnId, title])
   @@index([projectId, deletedAt])
   @@index([columnId, deletedAt])
   @@index([createdBy, deletedAt])
   @@index([dueDate, deletedAt])
   @@index(deletedAt)
-  @@unique([columnId, position])
-  @@unique([columnId, title])
   @@map("tasks")
 }
 
@@ -243,15 +244,20 @@ model TaskAssignee {
 }
 
 model Comment {
-  id        String    @id @default(uuid()) @db.Uuid
-  taskId    String    @map("task_id") @db.Uuid
-  authorId  String    @map("author_id") @db.Uuid
-  content   String
+  id       String  @id @default(uuid()) @db.Uuid
+  taskId   String  @map("task_id") @db.Uuid
+  authorId String  @map("author_id") @db.Uuid
+  parentId String? @map("parent_id") @db.Uuid
+  content  String
+
   createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("update_at")
   deletedAt DateTime? @map("deleted_at")
 
-  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+  task    Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([taskId, deletedAt])
   @@index([authorId, deletedAt])
@@ -325,6 +331,7 @@ enum ActivityAction {
   MOVE_TASK
   ASSIGN_TASK
   COMMENT_TASK
+  DELETE_COMMENT
   CREATE_LEAD
   UPDATE_LEAD
   UPDATE_LEAD_STAGE

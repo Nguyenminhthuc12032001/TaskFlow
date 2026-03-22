@@ -7,7 +7,8 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
 import projectRoutes from "./modules/project/project.routes.js";
 import columnRoutes from "./modules/column/column.routes.js";
-import taskRoutes from "./modules/task/task.routes.js"
+import taskRoutes from "./modules/task/task.routes.js";
+import commentRoutes from "./modules/comment/comment.routes.js";
 
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -54,17 +55,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/health", (_req: Request, res: Response) => {
     res.status(200).json({ ok: true })
-})
+});
 
 app.get("/csurf-token", csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() })
-})
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workSpaceRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/comments", commentRoutes);
 
 setupSwagger(app);
 
@@ -73,7 +75,7 @@ app.use((req: Request, res: Response) => {
         ok: false,
         error: { message: `Route not found: ${req.method} ${req.originalUrl}` }
     })
-})
+});
 
 app.use(errorMiddleware);
 

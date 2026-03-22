@@ -3,5 +3,6 @@ export type ResourceContext = {
     projectId: string,
     columnId?: string,
     TaskId?: string,
+    CommentId?: string,
     ActorId: string
 }
