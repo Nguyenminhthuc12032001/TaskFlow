@@ -48,6 +48,17 @@ export function requireWorkspaceRole(minRole = "viewer") {
                 if (!columnInProject) {
                     throw new AppError("Column not found", 404, "COLUMN_NOT_IN_PROJECT");
                 }
+                const taskId = req.params.taskId;
+                if (taskId) {
+                    const taskInColumn = await prisma.task.findUnique({
+                        where: {
+                            columnId_id: { columnId, id: taskId }
+                        }
+                    });
+                    if (!taskInColumn) {
+                        throw new AppError("Task not found", 404, "TASK_OT_FOUND");
+                    }
+                }
             }
             ;
         }

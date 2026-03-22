@@ -259,6 +259,7 @@ model Comment {
   task    Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  @@unique([taskId, id])
   @@index([taskId, deletedAt])
   @@index([authorId, deletedAt])
   @@index(deletedAt)

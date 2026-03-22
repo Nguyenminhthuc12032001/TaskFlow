@@ -46,7 +46,7 @@ export class CommentController {
             projectId: req.params.projectId!,
             columnId: req.params.columnId!,
             TaskId: req.params.taskId!,
-            CommentId: req.params.columnId!,
+            CommentId: req.params.commentId!,
             ActorId: req.user!.id
         };
 
@@ -56,6 +56,7 @@ export class CommentController {
             id: comment.id,
             taskId: comment.taskId,
             authorId: comment.authorId,
+            parentId: comment.parentId ?? "",
             content: comment.content,
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt
@@ -84,6 +85,7 @@ export class CommentController {
             id: comment.id,
             taskId: comment.taskId,
             authorId: comment.authorId,
+            parentId: comment.parentId ?? "",
             content: comment.content,
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt
@@ -93,7 +95,7 @@ export class CommentController {
         const envelopSchema = okEnvelopeSchema(safeCommentsSchema);
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
-        return validatedEnvelop;
+        return res.status(200).json(validatedEnvelop);
     };
 
     update = async (req: Request<WorkspaceParams, {}, UpdateBodyType, {}, {}>, res: Response) => {
@@ -103,7 +105,7 @@ export class CommentController {
             projectId: req.params.projectId!,
             columnId: req.params.columnId!,
             TaskId: req.params.taskId!,
-            CommentId: req.params.columnId!,
+            CommentId: req.params.commentId!,
             ActorId: req.user!.id
         };
 
@@ -113,6 +115,7 @@ export class CommentController {
             id: comment.id,
             taskId: comment.taskId,
             authorId: comment.authorId,
+            parentId: comment.parentId ?? "",
             content: comment.content,
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt
@@ -122,7 +125,7 @@ export class CommentController {
         const envelopSchema = okEnvelopeSchema(safeCommentSchema);
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
-        return validatedEnvelop;
+        return res.status(200).json(validatedEnvelop);
     };
 
     reply = async (req: Request<WorkspaceParams, {}, CreateBodyType, {}, {}>, res: Response) => {
@@ -132,11 +135,11 @@ export class CommentController {
             projectId: req.params.projectId!,
             columnId: req.params.columnId!,
             TaskId: req.params.taskId!,
-            CommentId: req.params.columnId!,
+            CommentId: req.params.commentId!,
             ActorId: req.user!.id
         };
 
-        const comment = await this.commentService.create(req.body, ctx);
+        const comment = await this.commentService.reply(req.body, ctx);
 
         const safeComment: SafeCommentType = {
             id: comment.id,
@@ -162,7 +165,7 @@ export class CommentController {
             projectId: req.params.projectId!,
             columnId: req.params.columnId!,
             TaskId: req.params.taskId!,
-            CommentId: req.params.columnId!,
+            CommentId: req.params.commentId!,
             ActorId: req.user!.id
         };
 
@@ -172,6 +175,7 @@ export class CommentController {
             id: comment.id,
             taskId: comment.taskId,
             authorId: comment.authorId,
+            parentId: comment.parentId ?? "",
             content: comment.content,
             createdAt: comment.createdAt,
             updatedAt: comment.updatedAt
@@ -181,6 +185,6 @@ export class CommentController {
         const envelopSchema = okEnvelopeSchema(safeCommentSchema);
         const validatedEnvelop = validateResponse(envelopSchema)(envelop);
 
-        return validatedEnvelop;
+        return res.status(200).json(validatedEnvelop);
     };
 };

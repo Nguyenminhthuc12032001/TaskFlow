@@ -3,6 +3,7 @@ import { AppError } from "../../common/errors/AppError.js";
 import type { ResourceContext } from "../../common/types/common.types.js";
 import type { DbClient } from "../../db/prisma.js";
 import { ActivityService } from "../activity/activity.service.js";
+import type { WorkspaceService } from "../workspace/workspace.service.js";
 import type { CommentRepo } from "./comment.repo.js";
 import type { CreateBodyType, UpdateBodyType } from "./comment.schemas.js";
 
@@ -101,16 +102,38 @@ export class CommentService {
     };
 
     update = async (data: UpdateBodyType, ctx: ResourceContext) => {
+
+        const comment = await this.commentRepo.get(ctx);
+        if (!comment) {
+            throw new AppError("Comment not found", 404);
+        }
+
+        if (comment.authorId !== ctx.ActorId) {
+            throw new AppError("You don't have permission to delete this comment", 403);
+        }
+        
         const updateData: Prisma.CommentUpdateInput = {
             content: data.content
         }
 
-        const comment = await this.commentRepo.update(updateData, ctx);
-
-        return comment;
+        return await this.commentRepo.update(updateData, ctx);
     };
 
     remove = async (ctx: ResourceContext) => {
+
+        const comment = await this.commentRepo.get(ctx);
+        if (!comment) {
+            throw new AppError("Comment not found", 404);
+        }
+
+        const actor = await this.commentRepo.getMember(ctx);
+        if (!actor) {
+            throw new AppError("Member not found", 404);
+        }
+
+        if (comment.authorId !== ctx.ActorId && !["admin", "owner"].includes(actor.role)) {
+            throw new AppError("You don't have permission to delete this comment", 403);
+        }
 
         return await this.prisma.$transaction(async (tx) => {
 

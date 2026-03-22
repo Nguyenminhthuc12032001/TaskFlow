@@ -71,6 +71,19 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
                     if (!taskInColumn) {
                         throw new AppError("Task not found", 404, "TASK_OT_FOUND")
                     }
+
+                    const commentId = req.params.commentId;
+                    if (commentId) {
+                        const commentInTask = await prisma.comment.findUnique({
+                            where: {
+                                taskId_id: { taskId, id: commentId }
+                            }
+                        });
+
+                        if (!commentInTask) {
+                            throw new AppError("Comment not found", 404, "COMMENT_NOT_FOUND")
+                        }
+                    }
                 }
             };
         };

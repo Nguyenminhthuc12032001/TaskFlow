@@ -5,8 +5,23 @@ import { requireWorkspaceRole } from "../../common/middlewares/requireWorkspaceR
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
 import { createBodySchema, updateBodySchema } from "./comment.schemas.js";
 import { emptyBodySchema } from "../../common/schemas/common.schemas.js";
+import { CommentService } from "./comment.service.js";
+import { prisma } from "../../db/prisma.js";
+import { ActivityService } from "../activity/activity.service.js";
+import { ActivityRepo } from "../activity/activity.repo.js";
+import { CommentRepo } from "./comment.repo.js";
 
-const commentControlelr = new CommentController();
+const commentControlelr = new CommentController(
+    new CommentService(
+        prisma,
+        new ActivityService(
+            new ActivityRepo()
+        ),
+        new CommentRepo(
+            prisma
+        )
+    )
+);
 
 const router = Router();
 
@@ -17,7 +32,7 @@ router.post(defaultRoute,
     requireWorkspaceRole("member"),
     validateBody(createBodySchema), commentControlelr.create);
 
-router.post(defaultRoute + "/reply",
+router.post(defaultRoute + "/:commentId",
     authMiddleware,
     requireWorkspaceRole("member"),
     validateBody(createBodySchema), commentControlelr.reply);

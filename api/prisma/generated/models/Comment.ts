@@ -229,6 +229,7 @@ export type CommentOrderByWithRelationInput = {
 
 export type CommentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  taskId_id?: Prisma.CommentTaskIdIdCompoundUniqueInput
   AND?: Prisma.CommentWhereInput | Prisma.CommentWhereInput[]
   OR?: Prisma.CommentWhereInput[]
   NOT?: Prisma.CommentWhereInput | Prisma.CommentWhereInput[]
@@ -243,7 +244,7 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   replies?: Prisma.CommentListRelationFilter
   task?: Prisma.XOR<Prisma.TaskScalarRelationFilter, Prisma.TaskWhereInput>
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "taskId_id">
 
 export type CommentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -364,6 +365,11 @@ export type CommentOrderByRelationAggregateInput = {
 export type CommentNullableScalarRelationFilter = {
   is?: Prisma.CommentWhereInput | null
   isNot?: Prisma.CommentWhereInput | null
+}
+
+export type CommentTaskIdIdCompoundUniqueInput = {
+  taskId: string
+  id: string
 }
 
 export type CommentCountOrderByAggregateInput = {

@@ -11,6 +11,10 @@ export class ColumnService {
                 throw new AppError("Duplicate name is not allowed", 409);
             }
             ;
+            if (columns.some((c) => c.position === data.position)) {
+                throw new AppError("Duplicate position is not allowed", 409);
+            }
+            ;
             const createData = {
                 name: data.name,
                 position: data.position,
@@ -56,6 +60,17 @@ export class ColumnService {
         };
         this.bulkUpdateStatus = async (data, ctx) => { };
         this.reOrder = async (data, workspaceId, projectId, actorId) => {
+            const oldColumns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+            oldColumns.map((c) => {
+                if (!data.some((d) => d.columnId === c.id)) {
+                    throw new AppError(`Column with id: ${c.id} not found in request`, 404);
+                }
+            });
+            data.map((d) => {
+                if (!oldColumns.some((c) => c.id === d.columnId)) {
+                    throw new AppError(`Column with id: ${d.columnId} not found in database`, 404);
+                }
+            });
             const result = await this.prisma.$transaction(async (tx) => {
                 await Promise.all(data.map(async ({ columnId, position }) => {
                     return await this.columnRepo.update({ position: -(position + 1) }, workspaceId, projectId, columnId, actorId, tx);
@@ -78,7 +93,7 @@ export class ColumnService {
         };
         this.remove = async (workspaceId, projectId, columnId, actorId) => {
             return this.prisma.$transaction(async (tx) => {
-                const column = await this.columnRepo.remove(workspaceId, projectId, columnId, actorId);
+                const column = await this.columnRepo.remove(workspaceId, projectId, columnId, actorId, tx);
                 await this.activityService.logActivity(workspaceId, ActivityAction.DELETE_COLUMN, "column", actorId, column.id, {
                     name: column.name,
                     position: column.position

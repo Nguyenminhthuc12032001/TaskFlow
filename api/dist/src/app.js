@@ -7,6 +7,7 @@ import workSpaceRoutes from "./modules/workspace/workspace.routes.js";
 import projectRoutes from "./modules/project/project.routes.js";
 import columnRoutes from "./modules/column/column.routes.js";
 import taskRoutes from "./modules/task/task.routes.js";
+import commentRoutes from "./modules/comment/comment.routes.js";
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import { csrfProtection } from "./common/middlewares/csrf.middleware.js";
@@ -51,6 +52,7 @@ app.use("/api/workspaces", workSpaceRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/comments", commentRoutes);
 setupSwagger(app);
 app.use((req, res) => {
     res.status(404).json({

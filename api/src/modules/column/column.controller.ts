@@ -117,7 +117,7 @@ export class ColumnController {
         const safeColumn: SafeColumnType = {
             id: column.id,
             projectId: column.projectId,
-            name: column.projectId,
+            name: column.name,
             position: column.position,
             type: column.type,
             createdAt: column.createdAt

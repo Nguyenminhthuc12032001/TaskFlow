@@ -114,4 +114,15 @@ export class CommentRepo {
             }
         })
     };
+
+    getMember = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+        return await db.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: ctx.workspaceId,
+                    userId: ctx.ActorId
+                }
+            }
+        })
+    };
 }
