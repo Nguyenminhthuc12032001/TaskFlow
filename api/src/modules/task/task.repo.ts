@@ -129,7 +129,7 @@ export class TaskRepo {
                     }
                 }
             }
-        })
+        });
     };
 
     archivTask = async (

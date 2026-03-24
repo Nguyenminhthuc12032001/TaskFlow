@@ -10,11 +10,12 @@ export const createBodySchema = z.object({
         .min(10, "Description must be at least 10 characters long")
         .max(100, "Description must be at most 100 characters long")
         .optional(),
-    priority: z.enum(TaskPriority),
+    priority: z.enum(TaskPriority).optional(),
     dueDate: z.coerce.date().optional(),
     position: z.number()
         .int("Position must be an integer")
         .min(0, "Position must be a positive number")
+        .optional()
 });
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 

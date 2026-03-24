@@ -29,3 +29,4 @@ import "../modules/project/project.openApi.js";
 import "../modules/column/column.openApi.js";
 import "../modules/task/task.openApi.js";
 import "../modules/comment/comment.openApi.js";
+import "../modules/lead/lead.openApi.js";
