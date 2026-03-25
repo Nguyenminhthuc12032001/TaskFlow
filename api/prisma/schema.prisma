@@ -294,6 +294,9 @@ model Lead {
 
   taskLinks LeadTaskLink[]
 
+  @@unique([workspaceId, id])
+  @@unique([workspaceId, email])
+  @@unique([workspaceId, phone])
   @@index([workspaceId, deletedAt])
   @@index([createdBy, deletedAt])
   @@index([stage, deletedAt])

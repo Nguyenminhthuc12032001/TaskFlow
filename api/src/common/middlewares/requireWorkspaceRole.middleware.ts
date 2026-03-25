@@ -3,7 +3,7 @@ import { prisma } from "../../db/prisma.js";
 import { AppError } from "../errors/AppError.js";
 import type { WorkspaceRole } from "../../../prisma/generated/enums.js";
 
-export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string, columnId?: string, taskId?: string, commentId?: string };
+export type WorkspaceParams = { workspaceId: string, memberId?: string, projectId?: string, columnId?: string, taskId?: string, commentId?: string, leadId?: string };
 
 const rank: Record<WorkspaceRole, number> = {
     owner: 4,
@@ -34,6 +34,19 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = "viewer") {
 
         if (rank[membership.role] < rank[minRole]) {
             throw new AppError("Forbidden", 403, "INSUFFICIENT_WORKSPACE_ROLE")
+        };
+
+        const leadId = req.params.leadId;
+        if (leadId) {
+            const leadInWorkspace = await prisma.lead.findUnique({
+                where: {
+                    workspaceId_id: { workspaceId, id: leadId }
+                }
+            });
+
+            if (!leadInWorkspace) {
+                throw new AppError("Lead not found", 404, "LEAD_NOT_IN_WORKSPACE");
+            };
         };
 
         const projectId = req.params.projectId;

@@ -1,7 +1,7 @@
 import { registry } from "../../docs/openapi.js";
 import z, { type ZodType } from "../../docs/zod.js";
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";
-import { createBodySchema, createFollowUpTaskBodySchema, safeLeadSchema, safeLeadsSchema, safeLeadWithTaskLinksSchema, updateBodySchema, updateStageBodySchema } from "./lead.schemas.js";
+import { createBodySchema, createFollowUpTaskBodySchema, safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema } from "./lead.schemas.js";
 
 const defaultPath = "/api/leads/{workspaceId}";
 
@@ -60,7 +60,7 @@ registry.registerPath({
     request: {
         params: withLeadId
     },
-    responses: defaultResponse(safeLeadWithTaskLinksSchema, [201, 409])
+    responses: defaultResponse(safeLeadSchema, [201, 409])
 });
 
 registry.registerPath({
@@ -116,7 +116,7 @@ registry.registerPath({
             taskId: z.uuid()
         })
     },
-    responses: defaultResponse(safeLeadWithTaskLinksSchema, [201])
+    responses: defaultResponse(safeLeadTaskLinkSchema, [201])
 });
 
 registry.registerPath({
@@ -130,7 +130,7 @@ registry.registerPath({
             taskId: z.uuid()
         })
     },
-    responses: defaultResponse(safeLeadWithTaskLinksSchema, [201, 409])
+    responses: defaultResponse(safeLeadTaskLinkSchema, [201, 409])
 });
 
 registry.registerPath({
@@ -145,7 +145,7 @@ registry.registerPath({
          },
         params: withLeadId
     },
-    responses: defaultResponse(safeLeadWithTaskLinksSchema, [200])
+    responses: defaultResponse(safeLeadTaskLinkSchema, [200])
 });
 
 registry.registerPath({
@@ -157,5 +157,5 @@ registry.registerPath({
     request: {
         params: withLeadId
     },
-    responses: defaultResponse(safeLeadWithTaskLinksSchema, [201, 409])
+    responses: defaultResponse(safeLeadTaskLinkSchema, [201, 409])
 });

@@ -48,7 +48,7 @@ export type UpdateBodyType = z.infer<typeof updateBodySchema>;
 export const updateStageBodySchema = z.object({
     stage: z.enum(LeadStage)
 });
-export type UpdateStageBodyType = z.infer<typeof updateBodySchema>;
+export type UpdateStageBodyType = z.infer<typeof updateStageBodySchema>;
 
 export const createFollowUpTaskBodySchema = z.object({
     title: z.string().trim()
@@ -93,10 +93,11 @@ export const safeLeadSchema = z.object({
 });
 export type SafeLeadType = z.infer<typeof safeLeadSchema>;
 
-export const safeLeadWithTaskLinksSchema = safeLeadSchema.extend({
-    taskLinks: z.array(safeTaskSchema)
-});
-export type SafeLeadWithTaskLinksType = z.infer<typeof safeLeadWithTaskLinksSchema>;
+export const safeLeadTaskLinkSchema = z.object({
+    leadId: z.uuid(),
+    taskId: z.uuid()
+})
+export type SafeLeadTaskLinkType = z.infer<typeof safeLeadTaskLinkSchema>;
 
 export const safeLeadsSchema = z.array(safeLeadSchema);
 export type SafeLeadsType = z.infer<typeof safeLeadsSchema>;

@@ -27,7 +27,7 @@ export class TaskService {
                 title: data.title,
                 priority: data.priority,
                 position: data.position,
-                description: data.description ?? "",
+                description: data.description ?? null,
                 dueDate: data.dueDate ?? null,
                 project: {
                     connect: {
