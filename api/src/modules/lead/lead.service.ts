@@ -1,7 +1,8 @@
-import { Prisma } from "../../../prisma/generated/client.js";
+import { ActivityAction, Prisma } from "../../../prisma/generated/client.js";
 import { AppError } from "../../common/errors/AppError.js";
 import type { ResourceContext } from "../../common/types/common.types.js";
 import type { DbClient } from "../../db/prisma.js";
+import type { ActivityService } from "../activity/activity.service.js";
 import type { TaskRepo } from "../task/task.repo.js";
 import type { LeadRepo } from "./lead.repo.js";
 import type { CreateBodyType, CreateFollowUpBodyType, UpdateBodyType, UpdateStageBodyType } from "./lead.schemas.js";
@@ -10,7 +11,8 @@ export class LeadService {
     constructor(
         readonly prisma: DbClient,
         readonly leadRepo: LeadRepo,
-        readonly taskRepo: TaskRepo
+        readonly taskRepo: TaskRepo,
+        readonly activityService: ActivityService
     ) { };
 
     create = async (data: CreateBodyType, ctx: ResourceContext) => {
@@ -34,9 +36,23 @@ export class LeadService {
             creator: { connect: { id: ctx.ActorId } }
         };
 
-        const lead = await this.leadRepo.create(dataCreate);
+        return await this.prisma.$transaction(async (tx) => {
 
-        return lead;
+            const lead = await this.leadRepo.create(dataCreate, tx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.CREATE_LEAD,
+                "lead",
+                ctx.ActorId,
+                ctx.LeadId,
+                { lead },
+                tx
+            );
+
+            return lead;
+
+        })
     };
 
     get = async (ctx: ResourceContext) => {
@@ -81,7 +97,22 @@ export class LeadService {
             ...(data.note !== undefined && { note: data.note })
         };
 
-        return await this.leadRepo.update(dataUpdate, ctx);
+        return await this.prisma.$transaction(async (tx) => {
+
+            const lead = await this.leadRepo.update(dataUpdate, ctx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.UPDATE_LEAD,
+                "lead",
+                ctx.ActorId,
+                lead.id,
+                { lead },
+                tx
+            );
+
+            return lead;
+        });
     }
 
     updateStage = async (data: UpdateStageBodyType, ctx: ResourceContext) => {
@@ -90,7 +121,22 @@ export class LeadService {
             stage: data.stage
         };
 
-        return await this.leadRepo.update(dataUpdateStage, ctx);
+        return await this.prisma.$transaction(async (tx) => {
+
+            const lead = await this.leadRepo.update(dataUpdateStage, ctx, tx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.UPDATE_LEAD_STAGE,
+                "lead",
+                ctx.ActorId,
+                lead.id,
+                { lead },
+                tx
+            );
+
+            return lead;
+        });
     };
 
     linkTask = async (ctx: ResourceContext) => {
@@ -106,15 +152,42 @@ export class LeadService {
             task: { connect: { id: ctx.TaskId } }
         };
 
-        const leadTaskLink = await this.leadRepo.linkTask(dataLinktask);
+        return await this.prisma.$transaction(async (tx) => {
 
-        return leadTaskLink;
+            const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.LINK_TASK,
+                "leadTaskLink",
+                ctx.ActorId,
+                undefined,
+                { leadTaskLink },
+                tx
+            );
+
+            return leadTaskLink;
+        });
     };
 
     unlinkTask = async (ctx: ResourceContext) => {
-        const leadTaskLink = await this.leadRepo.unlinkTask(ctx);
 
-        return leadTaskLink;
+        return await this.prisma.$transaction(async (tx) => {
+
+            const leadTaskLink = await this.leadRepo.unlinkTask(ctx, tx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.UNLINK_TASK,
+                "leadTaskLink",
+                ctx.ActorId,
+                undefined,
+                { leadTaskLink },
+                tx
+            );
+
+            return leadTaskLink;
+        });
     };
 
     createFollowUpTask = async (data: CreateFollowUpBodyType, ctx: ResourceContext) => {
@@ -153,6 +226,16 @@ export class LeadService {
 
             const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
 
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.CREATE_FOLLOWUP_TASK,
+                "task_leadTaskLink",
+                ctx.ActorId,
+                `leadId: ${leadTaskLink.leadId}, taskId: ${leadTaskLink.taskId}`,
+                { leadTaskLink },
+                tx
+            );
+
             return leadTaskLink
         });
     };
@@ -162,7 +245,18 @@ export class LeadService {
         return await this.prisma.$transaction(async (tx) => {
 
             const lead = await this.leadRepo.remove(ctx, tx);
+
             await this.leadRepo.removeLeadTaskLink(ctx, tx);
+
+            await this.activityService.logActivity(
+                ctx.workspaceId,
+                ActivityAction.REMOVE_LEAD,
+                "lead",
+                ctx.ActorId,
+                lead.id,
+                { lead },
+                tx
+            );
 
             return lead;
         });

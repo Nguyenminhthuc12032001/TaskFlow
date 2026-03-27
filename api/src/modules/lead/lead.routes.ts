@@ -9,6 +9,8 @@ import { LeadService } from "./lead.service.js";
 import { prisma } from "../../db/prisma.js";
 import { LeadRepo } from "./lead.repo.js";
 import { TaskRepo } from "../task/task.repo.js";
+import { ActivityService } from "../activity/activity.service.js";
+import { ActivityRepo } from "../activity/activity.repo.js";
 
 const leadController = new LeadController(
     new LeadService(
@@ -18,6 +20,9 @@ const leadController = new LeadController(
         ),
         new TaskRepo(
             prisma
+        ),
+        new ActivityService(
+            new ActivityRepo()
         )
     )
 );
