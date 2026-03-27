@@ -21,7 +21,7 @@ export class LeadRepo {
                         some: {
                             userId: ctx.ActorId,
                             role: {
-                                in: ["member"]
+                                in: ["member", "admin", "owner"]
                             }
                         }
                     }
@@ -39,7 +39,7 @@ export class LeadRepo {
                         some: {
                             userId: ctx.ActorId,
                             role: {
-                                in: ["member"]
+                                in: ["member", "admin", "owner"]
                             }
                         }
                     }

@@ -5,8 +5,22 @@ import { requireWorkspaceRole } from "../../common/middlewares/requireWorkspaceR
 import { validateBody } from "../../common/middlewares/validateBody.middleware.js";
 import { createBodySchema, createFollowUpTaskBodySchema, updateBodySchema, updateStageBodySchema } from "./lead.schemas.js";
 import { emptyBodySchema } from "../../common/schemas/common.schemas.js";
+import { LeadService } from "./lead.service.js";
+import { prisma } from "../../db/prisma.js";
+import { LeadRepo } from "./lead.repo.js";
+import { TaskRepo } from "../task/task.repo.js";
 
-const leadController = new LeadController();
+const leadController = new LeadController(
+    new LeadService(
+        prisma,
+        new LeadRepo(
+            prisma
+        ),
+        new TaskRepo(
+            prisma
+        )
+    )
+);
 
 const router = Router();
 
@@ -54,3 +68,5 @@ router.delete("/:workspaceId/:leadId",
     authMiddleware,
     requireWorkspaceRole("member"),
     validateBody(emptyBodySchema), leadController.remove);
+
+export default router;

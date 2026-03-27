@@ -1,11 +1,34 @@
 import { registry } from "../../docs/openapi.js";
 import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema } from "./workspace.schemas.js";
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";
-import z from "../../docs/zod.js";
+import z, { type ZodType } from "../../docs/zod.js";
+
+export const defaultResponse = (
+    schema: ZodType,
+    exclude: Array<200 | 201 | 400 | 401 | 403 | 404 | 409 | 500> = []) => {
+    const responses = {
+        200: ok200(schema),
+        201: created201(schema),
+        400: fail400,
+        401: fail401,
+        403: fail403,
+        404: fail404,
+        409: fail409,
+        500: fail500
+    };
+
+    for (const code of exclude) {
+        delete responses[code];
+    }
+
+    return responses;
+};
+
+const defaultPath = "/api/workspaces"
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspaces/create",
+    path: defaultPath,
     tags: ["Workspace"],
     summary: "Create new Workspace",
     security: [{ bearerAuth: [] }],
@@ -14,33 +37,21 @@ registry.registerPath({
             content: { "application/json": { schema: createBodySchema } }
         }
     },
-    responses: {
-        201: created201(createResponseSchema),
-        400: fail400,
-        401: fail401,
-        409: fail409,
-        500: fail500
-    }
+    responses: defaultResponse(createResponseSchema, [200, 403, 404])
 });
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspaces/list",
+    path: defaultPath,
     tags: ["Workspace"],
     summary: "Get list workspace by user ID",
     security: [{ bearerAuth: [] }],
-    responses: {
-        200: ok200(getByUserIdResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        500: fail500
-    }
+    responses: defaultResponse(getByUserIdResponseSchema, [201, 404, 409])
 });
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspaces/{workspaceId}",
+    path: defaultPath + "/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get workspace by ID",
     security: [{ bearerAuth: [] }],
@@ -49,19 +60,12 @@ registry.registerPath({
             workspaceId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(getByIdResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
+    responses: defaultResponse(getByIdResponseSchema, [201, 409])
 });
 
 registry.registerPath({
     method: "get",
-    path: "/api/workspaces/members/{workspaceId}",
+    path: defaultPath + "/members/{workspaceId}",
     tags: ["Workspace"],
     summary: "Get members by workspace ID",
     security: [{ bearerAuth: [] }],
@@ -70,19 +74,12 @@ registry.registerPath({
             workspaceId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(membersResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
+    responses: defaultResponse(membersResponseSchema, [201, 409])
 });
 
 registry.registerPath({
     method: "patch",
-    path: "/api/workspaces/{workspaceId}",
+    path: defaultPath + "/{workspaceId}",
     tags: ["Workspace"],
     summary: "Update workspace name",
     security: [{ bearerAuth: [] }],
@@ -94,20 +91,12 @@ registry.registerPath({
             workspaceId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(updateResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
+    responses: defaultResponse(updateResponseSchema, [201])
 });
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspaces/{workspaceId}",
+    path: defaultPath + "/{workspaceId}",
     tags: ["Workspace"],
     summary: "Delete workspace by ID",
     security: [{ bearerAuth: [] }],
@@ -116,19 +105,12 @@ registry.registerPath({
             workspaceId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(deleteResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        fail500: fail500
-    }
+    responses: defaultResponse(deleteResponseSchema, [201, 409])
 });
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspaces/invite/{workspaceId}",
+    path: defaultPath + "/invite/{workspaceId}",
     tags: ["Workspace"],
     summary: "Invite member for workspace",
     security: [{ bearerAuth: [] }],
@@ -140,20 +122,12 @@ registry.registerPath({
             workspaceId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(inviteResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
+    responses: defaultResponse(inviteResponseSchema, [201])
 });
 
 registry.registerPath({
     method: "post",
-    path: "/api/workspaces/accept_invite",
+    path: defaultPath + "/accept_invite",
     tags: ["Workspace"],
     summary: "Accept invite",
     security: [{ bearerAuth: [] }],
@@ -162,20 +136,12 @@ registry.registerPath({
             content: { "application/json": { schema: acceptBodySchema } }
         }
     },
-    responses: {
-        201: created201(acceptResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
+    responses: defaultResponse(acceptResponseSchema, [200])
 });
 
 registry.registerPath({
     method: "delete",
-    path: "/api/workspaces/remove_member/{workspaceId}/{memberId}",
+    path: defaultPath + "/remove_member/{workspaceId}/{memberId}",
     tags: ["Workspace"],
     summary: "Remove member",
     security: [{ bearerAuth: [] }],
@@ -185,12 +151,5 @@ registry.registerPath({
             memberId: z.uuid()
         })
     },
-    responses: {
-        200: ok200(removeMemberResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
+    responses: defaultResponse(removeMemberResponseSchema, [201, 409])
 });

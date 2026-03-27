@@ -9,6 +9,7 @@ import projectRoutes from "./modules/project/project.routes.js";
 import columnRoutes from "./modules/column/column.routes.js";
 import taskRoutes from "./modules/task/task.routes.js";
 import commentRoutes from "./modules/comment/comment.routes.js";
+import leadRoutes from "./modules/lead/lead.routes.js";
 
 import { setupSwagger } from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -67,6 +68,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/columns", columnRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/leads", leadRoutes);
 
 setupSwagger(app);
 

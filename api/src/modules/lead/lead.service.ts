@@ -119,6 +119,18 @@ export class LeadService {
 
     createFollowUpTask = async (data: CreateFollowUpBodyType, ctx: ResourceContext) => {
 
+        const tasks = await this.taskRepo.listByColumn(ctx);
+
+        if (data.position) {
+            if (tasks.some((t) => t.position === data.position)) {
+                throw new AppError("Duplicate task position is not allowed", 409);
+            }
+        }
+
+        const maxPosition = tasks.length > 0 ? Math.max(...tasks.map(t => t.position)) : 0;
+
+        data.position = maxPosition + 1000;
+
         const dataCreateTask: Prisma.TaskCreateInput = {
             title: data.title,
             ...(data.description !== undefined && { description: data.description }),
@@ -132,14 +144,14 @@ export class LeadService {
 
         return await this.prisma.$transaction(async (tx) => {
 
-            const task = await this.taskRepo.create(dataCreateTask);
+            const task = await this.taskRepo.create(dataCreateTask, tx);
 
             const dataLinktask: Prisma.LeadTaskLinkCreateInput = {
                 lead: { connect: { id: ctx.LeadId } },
                 task: { connect: { id: task.id } }
             };
 
-            const leadTaskLink = await this.leadRepo.linkTask(dataLinktask);
+            const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
 
             return leadTaskLink
         });

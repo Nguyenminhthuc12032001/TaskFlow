@@ -35,11 +35,11 @@ const workspaceController = new WorkspaceController(
     )
 )
 
-router.post("/create",
+router.post("",
     authMiddleware, validateBody(createBodySchema),
     workspaceController.create);
 
-router.get("/list",
+router.get("",
     authMiddleware, validateBody(emptyBodySchema),
     workspaceController.getByUserId);
 

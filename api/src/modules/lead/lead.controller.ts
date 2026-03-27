@@ -214,6 +214,8 @@ export class LeadController {
 
         const ctx: ResourceContext = {
             workspaceId: req.params.workspaceId,
+            projectId: req.params.projectId!,
+            columnId: req.params.columnId!,
             LeadId: req.params.leadId!,
             ActorId: req.user!.id
         };

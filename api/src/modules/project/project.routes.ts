@@ -25,12 +25,12 @@ const projectController = new ProjectController(
 
 const router = Router();
 
-router.post("/:workspaceId/create",
+router.post("/:workspaceId",
     authMiddleware,
     requireWorkspaceRole("admin"),
     validateBody(createBodySchema), projectController.create);
 
-router.get("/:workspaceId/list_by_workspace",
+router.get("/:workspaceId",
     authMiddleware,
     requireWorkspaceRole(),
     validateBody(emptyBodySchema), projectController.listByWorkspace);
@@ -40,12 +40,12 @@ router.get("/:workspaceId/:projectId",
     requireWorkspaceRole(),
     validateBody(emptyBodySchema), projectController.get);
 
-router.patch("/:workspaceId/update/:projectId",
+router.patch("/:workspaceId/:projectId",
     authMiddleware,
     requireWorkspaceRole("admin"),
     validateBody(updateBodySchema), projectController.update);
 
-router.delete("/:workspaceId/remove/:projectId",
+router.delete("/:workspaceId/:projectId",
     authMiddleware,
     requireWorkspaceRole("admin"),
     validateBody(emptyBodySchema), projectController.remove);
