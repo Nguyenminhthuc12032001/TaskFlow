@@ -1,5 +1,5 @@
-import z from "../../../docs/zod.js";
-import { AppError } from "../../errors/AppError.js";
+import z from '../../../docs/zod.js';
+import { AppError } from '../../errors/AppError.js';
 export function validateResponse(schema) {
     return (data) => {
         const result = schema.safeParse(data);

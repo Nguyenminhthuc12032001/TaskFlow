@@ -1,187 +1,140 @@
-import { registry } from "../../docs/openapi.js";
-import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema } from "./workspace.schemas.js";
-import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200 } from "../auth/auth.openApi.js";
-import z from "../../docs/zod.js";
-registry.registerPath({
-    method: "post",
-    path: "/api/workspaces/create",
-    tags: ["Workspace"],
-    summary: "Create new Workspace",
-    security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: createBodySchema } }
-        }
-    },
-    responses: {
-        201: created201(createResponseSchema),
+import { registry } from '../../docs/openapi.js';
+import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, } from './workspace.schemas.js';
+import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200, } from '../auth/auth.openApi.js';
+import z from '../../docs/zod.js';
+export const defaultResponse = (schema, exclude = []) => {
+    const responses = {
+        200: ok200(schema),
+        201: created201(schema),
         400: fail400,
         401: fail401,
+        403: fail403,
+        404: fail404,
         409: fail409,
-        500: fail500
+        500: fail500,
+    };
+    for (const code of exclude) {
+        delete responses[code];
     }
-});
+    return responses;
+};
+const defaultPath = '/api/workspaces';
 registry.registerPath({
-    method: "get",
-    path: "/api/workspaces/list",
-    tags: ["Workspace"],
-    summary: "Get list workspace by user ID",
-    security: [{ bearerAuth: [] }],
-    responses: {
-        200: ok200(getByUserIdResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        500: fail500
-    }
-});
-registry.registerPath({
-    method: "get",
-    path: "/api/workspaces/{workspaceId}",
-    tags: ["Workspace"],
-    summary: "Get workspace by ID",
-    security: [{ bearerAuth: [] }],
-    request: {
-        params: z.object({
-            workspaceId: z.uuid()
-        })
-    },
-    responses: {
-        200: ok200(getByIdResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
-});
-registry.registerPath({
-    method: "get",
-    path: "/api/workspaces/members/{workspaceId}",
-    tags: ["Workspace"],
-    summary: "Get members by workspace ID",
-    security: [{ bearerAuth: [] }],
-    request: {
-        params: z.object({
-            workspaceId: z.uuid()
-        })
-    },
-    responses: {
-        200: ok200(membersResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
-});
-registry.registerPath({
-    method: "patch",
-    path: "/api/workspaces/{workspaceId}",
-    tags: ["Workspace"],
-    summary: "Update workspace name",
+    method: 'post',
+    path: defaultPath,
+    tags: ['Workspace'],
+    summary: 'Create new Workspace',
     security: [{ bearerAuth: [] }],
     request: {
         body: {
-            content: { "application/json": { schema: updateBodySchema } }
+            content: { 'application/json': { schema: createBodySchema } },
         },
-        params: z.object({
-            workspaceId: z.uuid()
-        })
     },
-    responses: {
-        200: ok200(updateResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
+    responses: defaultResponse(createResponseSchema, [200, 403, 404]),
 });
 registry.registerPath({
-    method: "delete",
-    path: "/api/workspaces/{workspaceId}",
-    tags: ["Workspace"],
-    summary: "Delete workspace by ID",
+    method: 'get',
+    path: defaultPath,
+    tags: ['Workspace'],
+    summary: 'Get list workspace by user ID',
     security: [{ bearerAuth: [] }],
-    request: {
-        params: z.object({
-            workspaceId: z.uuid()
-        })
-    },
-    responses: {
-        200: ok200(deleteResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        fail500: fail500
-    }
+    responses: defaultResponse(getByUserIdResponseSchema, [201, 404, 409]),
 });
 registry.registerPath({
-    method: "post",
-    path: "/api/workspaces/invite/{workspaceId}",
-    tags: ["Workspace"],
-    summary: "Invite member for workspace",
-    security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: inviteBodySchema } }
-        },
-        params: z.object({
-            workspaceId: z.uuid()
-        })
-    },
-    responses: {
-        200: ok200(inviteResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
-});
-registry.registerPath({
-    method: "post",
-    path: "/api/workspaces/accept_invite",
-    tags: ["Workspace"],
-    summary: "Accept invite",
-    security: [{ bearerAuth: [] }],
-    request: {
-        body: {
-            content: { "application/json": { schema: acceptBodySchema } }
-        }
-    },
-    responses: {
-        201: created201(acceptResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        409: fail409,
-        500: fail500
-    }
-});
-registry.registerPath({
-    method: "delete",
-    path: "/api/workspaces/remove_member/{workspaceId}/{memberId}",
-    tags: ["Workspace"],
-    summary: "Remove member",
+    method: 'get',
+    path: defaultPath + '/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Get workspace by ID',
     security: [{ bearerAuth: [] }],
     request: {
         params: z.object({
             workspaceId: z.uuid(),
-            memberId: z.uuid()
-        })
+        }),
     },
-    responses: {
-        200: ok200(removeMemberResponseSchema),
-        400: fail400,
-        401: fail401,
-        403: fail403,
-        404: fail404,
-        500: fail500
-    }
+    responses: defaultResponse(getByIdResponseSchema, [201, 409]),
+});
+registry.registerPath({
+    method: 'get',
+    path: defaultPath + '/members/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Get members by workspace ID',
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(membersResponseSchema, [201, 409]),
+});
+registry.registerPath({
+    method: 'patch',
+    path: defaultPath + '/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Update workspace name',
+    security: [{ bearerAuth: [] }],
+    request: {
+        body: {
+            content: { 'application/json': { schema: updateBodySchema } },
+        },
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(updateResponseSchema, [201]),
+});
+registry.registerPath({
+    method: 'delete',
+    path: defaultPath + '/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Delete workspace by ID',
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(deleteResponseSchema, [201, 409]),
+});
+registry.registerPath({
+    method: 'post',
+    path: defaultPath + '/invite/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Invite member for workspace',
+    security: [{ bearerAuth: [] }],
+    request: {
+        body: {
+            content: { 'application/json': { schema: inviteBodySchema } },
+        },
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(inviteResponseSchema, [201]),
+});
+registry.registerPath({
+    method: 'post',
+    path: defaultPath + '/accept_invite',
+    tags: ['Workspace'],
+    summary: 'Accept invite',
+    security: [{ bearerAuth: [] }],
+    request: {
+        body: {
+            content: { 'application/json': { schema: acceptBodySchema } },
+        },
+    },
+    responses: defaultResponse(acceptResponseSchema, [200]),
+});
+registry.registerPath({
+    method: 'delete',
+    path: defaultPath + '/remove_member/{workspaceId}/{memberId}',
+    tags: ['Workspace'],
+    summary: 'Remove member',
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.uuid(),
+            memberId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(removeMemberResponseSchema, [201, 409]),
 });

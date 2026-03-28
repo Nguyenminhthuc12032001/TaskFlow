@@ -1,66 +1,76 @@
-import { z } from "../../docs/zod.js";
-export const emailSchema = z
-    .string()
-    .trim()
-    .toLowerCase()
-    .pipe(z.email("Invalid email address"));
+import { z } from '../../docs/zod.js';
+export const emailSchema = z.string().trim().toLowerCase().pipe(z.email('Invalid email address'));
 export const passwordSchema = z
     .string()
     .trim()
-    .min(8, "Password must be at least 8 characters")
-    .max(72, "Password must be less than or equal 72 characters");
+    .min(8, 'Password must be at least 8 characters')
+    .max(72, 'Password must be less than or equal 72 characters');
 // ========== REQUEST ==========
 // POST auth/register
-export const registerBodySchema = z.object({
+export const registerBodySchema = z
+    .object({
     name: z
         .string()
         .trim()
-        .min(2, "Name must be at least 2 characters")
-        .max(100, "Name must be less than or equal 100 characters"),
+        .min(2, 'Name must be at least 2 characters')
+        .max(100, 'Name must be less than or equal 100 characters'),
     email: emailSchema,
-    password: passwordSchema
-}).strict();
+    password: passwordSchema,
+})
+    .strict();
 // POST auth/login
-export const loginBodySchema = z.object({
+export const loginBodySchema = z
+    .object({
     email: emailSchema,
-    password: z
-        .string()
-        .min(1, "Password cannot be empty")
-}).strict();
+    password: z.string().min(1, 'Password cannot be empty'),
+})
+    .strict();
 // POST auth/forgot-password
-export const forgotPasswordBodySchema = z.object({
-    email: emailSchema
-}).strict();
+export const forgotPasswordBodySchema = z
+    .object({
+    email: emailSchema,
+})
+    .strict();
 // POST auth/reset-password
-export const resetPasswordBodySchema = z.object({
-    resetToken: z.string().min(10, "Invalid reset token"),
-    newPassword: passwordSchema
-}).strict();
+export const resetPasswordBodySchema = z
+    .object({
+    resetToken: z.string().min(10, 'Invalid reset token'),
+    newPassword: passwordSchema,
+})
+    .strict();
 // POST auth/change-password
-export const changePasswordBodySchema = z.object({
-    currentPassword: z
-        .string()
-        .min(1, "Current password cannot be empty"),
-    newPassword: passwordSchema
-}).strict();
+export const changePasswordBodySchema = z
+    .object({
+    currentPassword: z.string().min(1, 'Current password cannot be empty'),
+    newPassword: passwordSchema,
+})
+    .strict();
 // ========== RESSPONSE ==========
 // SafeUser
-export const safeUserSchema = z.object({
+export const safeUserSchema = z
+    .object({
     id: z.uuid(),
     name: z.string(),
     email: emailSchema,
-}).strict();
+})
+    .strict();
 // REGISTER
-export const registerResponseSchema = z.object({
+export const registerResponseSchema = z
+    .object({
     user: safeUserSchema,
     accessToken: z.string(),
-}).strict();
+})
+    .strict();
 // LOGIN
-export const loginResponseSchema = z.object({
+export const loginResponseSchema = z
+    .object({
     user: safeUserSchema,
     accessToken: z.string(),
-}).strict();
+})
+    .strict();
 // REFRESH
-export const refreshResponseSchema = z.object({
+export const refreshResponseSchema = z
+    .object({
     accessToken: z.string(),
-}).strict();
+})
+    .strict();

@@ -1,6 +1,6 @@
-import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateResponseSchema } from './workspace.schemas.js';
+import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateResponseSchema, } from './workspace.schemas.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
-import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from '../../common/utils/response/format.js';
+import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 export class WorkspaceController {
     constructor(workspaceService) {
         this.workspaceService = workspaceService;
@@ -11,7 +11,7 @@ export class WorkspaceController {
                 name: workspace.name,
                 createdBy: workspace.createdBy,
                 createdAt: workspace.createdAt,
-                updatedAt: workspace.updatedAt
+                updatedAt: workspace.updatedAt,
             };
             const envelop = created(workspaceResponse);
             const envelopSchema = createdEnvelopeSchema(createResponseSchema);
@@ -25,7 +25,7 @@ export class WorkspaceController {
                 name: workspace.name,
                 createdBy: workspace.createdBy,
                 createdAt: workspace.createdAt,
-                updatedAt: workspace.updatedAt
+                updatedAt: workspace.updatedAt,
             };
             const envelop = ok(workspaceResponse);
             const envelopSchema = okEnvelopeSchema(getByIdResponseSchema);
@@ -39,7 +39,7 @@ export class WorkspaceController {
                 name: w.name,
                 createdBy: w.createdBy,
                 createdAt: w.createdAt,
-                updatedAt: w.updatedAt
+                updatedAt: w.updatedAt,
             }));
             const envelop = ok(workspacesResponse);
             const envelopSchema = okEnvelopeSchema(getByUserIdResponseSchema);
@@ -52,10 +52,10 @@ export class WorkspaceController {
                 user: {
                     id: m.user.id,
                     name: m.user.name,
-                    email: m.user.email
+                    email: m.user.email,
                 },
                 role: m.role,
-                joinedAt: m.joinedAt
+                joinedAt: m.joinedAt,
             }));
             const envelop = ok(membersResponse);
             const envelopSchema = okEnvelopeSchema(membersResponseSchema);
@@ -70,7 +70,7 @@ export class WorkspaceController {
                 name: result.name,
                 createdBy: result.createdBy,
                 createdAt: result.createdAt,
-                updatedAt: result.updatedAt
+                updatedAt: result.updatedAt,
             };
             const envelop = ok(safeWorkspaceResponse);
             const envelopSchema = okEnvelopeSchema(updateResponseSchema);
@@ -84,7 +84,7 @@ export class WorkspaceController {
                 name: result.name,
                 createdBy: result.createdBy,
                 createdAt: result.createdAt,
-                updatedAt: result.updatedAt
+                updatedAt: result.updatedAt,
             };
             const envelop = ok(safeWorkspaceResponse);
             const envelopSchema = okEnvelopeSchema(deleteResponseSchema);
@@ -101,7 +101,7 @@ export class WorkspaceController {
                 jti: result.jti,
                 tokenHash: result.tokenHash,
                 createdAt: result.createdAt,
-                createdBy: result.createdBy
+                createdBy: result.createdBy,
             };
             const envelop = ok(inviteResponse);
             const envelopShcema = okEnvelopeSchema(inviteResponseSchema);
@@ -114,7 +114,7 @@ export class WorkspaceController {
                 role: result.role,
                 userId: result.userId,
                 workspaceId: result.workspaceId,
-                joinedAt: result.joinedAt
+                joinedAt: result.joinedAt,
             };
             const envelop = created(acceptResponse);
             const envelopSchema = createdEnvelopeSchema(acceptResponseSchema);
@@ -128,7 +128,7 @@ export class WorkspaceController {
                 deletedAt: result.deletedAt,
                 workspaceId: result.workspaceId,
                 role: result.role,
-                joinedAt: result.joinedAt
+                joinedAt: result.joinedAt,
             };
             const envelop = ok(removeMemberResponse);
             const envelopSchema = okEnvelopeSchema(removeMemberResponseSchema);

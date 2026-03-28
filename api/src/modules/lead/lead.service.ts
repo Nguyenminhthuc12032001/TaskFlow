@@ -20,7 +20,7 @@ export class LeadService {
     readonly activityService: ActivityService,
   ) {}
 
-  create = async (data: CreateBodyType, ctx: ResourceContext) => {
+  async create(data: CreateBodyType, ctx: ResourceContext) {
     if (data.email && (await this.leadRepo.existEmail(data.email, ctx))) {
       throw new AppError('Duplicate email is not allowed', 409);
     }
@@ -55,9 +55,9 @@ export class LeadService {
 
       return lead;
     });
-  };
+  }
 
-  get = async (ctx: ResourceContext) => {
+  async get(ctx: ResourceContext) {
     const lead = await this.leadRepo.get(ctx);
 
     if (!lead) {
@@ -65,13 +65,13 @@ export class LeadService {
     }
 
     return lead;
-  };
+  }
 
-  listByWorkspace = async (ctx: ResourceContext) => {
+  async listByWorkspace(ctx: ResourceContext) {
     return await this.leadRepo.listByWorkspace(ctx);
-  };
+  }
 
-  update = async (data: UpdateBodyType, ctx: ResourceContext) => {
+  async update(data: UpdateBodyType, ctx: ResourceContext) {
     if (data.email) {
       const duplicateEmail = await this.leadRepo.existEmail(data.email, ctx);
 
@@ -111,9 +111,9 @@ export class LeadService {
 
       return lead;
     });
-  };
+  }
 
-  updateStage = async (data: UpdateStageBodyType, ctx: ResourceContext) => {
+  async updateStage(data: UpdateStageBodyType, ctx: ResourceContext) {
     const dataUpdateStage: Prisma.LeadUpdateInput = {
       stage: data.stage,
     };
@@ -133,9 +133,9 @@ export class LeadService {
 
       return lead;
     });
-  };
+  }
 
-  linkTask = async (ctx: ResourceContext) => {
+  async linkTask(ctx: ResourceContext) {
     const duplicateLinkTask = await this.leadRepo.existLinkTask(ctx);
 
     if (duplicateLinkTask) {
@@ -162,9 +162,9 @@ export class LeadService {
 
       return leadTaskLink;
     });
-  };
+  }
 
-  unlinkTask = async (ctx: ResourceContext) => {
+  async unlinkTask(ctx: ResourceContext) {
     return await this.prisma.$transaction(async (tx) => {
       const leadTaskLink = await this.leadRepo.unlinkTask(ctx, tx);
 
@@ -180,9 +180,9 @@ export class LeadService {
 
       return leadTaskLink;
     });
-  };
+  }
 
-  createFollowUpTask = async (data: CreateFollowUpBodyType, ctx: ResourceContext) => {
+  async createFollowUpTask(data: CreateFollowUpBodyType, ctx: ResourceContext) {
     const tasks = await this.taskRepo.listByColumn(ctx);
 
     if (data.position) {
@@ -228,9 +228,9 @@ export class LeadService {
 
       return leadTaskLink;
     });
-  };
+  }
 
-  remove = async (ctx: ResourceContext) => {
+  async remove(ctx: ResourceContext) {
     return await this.prisma.$transaction(async (tx) => {
       const lead = await this.leadRepo.remove(ctx, tx);
 
@@ -248,5 +248,5 @@ export class LeadService {
 
       return lead;
     });
-  };
+  }
 }

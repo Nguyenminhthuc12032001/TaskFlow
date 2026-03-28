@@ -13,12 +13,12 @@ export class ColumnService {
     readonly activityService: ActivityService,
   ) {}
 
-  create = async (
+  async create(
     data: CreateBodyType,
     workspaceId: string,
     projectId: string,
     actorId: string,
-  ) => {
+  ) {
     const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
 
     if (columns.some((c) => c.name === data.name)) {
@@ -55,13 +55,13 @@ export class ColumnService {
 
       return column;
     });
-  };
+  }
 
-  listByProjectId = async (workspaceId: string, projectId: string, actorId: string) => {
+  async listByProjectId(workspaceId: string, projectId: string, actorId: string) {
     return await this.columnRepo.listByProject(workspaceId, projectId, actorId);
-  };
+  }
 
-  get = async (workspaceId: string, projectId: string, columnId: string, actorId: string) => {
+  async get(workspaceId: string, projectId: string, columnId: string, actorId: string) {
     const column = await this.columnRepo.get(workspaceId, projectId, columnId, actorId);
 
     if (!column) {
@@ -69,15 +69,15 @@ export class ColumnService {
     }
 
     return column;
-  };
+  }
 
-  update = async (
+  async update(
     data: UpdateBodyType,
     workspaceId: string,
     projectId: string,
     columnId: string,
     actorId: string,
-  ) => {
+  ) {
     const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
 
     if (columns.some((c) => c.name === data.name && c.id !== columnId)) {
@@ -112,16 +112,16 @@ export class ColumnService {
 
       return column;
     });
-  };
+  }
 
-  bulkUpdateStatus = async (data: any, ctx: ResourceContext) => {};
+  async bulkUpdateStatus(data: any, ctx: ResourceContext) {}
 
-  reOrder = async (
+  async reOrder(
     data: ReOrderBodyType,
     workspaceId: string,
     projectId: string,
     actorId: string,
-  ) => {
+  ) {
     const oldColumns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
 
     oldColumns.map((c) => {
@@ -185,9 +185,9 @@ export class ColumnService {
     });
 
     return result;
-  };
+  }
 
-  remove = async (workspaceId: string, projectId: string, columnId: string, actorId: string) => {
+  async remove(workspaceId: string, projectId: string, columnId: string, actorId: string) {
     return this.prisma.$transaction(async (tx) => {
       const column = await this.columnRepo.remove(workspaceId, projectId, columnId, actorId, tx);
 
@@ -206,5 +206,5 @@ export class ColumnService {
 
       return column;
     });
-  };
+  }
 }

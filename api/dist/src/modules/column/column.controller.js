@@ -1,6 +1,6 @@
-import { safeColumnSchema, safeColumnsSchema } from "./column.schemas.js";
-import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from "../../common/utils/response/format.js";
-import { validateResponse } from "../../common/utils/response/validate.js";
+import { safeColumnSchema, safeColumnsSchema, } from './column.schemas.js';
+import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
+import { validateResponse } from '../../common/utils/response/validate.js';
 export class ColumnController {
     constructor(columnService) {
         this.columnService = columnService;
@@ -12,7 +12,7 @@ export class ColumnController {
                 name: column.name,
                 position: column.position,
                 type: column.type,
-                createdAt: column.createdAt
+                createdAt: column.createdAt,
             };
             const envelop = created(safeColumn);
             const envelopSchema = createdEnvelopeSchema(safeColumnSchema);
@@ -27,7 +27,7 @@ export class ColumnController {
                 name: c.name,
                 position: c.position,
                 type: c.type,
-                createdAt: c.createdAt
+                createdAt: c.createdAt,
             }));
             const envelop = ok(safeColumns);
             const envelopSchema = okEnvelopeSchema(safeColumnsSchema);
@@ -42,7 +42,7 @@ export class ColumnController {
                 name: column.name,
                 position: column.position,
                 type: column.type,
-                createdAt: column.createdAt
+                createdAt: column.createdAt,
             };
             const envelop = ok(safeColumn);
             const envelopSchema = okEnvelopeSchema(safeColumnSchema);
@@ -57,7 +57,7 @@ export class ColumnController {
                 name: column.name,
                 position: column.position,
                 type: column.type,
-                createdAt: column.createdAt
+                createdAt: column.createdAt,
             };
             const envelop = ok(safeColumn);
             const envelopSchema = okEnvelopeSchema(safeColumnSchema);
@@ -72,7 +72,7 @@ export class ColumnController {
                 name: c.name,
                 position: c.position,
                 type: c.type,
-                createdAt: c.createdAt
+                createdAt: c.createdAt,
             }));
             const envelop = ok(safeColumns);
             const envelopSchema = okEnvelopeSchema(safeColumnsSchema);
@@ -87,7 +87,7 @@ export class ColumnController {
                 name: column.name,
                 position: column.position,
                 type: column.type,
-                createdAt: column.createdAt
+                createdAt: column.createdAt,
             };
             const envelop = ok(safeColumn);
             const envelopSchema = okEnvelopeSchema(safeColumnSchema);
@@ -96,4 +96,3 @@ export class ColumnController {
         };
     }
 }
-;

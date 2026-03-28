@@ -13,7 +13,7 @@ export class CommentService {
     readonly commentRepo: CommentRepo,
   ) {}
 
-  create = async (data: CreateBodyType, ctx: ResourceContext) => {
+  async create(data: CreateBodyType, ctx: ResourceContext) {
     const dataCreate: Prisma.CommentCreateInput = {
       content: data.content,
       task: {
@@ -43,9 +43,9 @@ export class CommentService {
 
       return comment;
     });
-  };
+  }
 
-  reply = async (data: CreateBodyType, ctx: ResourceContext) => {
+  async reply(data: CreateBodyType, ctx: ResourceContext) {
     const dataReply: Prisma.CommentCreateInput = {
       content: data.content,
       parent: {
@@ -80,9 +80,9 @@ export class CommentService {
 
       return comment;
     });
-  };
+  }
 
-  get = async (ctx: ResourceContext) => {
+  async get(ctx: ResourceContext) {
     const comment = await this.commentRepo.get(ctx);
 
     if (!comment) {
@@ -90,13 +90,13 @@ export class CommentService {
     }
 
     return comment;
-  };
+  }
 
-  listByTask = async (ctx: ResourceContext) => {
+  async listByTask(ctx: ResourceContext) {
     return await this.commentRepo.listByTask(ctx);
-  };
+  }
 
-  update = async (data: UpdateBodyType, ctx: ResourceContext) => {
+  async update(data: UpdateBodyType, ctx: ResourceContext) {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);
@@ -111,9 +111,9 @@ export class CommentService {
     };
 
     return await this.commentRepo.update(updateData, ctx);
-  };
+  }
 
-  remove = async (ctx: ResourceContext) => {
+  async remove(ctx: ResourceContext) {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);
@@ -143,5 +143,5 @@ export class CommentService {
 
       return comment;
     });
-  };
+  }
 }

@@ -4,22 +4,22 @@ import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 export class WorkspaceRepo {
   constructor(readonly prisma: DbClient) {}
 
-  create = async (workspaceData: Prisma.WorkspaceCreateInput, db: DbOrTxClient = this.prisma) => {
+  async create(workspaceData: Prisma.WorkspaceCreateInput, db: DbOrTxClient = this.prisma) {
     return db.workspace.create({
       data: workspaceData,
     });
-  };
+  }
 
-  createMembership = async (
+  async createMembership(
     workspaceMemberData: Prisma.WorkspaceMemberCreateInput,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return db.workspaceMember.create({
       data: workspaceMemberData,
     });
-  };
+  }
 
-  findMembership = async (workspaceId: string, userId: string, db: DbOrTxClient = this.prisma) => {
+  async findMembership(workspaceId: string, userId: string, db: DbOrTxClient = this.prisma) {
     return db.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {
@@ -28,9 +28,9 @@ export class WorkspaceRepo {
         },
       },
     });
-  };
+  }
 
-  findMembers = async (workspaceId: string, db: DbOrTxClient = this.prisma) => {
+  async findMembers(workspaceId: string, db: DbOrTxClient = this.prisma) {
     return db.workspaceMember.findMany({
       where: {
         workspaceId,
@@ -41,17 +41,17 @@ export class WorkspaceRepo {
         },
       },
     });
-  };
+  }
 
-  findById = async (workspaceId: string, db: DbOrTxClient = this.prisma) => {
+  async findById(workspaceId: string, db: DbOrTxClient = this.prisma) {
     return db.workspace.findUnique({
       where: {
         id: workspaceId,
       },
     });
-  };
+  }
 
-  findByUserId = async (userId: string, db: DbOrTxClient = this.prisma) => {
+  async findByUserId(userId: string, db: DbOrTxClient = this.prisma) {
     return db.workspace.findMany({
       where: {
         members: {
@@ -59,41 +59,41 @@ export class WorkspaceRepo {
         },
       },
     });
-  };
+  }
 
-  update = async (
+  async update(
     workspaceId: string,
     data: Prisma.WorkspaceUpdateInput,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return db.workspace.update({
       where: {
         id: workspaceId,
       },
       data,
     });
-  };
+  }
 
-  delete = async (workspaceId: string, db: DbOrTxClient = this.prisma) => {
+  async delete(workspaceId: string, db: DbOrTxClient = this.prisma) {
     return db.workspace.delete({
       where: { id: workspaceId },
     });
-  };
+  }
 
-  inviteMembership = async (
+  async inviteMembership(
     inviteData: Prisma.InviteCreateInput,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return db.invite.create({
       data: inviteData,
     });
-  };
+  }
 
-  findInviteByEmail = async (
+  async findInviteByEmail(
     workspaceId: string,
     email: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return db.invite.findFirst({
       where: {
         workspaceId,
@@ -104,9 +104,9 @@ export class WorkspaceRepo {
         usedAt: null,
       },
     });
-  };
+  }
 
-  findInviteByJti = async (jti: string, db: DbOrTxClient = this.prisma) => {
+  async findInviteByJti(jti: string, db: DbOrTxClient = this.prisma) {
     return db.invite.findFirst({
       where: {
         jti,
@@ -116,9 +116,9 @@ export class WorkspaceRepo {
         usedAt: null,
       },
     });
-  };
+  }
 
-  markInviteUsed = async (jti: string, db: DbOrTxClient = this.prisma) => {
+  async markInviteUsed(jti: string, db: DbOrTxClient = this.prisma) {
     return db.invite.updateMany({
       where: {
         jti,
@@ -131,13 +131,13 @@ export class WorkspaceRepo {
         usedAt: new Date(),
       },
     });
-  };
+  }
 
-  deleteMembership = async (
+  async deleteMembership(
     workspaceId: string,
     userId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return db.workspaceMember.delete({
       where: {
         workspaceId_userId: {
@@ -146,5 +146,5 @@ export class WorkspaceRepo {
         },
       },
     });
-  };
+  }
 }

@@ -4,16 +4,16 @@ import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 export class ProjectRepo {
   constructor(private readonly prisma: DbClient) {}
 
-  create = async (data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) => {
+  async create(data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.project.create({ data });
-  };
+  }
 
-  get = async (
+  async get(
     id: string,
     workspaceId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.project.findFirst({
       where: {
         id,
@@ -27,13 +27,13 @@ export class ProjectRepo {
         },
       },
     });
-  };
+  }
 
-  listByWorkspace = async (
+  async listByWorkspace(
     workspaceId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.project.findMany({
       where: {
         workspaceId,
@@ -46,9 +46,9 @@ export class ProjectRepo {
         },
       },
     });
-  };
+  }
 
-  listByUser = async (actorId: string, db: DbOrTxClient = this.prisma) => {
+  async listByUser(actorId: string, db: DbOrTxClient = this.prisma) {
     return await db.project.findMany({
       where: {
         workspace: {
@@ -60,15 +60,15 @@ export class ProjectRepo {
         },
       },
     });
-  };
+  }
 
-  update = async (
+  async update(
     data: Prisma.ProjectUpdateInput,
     workspaceId: string,
     projectId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.project.update({
       where: {
         id: projectId,
@@ -86,9 +86,9 @@ export class ProjectRepo {
       },
       data,
     });
-  };
+  }
 
-  remove = async (id: string, actorId: string, db: DbOrTxClient = this.prisma) => {
+  async remove(id: string, actorId: string, db: DbOrTxClient = this.prisma) {
     return await db.project.delete({
       where: {
         id,
@@ -104,5 +104,5 @@ export class ProjectRepo {
         },
       },
     });
-  };
+  }
 }

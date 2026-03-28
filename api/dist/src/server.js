@@ -1,6 +1,6 @@
-import app from "./app.js";
-import { loadEnv } from "./config/env.js";
-import { log } from "./common/logger/logger.js";
+import app from './app.js';
+import { loadEnv } from './config/env.js';
+import { log } from './common/logger/logger.js';
 try {
     const env = loadEnv();
     app.listen(env.PORT, () => {
@@ -8,6 +8,6 @@ try {
     });
 }
 catch (err) {
-    log.error({ error: err instanceof Error ? err.message : String(err) }, "Failed to start server due to invalid environment variables");
+    log.error({ error: err instanceof Error ? err.message : String(err) }, 'Failed to start server due to invalid environment variables');
     process.exit(1);
 }

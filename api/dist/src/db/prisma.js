@@ -10,12 +10,12 @@ const SOFT_DELETE_MODELS = new Set([
     'Task',
     'Comment',
     'Lead',
-    'ActivityLog'
+    'ActivityLog',
 ]);
 const db = new PrismaClient({
     adapter: new PrismaPg(new Pool({
-        connectionString: env.DATABASE_URL
-    }))
+        connectionString: env.DATABASE_URL,
+    })),
 });
 function addNotDeleted(args) {
     const where = args?.where ?? {};
@@ -52,12 +52,12 @@ export const prisma = db.$extends({
                 if (operation === 'deleteMany') {
                     return db[model].updateMany({
                         where: { ...(args?.where ?? {}), deletedAt: null },
-                        data: { deletedAt: new Date() }
+                        data: { deletedAt: new Date() },
                     });
                 }
                 return query(args);
-            }
-        }
-    }
+            },
+        },
+    },
 });
 export { db };

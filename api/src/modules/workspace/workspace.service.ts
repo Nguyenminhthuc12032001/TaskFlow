@@ -32,7 +32,7 @@ export class WorkspaceService {
     readonly prisma: DbClient,
   ) {}
 
-  create = async (workspaceData: CreateWorkspaceBody, actorId: string) => {
+  async create(workspaceData: CreateWorkspaceBody, actorId: string) {
     const workspaces = await this.workspaceRepo.findByUserId(actorId);
 
     if (workspaces.some((w) => w.name === workspaceData.name)) {
@@ -67,26 +67,26 @@ export class WorkspaceService {
     });
 
     return result;
-  };
+  }
 
-  getById = async (workspaceId: string) => {
+  async getById(workspaceId: string) {
     const workspace = await this.workspaceRepo.findById(workspaceId);
     if (!workspace) {
       throw new AppError('Workspace not found or access denied', 404);
     }
 
     return workspace;
-  };
+  }
 
-  getByUserId = async (actorId: string) => {
+  async getByUserId(actorId: string) {
     return await this.workspaceRepo.findByUserId(actorId);
-  };
+  }
 
-  listMembers = async (workspaceId: string) => {
+  async listMembers(workspaceId: string) {
     return await this.workspaceRepo.findMembers(workspaceId);
-  };
+  }
 
-  update = async (workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) => {
+  async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) {
     const workspaces = await this.workspaceRepo.findByUserId(actorId);
 
     if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
@@ -110,9 +110,9 @@ export class WorkspaceService {
     });
 
     return result;
-  };
+  }
 
-  delete = async (workspaceId: string, actorId: string) => {
+  async delete(workspaceId: string, actorId: string) {
     const result = await this.prisma.$transaction(async (tx) => {
       await this.activityService.logActivity(
         workspaceId,
@@ -130,14 +130,14 @@ export class WorkspaceService {
     });
 
     return result;
-  };
+  }
 
-  inviteMember = async (
+  async inviteMember(
     workspaceId: string,
     inviteeId: string,
     role: WorkspaceRole,
     actorId: string,
-  ) => {
+  ) {
     const result = await this.prisma.$transaction(async (tx) => {
       const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
       if (!actor) {
@@ -254,9 +254,9 @@ export class WorkspaceService {
     log.info({ inviteeId }, 'Invited member for workspace successfully');
 
     return result.invite;
-  };
+  }
 
-  acceptInvite = async (token: string, actorId: string) => {
+  async acceptInvite(token: string, actorId: string) {
     let payload: InviteTokenPayload;
 
     try {
@@ -319,9 +319,9 @@ export class WorkspaceService {
     log.info({ id: result.userId, role: result.role }, 'Accepted member successfully');
 
     return result;
-  };
+  }
 
-  removeMember = async (workspaceId: string, memberId: string, actorId: string) => {
+  async removeMember(workspaceId: string, memberId: string, actorId: string) {
     if (actorId !== memberId) {
       const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
       if (!actor) {
@@ -351,5 +351,5 @@ export class WorkspaceService {
     log.info({ id: result.userId, role: result.role }, 'Removed member successfully');
 
     return result;
-  };
+  }
 }

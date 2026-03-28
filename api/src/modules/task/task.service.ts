@@ -19,7 +19,7 @@ export class TaskService {
     readonly taskRepo: TaskRepo,
   ) {}
 
-  create = async (data: CreateBodyType, ctx: ResourceContext) => {
+  async create(data: CreateBodyType, ctx: ResourceContext) {
     const result = await this.prisma.$transaction(async (tx) => {
       const tasks = await this.taskRepo.listByColumn(ctx, tx);
 
@@ -66,9 +66,9 @@ export class TaskService {
     });
 
     return result;
-  };
+  }
 
-  assign = async (data: AssignBodyType, ctx: ResourceContext) => {
+  async assign(data: AssignBodyType, ctx: ResourceContext) {
     const result = await this.prisma.$transaction(async (tx) => {
       const existAssignee = await this.taskRepo.isExistAssignee(data.userId, ctx, tx);
 
@@ -105,9 +105,9 @@ export class TaskService {
     });
 
     return result;
-  };
+  }
 
-  get = async (ctx: ResourceContext) => {
+  async get(ctx: ResourceContext) {
     const task = await this.taskRepo.get(ctx);
 
     if (!task) {
@@ -115,13 +115,13 @@ export class TaskService {
     }
 
     return task;
-  };
+  }
 
-  listByColumn = async (ctx: ResourceContext) => {
+  async listByColumn(ctx: ResourceContext) {
     return await this.taskRepo.listByColumn(ctx);
-  };
+  }
 
-  update = async (data: UpdateBodyType, ctx: ResourceContext) => {
+  async update(data: UpdateBodyType, ctx: ResourceContext) {
     const tasks = await this.taskRepo.listByColumn(ctx);
 
     if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ''))) {
@@ -153,9 +153,9 @@ export class TaskService {
     });
 
     return result;
-  };
+  }
 
-  reOrder = async (data: ReOrderBodyType, ctx: ResourceContext) => {
+  async reOrder(data: ReOrderBodyType, ctx: ResourceContext) {
     return await this.prisma.$transaction(async (tx) => {
       await Promise.all(
         data.map(async ({ taskId, position }) => {
@@ -185,17 +185,17 @@ export class TaskService {
 
       return result;
     });
-  };
+  }
 
-  archivTask = async (ctx: ResourceContext) => {
+  async archivTask(ctx: ResourceContext) {
     return await this.taskRepo.archivTask(ctx);
-  };
+  }
 
-  restoreTask = async (ctx: ResourceContext) => {
+  async restoreTask(ctx: ResourceContext) {
     return await this.taskRepo.restoreTask(ctx);
-  };
+  }
 
-  remove = async (ctx: ResourceContext) => {
+  async remove(ctx: ResourceContext) {
     return await this.prisma.$transaction(async (tx) => {
       const task = await this.taskRepo.remove(ctx);
 
@@ -211,9 +211,9 @@ export class TaskService {
 
       return task;
     });
-  };
+  }
 
-  bulkRemove = async (data: BulkRemoveBodyType, ctx: ResourceContext) => {
+  async bulkRemove(data: BulkRemoveBodyType, ctx: ResourceContext) {
     const result = await this.prisma.$transaction(async (tx) => {
       const tasks = await Promise.all(
         data.map(async ({ taskId }) => {
@@ -235,5 +235,5 @@ export class TaskService {
     });
 
     return result;
-  };
+  }
 }

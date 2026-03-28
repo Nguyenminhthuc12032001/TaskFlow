@@ -5,15 +5,15 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class TaskRepo {
   constructor(readonly prisma: DbClient) {}
 
-  create = async (data: Prisma.TaskCreateInput, db: DbOrTxClient = this.prisma) => {
+  async create(data: Prisma.TaskCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.task.create({ data });
-  };
+  }
 
-  isExistAssignee = async (
+  async isExistAssignee(
     userId: string,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.taskAssignee.findFirst({
       where: {
         task: {
@@ -39,13 +39,13 @@ export class TaskRepo {
         userId,
       },
     });
-  };
+  }
 
-  assign = async (data: Prisma.TaskAssigneeCreateInput, db: DbOrTxClient = this.prisma) => {
+  async assign(data: Prisma.TaskAssigneeCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.taskAssignee.create({ data });
-  };
+  }
 
-  get = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.findUnique({
       where: {
         id: ctx.TaskId,
@@ -65,9 +65,9 @@ export class TaskRepo {
         },
       },
     });
-  };
+  }
 
-  listByColumn = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async listByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.findMany({
       where: {
         column: {
@@ -86,13 +86,13 @@ export class TaskRepo {
         },
       },
     });
-  };
+  }
 
-  update = async (
+  async update(
     data: Prisma.TaskUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.task.update({
       data,
       where: {
@@ -116,9 +116,9 @@ export class TaskRepo {
         },
       },
     });
-  };
+  }
 
-  archivTask = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async archivTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -144,9 +144,9 @@ export class TaskRepo {
         isArchiv: true,
       },
     });
-  };
+  }
 
-  restoreTask = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async restoreTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -172,9 +172,9 @@ export class TaskRepo {
         isArchiv: false,
       },
     });
-  };
+  }
 
-  remove = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.delete({
       where: {
         id: ctx.TaskId,
@@ -197,5 +197,5 @@ export class TaskRepo {
         },
       },
     });
-  };
+  }
 }

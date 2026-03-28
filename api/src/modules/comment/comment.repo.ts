@@ -5,15 +5,15 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class CommentRepo {
   constructor(readonly prisma: DbClient) {}
 
-  create = async (data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma) => {
+  async create(data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.comment.create({ data });
-  };
+  }
 
-  reply = async (data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma) => {
+  async reply(data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.comment.create({ data });
-  };
+  }
 
-  get = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.comment.findUnique({
       where: {
         id: ctx.CommentId,
@@ -36,9 +36,9 @@ export class CommentRepo {
         },
       },
     });
-  };
+  }
 
-  listByTask = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async listByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.comment.findMany({
       where: {
         task: {
@@ -60,13 +60,13 @@ export class CommentRepo {
         },
       },
     });
-  };
+  }
 
-  update = async (
+  async update(
     data: Prisma.CommentUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.comment.update({
       data,
       where: {
@@ -90,9 +90,9 @@ export class CommentRepo {
         },
       },
     });
-  };
+  }
 
-  remove = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.comment.delete({
       where: {
         id: ctx.CommentId,
@@ -115,9 +115,9 @@ export class CommentRepo {
         },
       },
     });
-  };
+  }
 
-  getMember = async (ctx: ResourceContext, db: DbOrTxClient = this.prisma) => {
+  async getMember(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {
@@ -126,5 +126,5 @@ export class CommentRepo {
         },
       },
     });
-  };
+  }
 }

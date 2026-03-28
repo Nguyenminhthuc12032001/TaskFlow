@@ -1,22 +1,22 @@
-import { loginResponseSchema, refreshResponseSchema, registerResponseSchema, safeUserSchema } from "./auth.schemas.js";
-import { AppError } from "../../common/errors/AppError.js";
-import { env } from "../../config/env.js";
-import { validateResponse } from "../../common/utils/response/validate.js";
-import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from "../../common/utils/response/format.js";
+import { loginResponseSchema, refreshResponseSchema, registerResponseSchema, safeUserSchema, } from './auth.schemas.js';
+import { AppError } from '../../common/errors/AppError.js';
+import { env } from '../../config/env.js';
+import { validateResponse } from '../../common/utils/response/validate.js';
+import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 export class AuthController {
     constructor(authService) {
         this.authService = authService;
         this.register = async (req, res) => {
             const result = await this.authService.register(req.body);
-            res.cookie("refreshToken", result.refreshToken, {
+            res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/api/auth"
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
             });
             const registerResponse = {
                 user: result.safeUser,
-                accessToken: result.accessToken
+                accessToken: result.accessToken,
             };
             const envelope = created(registerResponse);
             const validatedEnvelope = validateResponse(createdEnvelopeSchema(registerResponseSchema))(envelope);
@@ -24,15 +24,15 @@ export class AuthController {
         };
         this.login = async (req, res) => {
             const result = await this.authService.login(req.body);
-            res.cookie("refreshToken", result.refreshToken, {
+            res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/api/auth"
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
             });
             const loginResponse = {
                 user: result.safeUser,
-                accessToken: result.accessToken
+                accessToken: result.accessToken,
             };
             const envelope = ok(loginResponse);
             const validatedEnvelope = validateResponse(okEnvelopeSchema(loginResponseSchema))(envelope);
@@ -43,28 +43,28 @@ export class AuthController {
             if (!refreshToken)
                 return res.sendStatus(204);
             await this.authService.logout(refreshToken);
-            res.clearCookie("refreshToken", {
+            res.clearCookie('refreshToken', {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/api/auth"
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
             });
             return res.sendStatus(204);
         };
         this.refresh = async (req, res) => {
             const refreshToken = req.cookies?.refreshToken;
             if (!refreshToken) {
-                throw new AppError("Refresh token missing", 401);
+                throw new AppError('Refresh token missing', 401);
             }
             const result = await this.authService.refresh(refreshToken);
-            res.cookie("refreshToken", result.refreshToken, {
+            res.cookie('refreshToken', result.refreshToken, {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/api/auth"
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
             });
             const refreshResponse = {
-                accessToken: result.accessToken
+                accessToken: result.accessToken,
             };
             const envelope = ok(refreshResponse);
             const validatedEnvelope = validateResponse(okEnvelopeSchema(refreshResponseSchema))(envelope);
@@ -80,11 +80,11 @@ export class AuthController {
         };
         this.changePassword = async (req, res) => {
             await this.authService.changePassword(req.user.id, req.body);
-            res.clearCookie("refreshToken", {
+            res.clearCookie('refreshToken', {
                 httpOnly: true,
-                secure: env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/api/auth"
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
             });
             return res.sendStatus(204);
         };

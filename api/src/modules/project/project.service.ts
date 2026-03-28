@@ -15,7 +15,7 @@ export class ProjectService {
     readonly activityService: ActivityService,
   ) {}
 
-  create = async (data: CreateBodyType, workspaceId: string, actorId: string) => {
+  async create(data: CreateBodyType, workspaceId: string, actorId: string) {
     const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
 
     if (projects.some((p) => p.name === data.name)) {
@@ -64,31 +64,31 @@ export class ProjectService {
 
       return project;
     });
-  };
+  }
 
-  get = async (id: string, workspaceId: string, actorId: string) => {
+  async get(id: string, workspaceId: string, actorId: string) {
     const result = await this.projectRepo.get(id, workspaceId, actorId);
     if (!result) {
       throw new AppError('Project not found', 404);
     }
 
     return result;
-  };
+  }
 
-  listByWorkspace = async (workspaceId: string, actorId: string) => {
+  async listByWorkspace(workspaceId: string, actorId: string) {
     return await this.projectRepo.listByWorkspace(workspaceId, actorId);
-  };
+  }
 
-  listByUser = async (actorId: string) => {
+  async listByUser(actorId: string) {
     return await this.projectRepo.listByUser(actorId);
-  };
+  }
 
-  update = async (
+  async update(
     data: UpdateBodyType,
     workspaceId: string,
     projectId: string,
     actorId: string,
-  ) => {
+  ) {
     const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
 
     if (projects.some((p) => p.name === data.name && p.id !== projectId)) {
@@ -121,9 +121,9 @@ export class ProjectService {
 
       return project;
     });
-  };
+  }
 
-  remove = async (id: string, actorId: string) => {
+  async remove(id: string, actorId: string) {
     return await this.prisma.$transaction(async (tx) => {
       const project = await this.projectRepo.remove(id, actorId, tx);
 
@@ -139,5 +139,5 @@ export class ProjectService {
 
       return project;
     });
-  };
+  }
 }

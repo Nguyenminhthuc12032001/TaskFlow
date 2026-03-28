@@ -4,16 +4,16 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class ColumnRepo {
   constructor(readonly prisma: DbClient) {}
 
-  create = async (data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma) => {
+  async create(data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.column.create({ data });
-  };
+  }
 
-  listByProject = async (
+  async listByProject(
     workspaceId: string,
     projectId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.column.findMany({
       where: {
         project: {
@@ -29,15 +29,15 @@ export class ColumnRepo {
         },
       },
     });
-  };
+  }
 
-  get = async (
+  async get(
     workspaceId: string,
     projectId: string,
     columnId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.column.findFirst({
       where: {
         id: columnId,
@@ -54,16 +54,16 @@ export class ColumnRepo {
         },
       },
     });
-  };
+  }
 
-  update = async (
+  async update(
     data: Prisma.ColumnUpdateInput,
     workspaceId: string,
     projectId: string,
     columnId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.column.update({
       where: {
         id: columnId,
@@ -84,15 +84,15 @@ export class ColumnRepo {
       },
       data,
     });
-  };
+  }
 
-  remove = async (
+  async remove(
     workspaceId: string,
     projectId: string,
     columnId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
-  ) => {
+  ) {
     return await db.column.delete({
       where: {
         id: columnId,
@@ -112,5 +112,5 @@ export class ColumnRepo {
         },
       },
     });
-  };
+  }
 }

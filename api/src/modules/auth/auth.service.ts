@@ -32,9 +32,9 @@ export class AuthService {
     private emailService: IEmailService,
     private authRepo: AuthRepo,
     private prisma: DbClient,
-  ) {}
+  ) { }
 
-  register = async (data: RegisterBody) => {
+  async register(data: RegisterBody) {
     const existing = await this.authRepo.findUserByEmail(data.email);
     if (existing) {
       log.info(
@@ -89,7 +89,7 @@ export class AuthService {
     return result;
   };
 
-  login = async (data: LoginBody) => {
+  async login(data: LoginBody) {
     const match = await this.authRepo.findUserByEmail(data.email);
     if (!match) {
       log.info(
@@ -141,7 +141,7 @@ export class AuthService {
     return { safeUser, accessToken, refreshToken };
   };
 
-  logout = async (refreshToken: string) => {
+  async logout(refreshToken: string) {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
@@ -162,7 +162,7 @@ export class AuthService {
     if (result.count === 0) throw new AppError('Refresh token not found or expired', 401);
   };
 
-  refresh = async (refreshToken: string) => {
+  async refresh(refreshToken: string) {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
@@ -225,7 +225,7 @@ export class AuthService {
     return { accessToken, refreshToken: newRefreshToken };
   };
 
-  forgotPassword = async (data: ForgotPasswordBody) => {
+  async forgotPassword(data: ForgotPasswordBody) {
     const user = await this.authRepo.findUserByEmail(data.email);
     if (!user) {
       return;
@@ -250,7 +250,7 @@ export class AuthService {
     log.info({ userId: user.id }, 'Password reset email sent');
   };
 
-  resetPassword = async (data: ResetPasswordBody) => {
+  async resetPassword(data: ResetPasswordBody) {
     let payLoad;
     try {
       payLoad = verifyResetToken(data.resetToken);
@@ -282,7 +282,7 @@ export class AuthService {
     });
   };
 
-  changePassword = async (userId: string, data: ChangePasswordBody) => {
+  async changePassword(userId: string, data: ChangePasswordBody) {
     const user = await this.authRepo.findUserById(userId);
     if (!user) {
       throw new AppError('User not found', 404);
@@ -313,7 +313,7 @@ export class AuthService {
     return { id: user.id, name: user.name, updatedAt: user.updatedAt };
   };
 
-  me = async (userId: string) => {
+  async me(userId: string) {
     const user = await this.authRepo.findUserById(userId);
     if (!user) {
       throw new AppError('User not found', 404);

@@ -1,222 +1,230 @@
-import { hashValue, verifyHash } from "../../common/utils/crypto.js";
-import { AppError } from "../../common/errors/AppError.js";
-import { signAccessToken, signRefreshToken, signResetToken, verifyRefreshToken, verifyResetToken } from "../../common/utils/jwt.js";
-import { env } from "../../config/env.js";
-import { randomUUID } from "crypto";
-import { log } from "../../common/logger/logger.js";
-import ms from "ms";
+import { hashValue, verifyHash } from '../../common/utils/crypto.js';
+import { AppError } from '../../common/errors/AppError.js';
+import { signAccessToken, signRefreshToken, signResetToken, verifyRefreshToken, verifyResetToken, } from '../../common/utils/jwt.js';
+import { env } from '../../config/env.js';
+import { randomUUID } from 'crypto';
+import { log } from '../../common/logger/logger.js';
+import ms from 'ms';
 export class AuthService {
     constructor(emailService, authRepo, prisma) {
         this.emailService = emailService;
         this.authRepo = authRepo;
         this.prisma = prisma;
-        this.register = async (data) => {
-            const existing = await this.authRepo.findUserByEmail(data.email);
-            if (existing) {
-                log.info({
-                    emailDomain: data.email?.split("@")[1] ?? "unknown"
-                }, "Register failed: email already exists");
-                throw new AppError("Email already exists", 409);
-            }
-            const result = await this.prisma.$transaction(async (tx) => {
-                const user = await this.authRepo.createUser({
-                    email: data.email,
-                    name: data.name,
-                    passwordHash: await hashValue(data.password),
-                }, tx);
-                const accessTokenPayload = {
-                    id: user.id,
-                    jti: randomUUID(),
-                    email: user.email,
-                    name: user.name
-                };
-                const accessToken = signAccessToken(accessTokenPayload);
-                const refreshTokenPayload = {
-                    id: user.id,
-                    jti: randomUUID(),
-                };
-                const refreshToken = signRefreshToken(refreshTokenPayload);
-                await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
-                const safeUser = {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                };
-                return { safeUser, accessToken, refreshToken };
-            });
-            return result;
-        };
-        this.login = async (data) => {
-            const match = await this.authRepo.findUserByEmail(data.email);
-            if (!match) {
-                log.info({
-                    emailDomain: data.email.split("@")[1]
-                }, "Login failed: email not found");
-                throw new AppError("Invalid email or password", 401);
-            }
-            if (!(await verifyHash(data.password, match.passwordHash))) {
-                log.info({
-                    userId: match.id,
-                }, "Login failed: invalid password");
-                throw new AppError("Invalid email or password", 401);
-            }
+    }
+    async register(data) {
+        const existing = await this.authRepo.findUserByEmail(data.email);
+        if (existing) {
+            log.info({
+                emailDomain: data.email?.split('@')[1] ?? 'unknown',
+            }, 'Register failed: email already exists');
+            throw new AppError('Email already exists', 409);
+        }
+        const result = await this.prisma.$transaction(async (tx) => {
+            const user = await this.authRepo.createUser({
+                email: data.email,
+                name: data.name,
+                passwordHash: await hashValue(data.password),
+            }, tx);
             const accessTokenPayload = {
-                id: match.id,
+                id: user.id,
                 jti: randomUUID(),
-                email: match.email,
-                name: match.name
+                email: user.email,
+                name: user.name,
             };
             const accessToken = signAccessToken(accessTokenPayload);
             const refreshTokenPayload = {
-                id: match.id,
+                id: user.id,
                 jti: randomUUID(),
             };
             const refreshToken = signRefreshToken(refreshTokenPayload);
-            await this.authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)));
+            await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
             const safeUser = {
-                id: match.id,
-                name: match.name,
-                email: match.email
+                id: user.id,
+                name: user.name,
+                email: user.email,
             };
             return { safeUser, accessToken, refreshToken };
-        };
-        this.logout = async (refreshToken) => {
-            let payload;
-            try {
-                payload = verifyRefreshToken(refreshToken);
-            }
-            catch (error) {
-                throw new AppError("Invalid or expired refresh token", 401);
-            }
-            const token = await this.authRepo.findRefreshToken(payload.jti);
-            if (!token) {
-                throw new AppError("Refresh token not found or expired", 401);
-            }
-            if (!(await verifyHash(refreshToken, token.tokenHash))) {
-                throw new AppError("Invalid token", 401);
-            }
-            const result = await this.authRepo.revokeRefreshToken(payload.jti);
-            if (result.count === 0)
-                throw new AppError("Refresh token not found or expired", 401);
-        };
-        this.refresh = async (refreshToken) => {
-            let payload;
-            try {
-                payload = verifyRefreshToken(refreshToken);
-            }
-            catch (error) {
-                log.warn("Refresh token failed: invalid or expired token");
-                throw new AppError("Invalid or expired refresh token", 401);
-            }
-            const token = await this.authRepo.findRefreshToken(payload.jti);
-            if (!token) {
-                log.warn({
-                    jti: payload.jti,
-                }, "Refresh token failed: token not found");
-                throw new AppError("Refresh token not found or expired", 401);
-            }
-            if (!(await verifyHash(refreshToken, token.tokenHash))) {
-                throw new AppError("Invalid token", 401);
-            }
-            const user = await this.authRepo.findUserById(payload.id);
-            if (!user) {
-                throw new AppError("User not found, cannot refresh token", 401);
-            }
-            const newRefreshToken = await this.prisma.$transaction(async (tx) => {
-                const revoke = await this.authRepo.revokeRefreshToken(payload.jti, tx);
-                if (revoke.count === 0) {
-                    throw new AppError("Refresh token not found or expired", 401);
-                }
-                const refreshTokenPayload = {
-                    id: user.id,
-                    jti: randomUUID()
-                };
-                const refreshToken = signRefreshToken(refreshTokenPayload);
-                await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
-                return refreshToken;
-            });
-            const accessTokenPayload = {
-                id: user.id,
-                jti: randomUUID(),
-                email: user.email,
-                name: user.name
-            };
-            const accessToken = signAccessToken(accessTokenPayload);
-            return { accessToken, refreshToken: newRefreshToken };
-        };
-        this.forgotPassword = async (data) => {
-            const user = await this.authRepo.findUserByEmail(data.email);
-            if (!user) {
-                return;
-            }
-            const resetTokenPayload = {
-                id: user.id,
-                jti: randomUUID(),
-                email: user.email,
-            };
-            const resetToken = signResetToken(resetTokenPayload);
-            await this.authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hashValue(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN)));
-            const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
-            await this.emailService.sendPasswordResetEmail(user.email, resetLink);
-            log.info({ userId: user.id }, "Password reset email sent");
-        };
-        this.resetPassword = async (data) => {
-            let payLoad;
-            try {
-                payLoad = verifyResetToken(data.resetToken);
-            }
-            catch (error) {
-                log.warn("Reset password failed: invalid or expired token");
-                throw new AppError("Invalid or expired reset token", 401);
-            }
-            const token = await this.authRepo.findResetToken(payLoad.jti);
-            if (!token) {
-                throw new AppError("Invalid or expired reset token", 401);
-            }
-            if (!(await verifyHash(data.resetToken, token.tokenHash))) {
-                throw new AppError("Invalid or expired reset token", 401);
-            }
-            await this.prisma.$transaction(async (tx) => {
-                const result = await this.authRepo.markResetToken(payLoad.jti, tx);
-                if (result.count === 0) {
-                    throw new AppError("Invalid or expired reset token", 401);
-                }
-                await this.authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
-                await this.authRepo.updatePassword(payLoad.id, await hashValue(data.newPassword), tx);
-                log.info({ userId: payLoad.id }, "Password reset successful, all refresh tokens revoked");
-            });
-        };
-        this.changePassword = async (userId, data) => {
-            const user = await this.authRepo.findUserById(userId);
-            if (!user) {
-                throw new AppError("User not found", 404);
-            }
-            if (data.newPassword === data.currentPassword) {
-                throw new AppError("New password must be different", 400);
-            }
-            if (!(await verifyHash(data.currentPassword, user.passwordHash))) {
-                log.warn({ userId }, "Change password failed: invalid current password");
-                throw new AppError("Invalid current password", 401);
-            }
-            const result = await this.prisma.$transaction(async (tx) => {
-                await this.authRepo.revokeAllRefreshTokenByUser(userId, tx);
-                const user = await this.authRepo.updatePassword(userId, await hashValue(data.newPassword), tx);
-                log.info({ userId }, "Password change successfully");
-                return user;
-            });
-            return { id: user.id, name: user.name, updatedAt: user.updatedAt };
-        };
-        this.me = async (userId) => {
-            const user = await this.authRepo.findUserById(userId);
-            if (!user) {
-                throw new AppError("User not found", 404);
-            }
-            const safeUser = {
-                id: user.id,
-                email: user.email,
-                name: user.name
-            };
-            return safeUser;
-        };
+        });
+        return result;
     }
+    ;
+    async login(data) {
+        const match = await this.authRepo.findUserByEmail(data.email);
+        if (!match) {
+            log.info({
+                emailDomain: data.email.split('@')[1],
+            }, 'Login failed: email not found');
+            throw new AppError('Invalid email or password', 401);
+        }
+        if (!(await verifyHash(data.password, match.passwordHash))) {
+            log.info({
+                userId: match.id,
+            }, 'Login failed: invalid password');
+            throw new AppError('Invalid email or password', 401);
+        }
+        const accessTokenPayload = {
+            id: match.id,
+            jti: randomUUID(),
+            email: match.email,
+            name: match.name,
+        };
+        const accessToken = signAccessToken(accessTokenPayload);
+        const refreshTokenPayload = {
+            id: match.id,
+            jti: randomUUID(),
+        };
+        const refreshToken = signRefreshToken(refreshTokenPayload);
+        await this.authRepo.saveRefreshToken(match.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)));
+        const safeUser = {
+            id: match.id,
+            name: match.name,
+            email: match.email,
+        };
+        return { safeUser, accessToken, refreshToken };
+    }
+    ;
+    async logout(refreshToken) {
+        let payload;
+        try {
+            payload = verifyRefreshToken(refreshToken);
+        }
+        catch (error) {
+            throw new AppError('Invalid or expired refresh token', 401);
+        }
+        const token = await this.authRepo.findRefreshToken(payload.jti);
+        if (!token) {
+            throw new AppError('Refresh token not found or expired', 401);
+        }
+        if (!(await verifyHash(refreshToken, token.tokenHash))) {
+            throw new AppError('Invalid token', 401);
+        }
+        const result = await this.authRepo.revokeRefreshToken(payload.jti);
+        if (result.count === 0)
+            throw new AppError('Refresh token not found or expired', 401);
+    }
+    ;
+    async refresh(refreshToken) {
+        let payload;
+        try {
+            payload = verifyRefreshToken(refreshToken);
+        }
+        catch (error) {
+            log.warn('Refresh token failed: invalid or expired token');
+            throw new AppError('Invalid or expired refresh token', 401);
+        }
+        const token = await this.authRepo.findRefreshToken(payload.jti);
+        if (!token) {
+            log.warn({
+                jti: payload.jti,
+            }, 'Refresh token failed: token not found');
+            throw new AppError('Refresh token not found or expired', 401);
+        }
+        if (!(await verifyHash(refreshToken, token.tokenHash))) {
+            throw new AppError('Invalid token', 401);
+        }
+        const user = await this.authRepo.findUserById(payload.id);
+        if (!user) {
+            throw new AppError('User not found, cannot refresh token', 401);
+        }
+        const newRefreshToken = await this.prisma.$transaction(async (tx) => {
+            const revoke = await this.authRepo.revokeRefreshToken(payload.jti, tx);
+            if (revoke.count === 0) {
+                throw new AppError('Refresh token not found or expired', 401);
+            }
+            const refreshTokenPayload = {
+                id: user.id,
+                jti: randomUUID(),
+            };
+            const refreshToken = signRefreshToken(refreshTokenPayload);
+            await this.authRepo.saveRefreshToken(user.id, refreshTokenPayload.jti, await hashValue(refreshToken), new Date(Date.now() + ms(env.TTL_REFRESH_TOKEN)), tx);
+            return refreshToken;
+        });
+        const accessTokenPayload = {
+            id: user.id,
+            jti: randomUUID(),
+            email: user.email,
+            name: user.name,
+        };
+        const accessToken = signAccessToken(accessTokenPayload);
+        return { accessToken, refreshToken: newRefreshToken };
+    }
+    ;
+    async forgotPassword(data) {
+        const user = await this.authRepo.findUserByEmail(data.email);
+        if (!user) {
+            return;
+        }
+        const resetTokenPayload = {
+            id: user.id,
+            jti: randomUUID(),
+            email: user.email,
+        };
+        const resetToken = signResetToken(resetTokenPayload);
+        await this.authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hashValue(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN)));
+        const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
+        await this.emailService.sendPasswordResetEmail(user.email, resetLink);
+        log.info({ userId: user.id }, 'Password reset email sent');
+    }
+    ;
+    async resetPassword(data) {
+        let payLoad;
+        try {
+            payLoad = verifyResetToken(data.resetToken);
+        }
+        catch (error) {
+            log.warn('Reset password failed: invalid or expired token');
+            throw new AppError('Invalid or expired reset token', 401);
+        }
+        const token = await this.authRepo.findResetToken(payLoad.jti);
+        if (!token) {
+            throw new AppError('Invalid or expired reset token', 401);
+        }
+        if (!(await verifyHash(data.resetToken, token.tokenHash))) {
+            throw new AppError('Invalid or expired reset token', 401);
+        }
+        await this.prisma.$transaction(async (tx) => {
+            const result = await this.authRepo.markResetToken(payLoad.jti, tx);
+            if (result.count === 0) {
+                throw new AppError('Invalid or expired reset token', 401);
+            }
+            await this.authRepo.revokeAllRefreshTokenByUser(payLoad.id, tx);
+            await this.authRepo.updatePassword(payLoad.id, await hashValue(data.newPassword), tx);
+            log.info({ userId: payLoad.id }, 'Password reset successful, all refresh tokens revoked');
+        });
+    }
+    ;
+    async changePassword(userId, data) {
+        const user = await this.authRepo.findUserById(userId);
+        if (!user) {
+            throw new AppError('User not found', 404);
+        }
+        if (data.newPassword === data.currentPassword) {
+            throw new AppError('New password must be different', 400);
+        }
+        if (!(await verifyHash(data.currentPassword, user.passwordHash))) {
+            log.warn({ userId }, 'Change password failed: invalid current password');
+            throw new AppError('Invalid current password', 401);
+        }
+        const result = await this.prisma.$transaction(async (tx) => {
+            await this.authRepo.revokeAllRefreshTokenByUser(userId, tx);
+            const user = await this.authRepo.updatePassword(userId, await hashValue(data.newPassword), tx);
+            log.info({ userId }, 'Password change successfully');
+            return user;
+        });
+        return { id: user.id, name: user.name, updatedAt: user.updatedAt };
+    }
+    ;
+    async me(userId) {
+        const user = await this.authRepo.findUserById(userId);
+        if (!user) {
+            throw new AppError('User not found', 404);
+        }
+        const safeUser = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+        };
+        return safeUser;
+    }
+    ;
 }

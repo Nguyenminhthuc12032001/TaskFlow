@@ -1,6 +1,6 @@
-import { listProjectsResponseSchema, safeProjectResponseSchema } from "./project.schemas.js";
-import { created, createdEnvelopeSchema, ok, okEnvelopeSchema } from "../../common/utils/response/format.js";
-import { validateResponse } from "../../common/utils/response/validate.js";
+import { listProjectsResponseSchema, safeProjectResponseSchema, } from './project.schemas.js';
+import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
+import { validateResponse } from '../../common/utils/response/validate.js';
 export class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
@@ -11,9 +11,9 @@ export class ProjectController {
                 workspaceId: project.workspaceId,
                 id: project.id,
                 name: project.name,
-                description: project.description ?? "",
+                description: project.description ?? '',
                 createdAt: project.createdAt,
-                createdBy: project.createdBy
+                createdBy: project.createdBy,
             };
             const envelop = created(safeProject);
             const envelopSchema = createdEnvelopeSchema(safeProjectResponseSchema);
@@ -26,9 +26,9 @@ export class ProjectController {
                 workspaceId: project.workspaceId,
                 id: project.id,
                 name: project.name,
-                description: project.description ?? "",
+                description: project.description ?? '',
                 createdAt: project.createdAt,
-                createdBy: project.createdBy
+                createdBy: project.createdBy,
             };
             const envelop = ok(safeProject);
             const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
@@ -41,9 +41,9 @@ export class ProjectController {
                 workspaceId: p.workspaceId,
                 id: p.id,
                 name: p.name,
-                description: p.description ?? "",
+                description: p.description ?? '',
                 createdAt: p.createdAt,
-                createdBy: p.createdBy
+                createdBy: p.createdBy,
             }));
             const envelop = ok(safeProjectResponse);
             const envelopSchema = okEnvelopeSchema(listProjectsResponseSchema);
@@ -56,9 +56,9 @@ export class ProjectController {
                 workspaceId: project.workspaceId,
                 id: project.id,
                 name: project.name,
-                description: project.description ?? "",
+                description: project.description ?? '',
                 createdAt: project.createdAt,
-                createdBy: project.createdBy
+                createdBy: project.createdBy,
             };
             const envelop = ok(safeProjectResponse);
             const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
@@ -71,9 +71,9 @@ export class ProjectController {
                 workspaceId: project.workspaceId,
                 id: project.id,
                 name: project.name,
-                description: project.description ?? "",
+                description: project.description ?? '',
                 createdAt: project.createdAt,
-                createdBy: project.createdBy
+                createdBy: project.createdBy,
             };
             const envelop = ok(safeProjectResponse);
             const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);

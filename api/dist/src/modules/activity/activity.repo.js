@@ -1,4 +1,4 @@
-import { prisma } from "../../db/prisma.js";
+import { prisma } from '../../db/prisma.js';
 export class ActivityRepo {
     async log(data, db = prisma) {
         return db.activityLog.create({ data });
