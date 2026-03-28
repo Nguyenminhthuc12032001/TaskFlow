@@ -1,54 +1,56 @@
-import z from "../../../docs/zod.js";
-export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) => z.object
-    ({
-        ok: z.literal(true),
-        data: dataSchema,
+import z from '../../../docs/zod.js';
+export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
+  z
+    .object({
+      ok: z.literal(true),
+      data: dataSchema,
     })
     .strict();
 
-export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) => z.object
-    ({
-        ok: z.literal(true),
-        created: z.literal(true),
-        data: dataSchema,
+export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
+  z
+    .object({
+      ok: z.literal(true),
+      created: z.literal(true),
+      data: dataSchema,
     })
     .strict();
 
-export const failEnvelopeSchema = z.object
-    ({
-        ok: z.literal(false),
-        message: z.string().min(1),
-        details: z.unknown().optional(),
-    })
-    .strict();
+export const failEnvelopeSchema = z
+  .object({
+    ok: z.literal(false),
+    message: z.string().min(1),
+    details: z.unknown().optional(),
+  })
+  .strict();
 
 export type Ok<T = unknown> = {
-    ok: true;
-    data: T;
+  ok: true;
+  data: T;
 };
 
 export type Created<T = unknown> = {
-    ok: true;
-    created: true;
-    data: T;
+  ok: true;
+  created: true;
+  data: T;
 };
 
 export type Fail = z.infer<typeof failEnvelopeSchema>;
 
 export const ok = <T>(data: T): Ok<T> => ({
-    ok: true,
-    data,
+  ok: true,
+  data,
 });
 
 export const created = <T>(data: T): Created<T> => ({
-    ok: true,
-    created: true,
-    data,
+  ok: true,
+  created: true,
+  data,
 });
 
 export const fail = (message: string, code?: string, details?: unknown): Fail => ({
-    ok: false,
-    message,
-    ...(code ? { code } : {}),
-    ...(details === undefined ? {} : { details }),
+  ok: false,
+  message,
+  ...(code ? { code } : {}),
+  ...(details === undefined ? {} : { details }),
 });

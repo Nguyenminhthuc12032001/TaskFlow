@@ -1,140 +1,114 @@
-import { prisma, type DbClient, type DbOrTxClient } from "../../db/prisma.js";
+import { prisma, type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class AuthRepo {
-    constructor(
-        readonly prisma: DbClient
-    ) {}
+  constructor(readonly prisma: DbClient) {}
 
-    findUserById = async (
-        userId: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.user.findUnique({
-            where: { id: userId }
-        });
-    }
+  findUserById = async (userId: string, db: DbOrTxClient = this.prisma) => {
+    return db.user.findUnique({
+      where: { id: userId },
+    });
+  };
 
-    findUserByEmail = async (
-        email: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.user.findUnique({
-            where: { email }
-        });
-    }
+  findUserByEmail = async (email: string, db: DbOrTxClient = this.prisma) => {
+    return db.user.findUnique({
+      where: { email },
+    });
+  };
 
-    createUser = async (
-        data: { email: string; name: string; passwordHash: string },
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.user.create({ data });
-    }
+  createUser = async (
+    data: { email: string; name: string; passwordHash: string },
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return db.user.create({ data });
+  };
 
-    updatePassword = async (
-        userId: string, passwordHash: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.user.update({
-            where: { id: userId },
-            data: { passwordHash }
-        })
-    }
+  updatePassword = async (userId: string, passwordHash: string, db: DbOrTxClient = this.prisma) => {
+    return db.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  };
 
-    saveRefreshToken = async (
-        userId: string,
-        jti: string,
-        tokenHash: string,
-        expiresAt: Date,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.refreshToken.create({
-            data: {
-                userId,
-                jti,
-                tokenHash,
-                expiresAt,
-            }
-        })
-    }
+  saveRefreshToken = async (
+    userId: string,
+    jti: string,
+    tokenHash: string,
+    expiresAt: Date,
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return db.refreshToken.create({
+      data: {
+        userId,
+        jti,
+        tokenHash,
+        expiresAt,
+      },
+    });
+  };
 
-    findRefreshToken = async (
-        jti: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.refreshToken.findUnique({
-            where: {
-                jti,
-                revokedAt: null,
-                expiresAt: { gt: new Date() }
-            }
-        })
-    }
+  findRefreshToken = async (jti: string, db: DbOrTxClient = this.prisma) => {
+    return db.refreshToken.findUnique({
+      where: {
+        jti,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+    });
+  };
 
-    revokeAllRefreshTokenByUser = async (
-        userId: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.refreshToken.updateMany({
-            where: { userId, revokedAt: null },
-            data: { revokedAt: new Date() }
-        })
-    }
+  revokeAllRefreshTokenByUser = async (userId: string, db: DbOrTxClient = this.prisma) => {
+    return db.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  };
 
-    revokeRefreshToken = async (
-        jti: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.refreshToken.updateMany({
-            where: {
-                jti,
-                revokedAt: null,
-                expiresAt: { gt: new Date() }
-            },
-            data: { revokedAt: new Date() }
-        })
-    }
+  revokeRefreshToken = async (jti: string, db: DbOrTxClient = this.prisma) => {
+    return db.refreshToken.updateMany({
+      where: {
+        jti,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      data: { revokedAt: new Date() },
+    });
+  };
 
-    saveResetToken = async (
-        userId: string,
-        jti: string,
-        tokenHash: string,
-        expiresAt: Date,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.passwordResetToken.create({
-            data: {
-                userId,
-                jti,
-                tokenHash,
-                expiresAt,
-            }
-        })
-    }
+  saveResetToken = async (
+    userId: string,
+    jti: string,
+    tokenHash: string,
+    expiresAt: Date,
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return db.passwordResetToken.create({
+      data: {
+        userId,
+        jti,
+        tokenHash,
+        expiresAt,
+      },
+    });
+  };
 
-    findResetToken = async (
-        jti: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.passwordResetToken.findFirst({
-            where: {
-                jti,
-                usedAt: null,
-                expiresAt: { gt: new Date() }
-            }
-        })
-    }
+  findResetToken = async (jti: string, db: DbOrTxClient = this.prisma) => {
+    return db.passwordResetToken.findFirst({
+      where: {
+        jti,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+    });
+  };
 
-    markResetToken = async (
-        jti: string,
-        db: DbOrTxClient = this.prisma
-    ) => {
-        return db.passwordResetToken.updateMany({
-            where: {
-                jti,
-                usedAt: null,
-                expiresAt: { gt: new Date() }
-            },
-            data: { usedAt: new Date() }
-        })
-    }
+  markResetToken = async (jti: string, db: DbOrTxClient = this.prisma) => {
+    return db.passwordResetToken.updateMany({
+      where: {
+        jti,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      data: { usedAt: new Date() },
+    });
+  };
 }

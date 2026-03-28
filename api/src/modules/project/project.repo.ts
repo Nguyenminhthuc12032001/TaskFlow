@@ -1,97 +1,108 @@
-import type { Prisma } from "../../../prisma/generated/client.js";
-import { type DbClient, type DbOrTxClient } from "../../db/prisma.js";
+import type { Prisma } from '../../../prisma/generated/client.js';
+import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class ProjectRepo {
-    constructor(
-        private readonly prisma: DbClient
-    ) {};
+  constructor(private readonly prisma: DbClient) {}
 
-    create = async (data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) => {
-        return await db.project.create({ data });
-    };
+  create = async (data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) => {
+    return await db.project.create({ data });
+  };
 
-    get = async (id: string, workspaceId: string, actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.findFirst({
-            where: {
-                id,
-                workspaceId,
-                workspace: {
-                    members: {
-                        some: {
-                            userId: actorId
-                        }
-                    }
-                }
-            }
-        })
-    };
-
-    listByWorkspace = async (workspaceId: string, actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.findMany(
-            {
-                where: {
-                    workspaceId,
-                    workspace: {
-                        members: {
-                            some: {
-                                userId: actorId
-                            }
-                        }
-                    }
-                }
-            }
-        )
-    };
-
-    listByUser = async (actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.findMany({
-            where: {
-                workspace: {
-                    members: {
-                        some: {
-                            userId: actorId
-                        }
-                    }
-                }
-            }
-        })
-    };
-
-    update = async (data: Prisma.ProjectUpdateInput, workspaceId: string, projectId: string, actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.update({
-            where: {
-                id: projectId,
-                workspace: {
-                    id: workspaceId,
-                    members: {
-                        some: {
-                            userId: actorId,
-                            role: {
-                                in: ["admin", "owner"]
-                            }
-                        }
-                    }
-                }
+  get = async (
+    id: string,
+    workspaceId: string,
+    actorId: string,
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return await db.project.findFirst({
+      where: {
+        id,
+        workspaceId,
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
             },
-            data,
-        })
-    };
+          },
+        },
+      },
+    });
+  };
 
-    remove = async (id: string, actorId: string, db: DbOrTxClient = this.prisma) => {
-        return await db.project.delete({
-            where: {
-                id,
-                workspace: {
-                    members: {
-                        some: {
-                            userId: actorId,
-                            role: {
-                                in: ["admin", "owner"]
-                            }
-                        }
-                    }
-                }
-            }
-        })
-    };
+  listByWorkspace = async (
+    workspaceId: string,
+    actorId: string,
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return await db.project.findMany({
+      where: {
+        workspaceId,
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
+            },
+          },
+        },
+      },
+    });
+  };
+
+  listByUser = async (actorId: string, db: DbOrTxClient = this.prisma) => {
+    return await db.project.findMany({
+      where: {
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
+            },
+          },
+        },
+      },
+    });
+  };
+
+  update = async (
+    data: Prisma.ProjectUpdateInput,
+    workspaceId: string,
+    projectId: string,
+    actorId: string,
+    db: DbOrTxClient = this.prisma,
+  ) => {
+    return await db.project.update({
+      where: {
+        id: projectId,
+        workspace: {
+          id: workspaceId,
+          members: {
+            some: {
+              userId: actorId,
+              role: {
+                in: ['admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+      data,
+    });
+  };
+
+  remove = async (id: string, actorId: string, db: DbOrTxClient = this.prisma) => {
+    return await db.project.delete({
+      where: {
+        id,
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
+              role: {
+                in: ['admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+    });
+  };
 }

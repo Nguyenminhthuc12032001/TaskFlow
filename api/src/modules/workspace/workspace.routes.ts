@@ -10,66 +10,86 @@ import { ActivityService } from '../activity/activity.service.js';
 import { prisma } from '../../db/prisma.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
-import { acceptBodySchema, createBodySchema, inviteBodySchema, removeMemberBodySchema, updateBodySchema } from './workspace.schemas.js';
+import {
+  acceptBodySchema,
+  createBodySchema,
+  inviteBodySchema,
+  removeMemberBodySchema,
+  updateBodySchema,
+} from './workspace.schemas.js';
 import { ProjectRepo } from '../project/project.repo.js';
 import { emptyBodySchema } from '../../common/schemas/common.schemas.js';
 
 const router = Router();
 
 const workspaceController = new WorkspaceController(
-    new WorkspaceService(
-        new EmailService(),
-        new WorkspaceRepo(
-            prisma
-        ),
-        new AuthRepo(
-            prisma
-        ),
-        new ProjectRepo(
-            prisma
-        ),
-        new ActivityService(
-            new ActivityRepo
-        ),
-        prisma
-    )
-)
+  new WorkspaceService(
+    new EmailService(),
+    new WorkspaceRepo(prisma),
+    new AuthRepo(prisma),
+    new ProjectRepo(prisma),
+    new ActivityService(new ActivityRepo()),
+    prisma,
+  ),
+);
 
-router.post("",
-    authMiddleware, validateBody(createBodySchema),
-    workspaceController.create);
+router.post('', authMiddleware, validateBody(createBodySchema), workspaceController.create);
 
-router.get("",
-    authMiddleware, validateBody(emptyBodySchema),
-    workspaceController.getByUserId);
+router.get('', authMiddleware, validateBody(emptyBodySchema), workspaceController.getByUserId);
 
-router.get("/:workspaceId",
-    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole(),
-    workspaceController.getById);
+router.get(
+  '/:workspaceId',
+  authMiddleware,
+  validateBody(emptyBodySchema),
+  requireWorkspaceRole(),
+  workspaceController.getById,
+);
 
-router.get("/members/:workspaceId",
-    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole(),
-    workspaceController.getMembersById);
+router.get(
+  '/members/:workspaceId',
+  authMiddleware,
+  validateBody(emptyBodySchema),
+  requireWorkspaceRole(),
+  workspaceController.getMembersById,
+);
 
-router.patch("/:workspaceId",
-    authMiddleware, validateBody(updateBodySchema), requireWorkspaceRole("admin"),
-    workspaceController.update);
+router.patch(
+  '/:workspaceId',
+  authMiddleware,
+  validateBody(updateBodySchema),
+  requireWorkspaceRole('admin'),
+  workspaceController.update,
+);
 
-router.delete("/:workspaceId",
-    authMiddleware, validateBody(emptyBodySchema), requireWorkspaceRole("admin"),
-    workspaceController.remove);
+router.delete(
+  '/:workspaceId',
+  authMiddleware,
+  validateBody(emptyBodySchema),
+  requireWorkspaceRole('admin'),
+  workspaceController.remove,
+);
 
-router.post("/invite/:workspaceId",
-    authMiddleware, validateBody(inviteBodySchema), requireWorkspaceRole("admin"),
-    workspaceController.invinte);
+router.post(
+  '/invite/:workspaceId',
+  authMiddleware,
+  validateBody(inviteBodySchema),
+  requireWorkspaceRole('admin'),
+  workspaceController.invinte,
+);
 
-router.post("/accept_invite",
-    authMiddleware, validateBody(acceptBodySchema),
-    workspaceController.accept);
+router.post(
+  '/accept_invite',
+  authMiddleware,
+  validateBody(acceptBodySchema),
+  workspaceController.accept,
+);
 
-router.delete("/remove_member/:workspaceId/:memberId",
-    authMiddleware,
-    validateBody(removeMemberBodySchema), requireWorkspaceRole("member"),
-    workspaceController.removeMember);
+router.delete(
+  '/remove_member/:workspaceId/:memberId',
+  authMiddleware,
+  validateBody(removeMemberBodySchema),
+  requireWorkspaceRole('member'),
+  workspaceController.removeMember,
+);
 
 export default router;
