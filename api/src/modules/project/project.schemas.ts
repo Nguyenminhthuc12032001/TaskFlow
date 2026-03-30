@@ -1,3 +1,4 @@
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 
 // REQUEST
@@ -52,5 +53,8 @@ export const safeProjectResponseSchema = z.object({
 });
 export type SafeProjectResponseType = z.infer<typeof safeProjectResponseSchema>;
 
-export const listProjectsResponseSchema = z.array(safeProjectResponseSchema);
+export const listProjectsResponseSchema = z.object({
+  data: z.array(safeProjectResponseSchema),
+  paginationMeta: paginationMetaSchema
+});
 export type ListProjectResponseType = z.infer<typeof listProjectsResponseSchema>;

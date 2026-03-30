@@ -2,16 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../db/prisma.js';
 import { AppError } from '../errors/AppError.js';
 import type { WorkspaceRole } from '../../../prisma/generated/enums.js';
-
-export type WorkspaceParams = {
-  workspaceId: string;
-  memberId?: string;
-  projectId?: string;
-  columnId?: string;
-  taskId?: string;
-  commentId?: string;
-  leadId?: string;
-};
+import type { WorkspaceParamsType } from '../schemas/common.schemas.js';
 
 const rank: Record<WorkspaceRole, number> = {
   owner: 4,
@@ -21,7 +12,7 @@ const rank: Record<WorkspaceRole, number> = {
 };
 
 export function requireWorkspaceRole(minRole: WorkspaceRole = 'viewer') {
-  return async (req: Request<WorkspaceParams>, res: Response, next: NextFunction) => {
+  return async (req: Request<WorkspaceParamsType>, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     if (!userId) {
       throw new AppError('Unauthorized', 401, 'USER_NOT_AUTHENTICATED');

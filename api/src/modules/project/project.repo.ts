@@ -2,7 +2,7 @@ import type { Prisma } from '../../../prisma/generated/client.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class ProjectRepo {
-  constructor(private readonly prisma: DbClient) {}
+  constructor(private readonly prisma: DbClient) { }
 
   async create(data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.project.create({ data });
@@ -30,6 +30,28 @@ export class ProjectRepo {
   }
 
   async listByWorkspace(
+    workspaceId: string,
+    actorId: string,
+    { take, skip }: { take: number; skip: number },
+    db: DbOrTxClient = this.prisma,
+  ) {
+    return await db.project.findMany({
+      where: {
+        workspaceId,
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
+            },
+          },
+        },
+      },
+      skip,
+      take,
+    });
+  }
+
+  async allProjectsByWorkspace(
     workspaceId: string,
     actorId: string,
     db: DbOrTxClient = this.prisma,
@@ -99,6 +121,21 @@ export class ProjectRepo {
               role: {
                 in: ['admin', 'owner'],
               },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async countProjectsByWorkspace(workspaceId: string, actorId: string, db: DbOrTxClient = this.prisma) {
+    return await db.project.count({
+      where: {
+        workspaceId,
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
             },
           },
         },

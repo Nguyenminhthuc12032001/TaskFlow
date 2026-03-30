@@ -15,12 +15,12 @@ import {
   okEnvelopeSchema,
 } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
-import type { WorkspaceParams } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
+import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
-  create = async (req: Request<WorkspaceParams, {}, CreateBodyType, {}, {}>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
     const workspaceId = req.params.workspaceId;
 
     const project = await this.projectService.create(req.body, workspaceId, req.user!.id);
@@ -41,7 +41,7 @@ export class ProjectController {
     return res.status(201).json(validatedEnvelop);
   };
 
-  get = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
     const project = await this.projectService.get(
       req.params.projectId!,
       req.params.workspaceId,
@@ -64,20 +64,27 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  listByWorkspace = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
-    const projects = await this.projectService.listByWorkspace(
+  listByWorkspace = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+
+    const { projects, paginationMeta } = await this.projectService.listByWorkspace(
       req.params.workspaceId,
       req.user!.id,
+      paginationQuery
     );
 
-    const safeProjectResponse: ListProjectResponseType = projects.map((p) => ({
-      workspaceId: p.workspaceId,
-      id: p.id,
-      name: p.name,
-      description: p.description ?? '',
-      createdAt: p.createdAt,
-      createdBy: p.createdBy,
-    }));
+    const safeProjectResponse: ListProjectResponseType = {
+      data:
+        projects.map((p) => ({
+          workspaceId: p.workspaceId,
+          id: p.id,
+          name: p.name,
+          description: p.description ?? '',
+          createdAt: p.createdAt,
+          createdBy: p.createdBy,
+        })),
+        paginationMeta
+    };
 
     const envelop = ok(safeProjectResponse);
     const envelopSchema = okEnvelopeSchema(listProjectsResponseSchema);
@@ -86,7 +93,7 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  update = async (req: Request<WorkspaceParams, {}, UpdateBodyType, {}, {}>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
     const project = await this.projectService.update(
       req.body,
       req.params.workspaceId,
@@ -110,7 +117,7 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  remove = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
     const project = await this.projectService.remove(req.params.projectId!, req.user!.id);
 
     const safeProjectResponse: SafeProjectResponseType = {

@@ -1,8 +1,9 @@
 import { Prisma } from '../../../prisma/generated/client.js';
+import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class WorkspaceRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(workspaceData: Prisma.WorkspaceCreateInput, db: DbOrTxClient = this.prisma) {
     return db.workspace.create({
@@ -30,7 +31,7 @@ export class WorkspaceRepo {
     });
   }
 
-  async findMembers(workspaceId: string, db: DbOrTxClient = this.prisma) {
+  async findMembers(workspaceId: string, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
     return db.workspaceMember.findMany({
       where: {
         workspaceId,
@@ -40,6 +41,8 @@ export class WorkspaceRepo {
           select: { id: true, name: true, email: true },
         },
       },
+      skip,
+      take
     });
   }
 
@@ -51,13 +54,25 @@ export class WorkspaceRepo {
     });
   }
 
-  async findByUserId(userId: string, db: DbOrTxClient = this.prisma) {
+  async findByUserId(userId: string, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
     return db.workspace.findMany({
       where: {
         members: {
           some: { userId },
         },
       },
+      skip,
+      take,
+    });
+  }
+
+  async findAllByUserId(userId: string, db: DbOrTxClient = this.prisma) {
+    return db.workspace.findMany({
+      where: {
+        members: {
+          some: { userId },
+        },
+      }
     });
   }
 
@@ -143,6 +158,24 @@ export class WorkspaceRepo {
         workspaceId_userId: {
           workspaceId,
           userId,
+        },
+      },
+    });
+  }
+
+  async countWorkspaceMembers(workspaceId: string, db: DbOrTxClient = this.prisma) {
+    return db.workspaceMember.count({
+      where: {
+        workspaceId,
+      },
+    });
+  }
+
+  async countWorkspacesByUserId(userId: string, db: DbOrTxClient = this.prisma) {
+    return db.workspace.count({
+      where: {
+        members: {
+          some: { userId },
         },
       },
     });

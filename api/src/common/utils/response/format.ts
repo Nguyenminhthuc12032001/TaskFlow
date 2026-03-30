@@ -1,4 +1,4 @@
-import z from '../../../docs/zod.js';
+import z, { type ZodType } from '../../../docs/zod.js';
 export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
   z
     .object({

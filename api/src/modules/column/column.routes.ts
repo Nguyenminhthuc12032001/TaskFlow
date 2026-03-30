@@ -5,7 +5,7 @@ import { prisma } from '../../db/prisma.js';
 import { ColumnRepo } from './column.repo.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
-import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
+import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
 import { createBodySchema, reOrderBodySchema, updateBodySchema } from './column.schemas.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';

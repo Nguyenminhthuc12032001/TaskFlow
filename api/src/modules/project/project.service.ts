@@ -1,6 +1,8 @@
 import { ActivityAction, ColumnType, type Prisma } from '../../../prisma/generated/client.js';
 import type { ProjectUpdateInput } from '../../../prisma/generated/models.js';
 import { AppError } from '../../common/errors/AppError.js';
+import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 
@@ -16,7 +18,7 @@ export class ProjectService {
   ) {}
 
   async create(data: CreateBodyType, workspaceId: string, actorId: string) {
-    const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
+    const projects = await this.projectRepo.allProjectsByWorkspace(workspaceId, actorId);
 
     if (projects.some((p) => p.name === data.name)) {
       throw new AppError('Duplicate name is not allowed', 409);
@@ -75,8 +77,16 @@ export class ProjectService {
     return result;
   }
 
-  async listByWorkspace(workspaceId: string, actorId: string) {
-    return await this.projectRepo.listByWorkspace(workspaceId, actorId);
+  async listByWorkspace(workspaceId: string, actorId: string, paginationQuery: PaginationQueryType) {
+    const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(workspaceId, actorId);
+
+    const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
+
+    const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId, { take, skip });
+    
+    return { projects, paginationMeta };
   }
 
   async listByUser(actorId: string) {
@@ -89,7 +99,7 @@ export class ProjectService {
     projectId: string,
     actorId: string,
   ) {
-    const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId);
+    const projects = await this.projectRepo.allProjectsByWorkspace(workspaceId, actorId);
 
     if (projects.some((p) => p.name === data.name && p.id !== projectId)) {
       throw new AppError('Duplicate name is not allowed', 409);

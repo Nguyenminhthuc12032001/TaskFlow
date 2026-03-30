@@ -7,7 +7,7 @@ import {
   resetPasswordBodySchema,
   changePasswordBodySchema,
 } from './auth.schemas.js';
-import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
+import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
 import { csrfProtection } from '../../common/middlewares/csrf.middleware.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';

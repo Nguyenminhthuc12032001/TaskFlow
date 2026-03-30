@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { LeadController } from './lead.controller.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
-import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
+import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
 import {
   createBodySchema,
   createFollowUpTaskBodySchema,

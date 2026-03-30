@@ -1,6 +1,7 @@
-import z from '../../docs/zod.js';
+import z, { type ZodType } from '../../docs/zod.js';
 import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 
 // ========= REQUEST ==========
 
@@ -53,7 +54,10 @@ export const createResponseSchema = z.object({
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
 // Get workspace/list
-export const getByUserIdResponseSchema = z.array(createResponseSchema);
+export const getByUserIdResponseSchema = z.object({
+  data: z.array(createResponseSchema),
+  paginationMeta: paginationMetaSchema,
+});
 export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
 // Get workspace/:workspaceId
@@ -73,7 +77,10 @@ export const safeMemberResponseSchema = z.object({
 export type SafeMemberResponse = z.infer<typeof safeMemberResponseSchema>;
 
 // GET workspace/members/:workspaceId
-export const membersResponseSchema = z.array(safeMemberResponseSchema);
+export const membersResponseSchema = z.object({
+  data: z.array(safeMemberResponseSchema),
+  paginationMeta: paginationMetaSchema,
+});
 export type SafeMembersResponse = z.infer<typeof membersResponseSchema>;
 
 // POST workspace/invite/:workspaceId

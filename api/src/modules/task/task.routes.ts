@@ -6,7 +6,7 @@ import { ActivityService } from '../activity/activity.service.js';
 import { TaskRepo } from './task.repo.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
-import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
+import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
 import {
   assignBodySchema,
   bulkRemoveBodySchema,
