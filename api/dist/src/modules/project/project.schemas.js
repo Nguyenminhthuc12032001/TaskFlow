@@ -1,3 +1,4 @@
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 // REQUEST
 export const createBodySchema = z.object({
@@ -43,4 +44,7 @@ export const safeProjectResponseSchema = z.object({
     createdAt: z.date(),
     createdBy: z.uuid(),
 });
-export const listProjectsResponseSchema = z.array(safeProjectResponseSchema);
+export const listProjectsResponseSchema = z.object({
+    data: z.array(safeProjectResponseSchema),
+    paginationMeta: paginationMetaSchema
+});

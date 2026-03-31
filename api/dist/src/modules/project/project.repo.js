@@ -5,29 +5,45 @@ export class ProjectRepo {
     async create(data, db = this.prisma) {
         return await db.project.create({ data });
     }
-    async get(id, workspaceId, actorId, db = this.prisma) {
+    async get(ctx, db = this.prisma) {
         return await db.project.findFirst({
             where: {
-                id,
-                workspaceId,
+                id: ctx.projectId,
+                workspaceId: ctx.workspaceId,
                 workspace: {
                     members: {
                         some: {
-                            userId: actorId,
+                            userId: ctx.ActorId,
                         },
                     },
                 },
             },
         });
     }
-    async listByWorkspace(workspaceId, actorId, db = this.prisma) {
+    async listByWorkspace(ctx, { take, skip }, db = this.prisma) {
         return await db.project.findMany({
             where: {
-                workspaceId,
+                workspaceId: ctx.workspaceId,
                 workspace: {
                     members: {
                         some: {
-                            userId: actorId,
+                            userId: ctx.ActorId,
+                        },
+                    },
+                },
+            },
+            skip,
+            take,
+        });
+    }
+    async allProjectsByWorkspace(ctx, db = this.prisma) {
+        return await db.project.findMany({
+            where: {
+                workspaceId: ctx.workspaceId,
+                workspace: {
+                    members: {
+                        some: {
+                            userId: ctx.ActorId,
                         },
                     },
                 },
@@ -47,15 +63,15 @@ export class ProjectRepo {
             },
         });
     }
-    async update(data, workspaceId, projectId, actorId, db = this.prisma) {
+    async update(data, ctx, db = this.prisma) {
         return await db.project.update({
             where: {
-                id: projectId,
+                id: ctx.projectId,
                 workspace: {
-                    id: workspaceId,
+                    id: ctx.workspaceId,
                     members: {
                         some: {
-                            userId: actorId,
+                            userId: ctx.ActorId,
                             role: {
                                 in: ['admin', 'owner'],
                             },
@@ -66,17 +82,32 @@ export class ProjectRepo {
             data,
         });
     }
-    async remove(id, actorId, db = this.prisma) {
+    async remove(ctx, db = this.prisma) {
         return await db.project.delete({
             where: {
-                id,
+                id: ctx.projectId,
                 workspace: {
+                    id: ctx.workspaceId,
                     members: {
                         some: {
-                            userId: actorId,
+                            userId: ctx.ActorId,
                             role: {
                                 in: ['admin', 'owner'],
                             },
+                        },
+                    },
+                },
+            },
+        });
+    }
+    async countProjectsByWorkspace(ctx, db = this.prisma) {
+        return await db.project.count({
+            where: {
+                workspaceId: ctx.workspaceId,
+                workspace: {
+                    members: {
+                        some: {
+                            userId: ctx.ActorId,
                         },
                     },
                 },

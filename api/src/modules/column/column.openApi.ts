@@ -8,6 +8,7 @@ import {
   updateBodySchema,
 } from './column.schemas.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 
 const defaultPath = '/api/columns/{workspaceId}/{projectId}';
 
@@ -40,6 +41,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
+    query: paginationQuerySchema
   },
   responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });
@@ -70,6 +72,7 @@ registry.registerPath({
       required: true,
     },
     params: defaultParams,
+    query: paginationQuerySchema
   },
   responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });

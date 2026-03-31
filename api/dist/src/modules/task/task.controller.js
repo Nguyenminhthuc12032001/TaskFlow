@@ -1,6 +1,7 @@
 import { safeAssigneeSchema, safeTaskSchema, safeTasksSchema, } from './task.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 export class TaskController {
     constructor(taskService) {
         this.taskService = taskService;
@@ -58,26 +59,30 @@ export class TaskController {
             return res.status(200).json(validatedEnvelop);
         };
         this.listByColumn = async (req, res) => {
+            const paginationQuery = paginationQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
                 columnId: req.params.columnId,
                 ActorId: req.user.id,
             };
-            const tasks = await this.taskService.listByColumn(ctx);
-            const safeTasks = tasks.map((task) => ({
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            }));
+            const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, paginationQuery);
+            const safeTasks = {
+                data: tasks.map((task) => ({
+                    id: task.id,
+                    projectId: task.projectId,
+                    columnId: task.columnId,
+                    title: task.title,
+                    priority: task.priority,
+                    position: task.position,
+                    createdBy: task.createdBy,
+                    createdAt: task.createdAt,
+                    updatedAt: task.updatedAt,
+                    description: task.description ?? '',
+                    dueDate: task.dueDate ?? undefined,
+                })),
+                paginationMeta
+            };
             const envelop = ok(safeTasks);
             const envelopSchema = okEnvelopeSchema(safeTasksSchema);
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);
@@ -111,26 +116,30 @@ export class TaskController {
             return res.status(200).json(validatedEnvelop);
         };
         this.reOrder = async (req, res) => {
+            const paginationQuery = paginationQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
                 columnId: req.params.columnId,
                 ActorId: req.user.id,
             };
-            const tasks = await this.taskService.reOrder(req.body, ctx);
-            const safeTasks = tasks.map((task) => ({
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            }));
+            const { tasks, paginationMeta } = await this.taskService.reOrder(req.body, ctx, paginationQuery);
+            const safeTasks = {
+                data: tasks.map((task) => ({
+                    id: task.id,
+                    projectId: task.projectId,
+                    columnId: task.columnId,
+                    title: task.title,
+                    priority: task.priority,
+                    position: task.position,
+                    createdBy: task.createdBy,
+                    createdAt: task.createdAt,
+                    updatedAt: task.updatedAt,
+                    description: task.description ?? '',
+                    dueDate: task.dueDate ?? undefined,
+                })),
+                paginationMeta
+            };
             const envelop = ok(safeTasks);
             const envelopSchema = okEnvelopeSchema(safeTasksSchema);
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);
@@ -171,19 +180,29 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const tasks = await this.taskService.bulkRemove(req.body, ctx);
-            const safeTasks = tasks.map((task) => ({
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            }));
+            const safeTasks = {
+                data: tasks.map((task) => ({
+                    id: task.id,
+                    projectId: task.projectId,
+                    columnId: task.columnId,
+                    title: task.title,
+                    priority: task.priority,
+                    position: task.position,
+                    createdBy: task.createdBy,
+                    createdAt: task.createdAt,
+                    updatedAt: task.updatedAt,
+                    description: task.description ?? '',
+                    dueDate: task.dueDate ?? undefined,
+                })),
+                paginationMeta: {
+                    page: 1,
+                    limit: tasks.length,
+                    totalItems: tasks.length,
+                    totalPages: 1,
+                    hasNextPage: false,
+                    hasPrevPage: false,
+                }
+            };
             const envelop = ok(safeTasks);
             const envelopSchema = okEnvelopeSchema(safeTasksSchema);
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);

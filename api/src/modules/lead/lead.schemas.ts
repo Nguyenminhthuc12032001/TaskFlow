@@ -3,6 +3,7 @@ import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { safeTaskSchema } from '../task/task.schemas.js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 
 // REQUEST
 
@@ -131,5 +132,8 @@ export const safeLeadTaskLinkSchema = z.object({
 });
 export type SafeLeadTaskLinkType = z.infer<typeof safeLeadTaskLinkSchema>;
 
-export const safeLeadsSchema = z.array(safeLeadSchema);
+export const safeLeadsSchema = z.object({
+  data: z.array(safeLeadSchema),
+  paginationMeta: paginationMetaSchema
+});
 export type SafeLeadsType = z.infer<typeof safeLeadsSchema>;

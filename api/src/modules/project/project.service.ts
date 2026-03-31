@@ -2,6 +2,7 @@ import { ActivityAction, ColumnType, type Prisma } from '../../../prisma/generat
 import type { ProjectUpdateInput } from '../../../prisma/generated/models.js';
 import { AppError } from '../../common/errors/AppError.js';
 import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
@@ -17,8 +18,8 @@ export class ProjectService {
     readonly activityService: ActivityService,
   ) {}
 
-  async create(data: CreateBodyType, workspaceId: string, actorId: string) {
-    const projects = await this.projectRepo.allProjectsByWorkspace(workspaceId, actorId);
+  async create(data: CreateBodyType, ctx: ResourceContext) {
+    const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
     if (projects.some((p) => p.name === data.name)) {
       throw new AppError('Duplicate name is not allowed', 409);
@@ -29,10 +30,10 @@ export class ProjectService {
       description: data.description,
       workspace: {
         connect: {
-          id: workspaceId,
+          id: ctx.workspaceId,
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
               role: {
                 in: ['admin', 'owner'],
               },
@@ -40,7 +41,7 @@ export class ProjectService {
           },
         },
       },
-      creator: { connect: { id: actorId } },
+      creator: { connect: { id: ctx.ActorId } },
     };
 
     return await this.prisma.$transaction(async (tx) => {
@@ -58,7 +59,7 @@ export class ProjectService {
         project.workspaceId,
         ActivityAction.CREATE_PROJECT,
         'project',
-        actorId,
+        ctx.ActorId,
         project.id,
         { name: project.name },
         tx,
@@ -68,8 +69,8 @@ export class ProjectService {
     });
   }
 
-  async get(id: string, workspaceId: string, actorId: string) {
-    const result = await this.projectRepo.get(id, workspaceId, actorId);
+  async get(ctx: ResourceContext) {
+    const result = await this.projectRepo.get(ctx);
     if (!result) {
       throw new AppError('Project not found', 404);
     }
@@ -77,14 +78,14 @@ export class ProjectService {
     return result;
   }
 
-  async listByWorkspace(workspaceId: string, actorId: string, paginationQuery: PaginationQueryType) {
+  async listByWorkspace(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
     const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(workspaceId, actorId);
+    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 
-    const projects = await this.projectRepo.listByWorkspace(workspaceId, actorId, { take, skip });
+    const projects = await this.projectRepo.listByWorkspace(ctx, { take, skip });
     
     return { projects, paginationMeta };
   }
@@ -95,13 +96,11 @@ export class ProjectService {
 
   async update(
     data: UpdateBodyType,
-    workspaceId: string,
-    projectId: string,
-    actorId: string,
+    ctx: ResourceContext,
   ) {
-    const projects = await this.projectRepo.allProjectsByWorkspace(workspaceId, actorId);
+    const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
-    if (projects.some((p) => p.name === data.name && p.id !== projectId)) {
+    if (projects.some((p) => p.name === data.name && p.id !== ctx.projectId)) {
       throw new AppError('Duplicate name is not allowed', 409);
     }
 
@@ -111,19 +110,13 @@ export class ProjectService {
     };
 
     return await this.prisma.$transaction(async (tx) => {
-      const project = await this.projectRepo.update(
-        updateData,
-        workspaceId,
-        projectId,
-        actorId,
-        tx,
-      );
+      const project = await this.projectRepo.update(updateData, ctx, tx);
 
       await this.activityService.logActivity(
         project.workspaceId,
         ActivityAction.UPDATE_PROJECT,
         'project',
-        actorId,
+        ctx.ActorId,
         project.id,
         { name: project.name },
         tx,
@@ -133,15 +126,15 @@ export class ProjectService {
     });
   }
 
-  async remove(id: string, actorId: string) {
+  async remove(ctx: ResourceContext) {
     return await this.prisma.$transaction(async (tx) => {
-      const project = await this.projectRepo.remove(id, actorId, tx);
+      const project = await this.projectRepo.remove(ctx, tx);
 
       await this.activityService.logActivity(
         project.workspaceId,
         ActivityAction.DELETE_PROJECT,
         'project',
-        actorId,
+        ctx.ActorId,
         project.id,
         { name: project.name },
         tx,

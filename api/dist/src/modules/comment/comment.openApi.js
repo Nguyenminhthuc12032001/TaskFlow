@@ -1,3 +1,4 @@
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
@@ -44,10 +45,11 @@ registry.registerPath({
     method: 'get',
     path: defaultPath,
     tags: ['Comment'],
-    summary: 'List comments',
+    summary: 'List comments by task',
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
+        query: paginationQuerySchema
     },
     responses: defaultResponse(safeCommentsSchema, [201, 409]),
 });

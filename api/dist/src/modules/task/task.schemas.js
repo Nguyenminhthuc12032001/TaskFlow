@@ -1,5 +1,6 @@
 import z from '../../docs/zod.js';
 import { TaskPriority } from '../../../prisma/generated/enums.js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // REQUEST
 export const createBodySchema = z.object({
     title: z
@@ -122,7 +123,10 @@ export const safeTaskSchema = z.object({
     createdAt: z.date(),
     updatedAt: z.date(),
 });
-export const safeTasksSchema = z.array(safeTaskSchema);
+export const safeTasksSchema = z.object({
+    data: z.array(safeTaskSchema),
+    paginationMeta: paginationMetaSchema
+});
 export const safeAssigneeSchema = z.object({
     taskId: z.uuid(),
     userId: z.uuid(),

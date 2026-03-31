@@ -3,7 +3,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class LeadRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(data: Prisma.LeadCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.lead.create({ data });
@@ -28,8 +28,52 @@ export class LeadRepo {
     });
   }
 
-  async listByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async listByWorkspace(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
     return await db.lead.findMany({
+      where: {
+        workspace: {
+          id: ctx.workspaceId,
+          members: {
+            some: {
+              userId: ctx.ActorId,
+              role: {
+                in: ['member', 'admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
+
+  async allLeadsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.lead.findMany({
+      where: {
+        workspace: {
+          id: ctx.workspaceId,
+          members: {
+            some: {
+              userId: ctx.ActorId,
+              role: {
+                in: ['member', 'admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
+
+  async countLeadsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.lead.count({
       where: {
         workspace: {
           id: ctx.workspaceId,

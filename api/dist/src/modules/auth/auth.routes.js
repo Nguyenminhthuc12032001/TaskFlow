@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { registerBodySchema, loginBodySchema, forgotPasswordBodySchema, resetPasswordBodySchema, changePasswordBodySchema, } from './auth.schemas.js';
-import { validateBody } from '../../common/middlewares/validateBody.middleware.js';
+import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
 import { csrfProtection } from '../../common/middlewares/csrf.middleware.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';

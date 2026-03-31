@@ -1,6 +1,8 @@
 import { ActivityAction, Prisma } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
 import type { CommentRepo } from './comment.repo.js';
@@ -92,8 +94,16 @@ export class CommentService {
     return comment;
   }
 
-  async listByTask(ctx: ResourceContext) {
-    return await this.commentRepo.listByTask(ctx);
+  async listByTask(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countComments = await this.commentRepo.countCommentsByTask(ctx);
+
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(countComments, safePage, safeLimit);
+
+    const comments = await this.commentRepo.listByTask(ctx, { skip, take });
+
+    return { comments, paginationMeta };
   }
 
   async update(data: UpdateBodyType, ctx: ResourceContext) {

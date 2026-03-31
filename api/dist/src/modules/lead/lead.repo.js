@@ -23,8 +23,44 @@ export class LeadRepo {
             },
         });
     }
-    async listByWorkspace(ctx, db = this.prisma) {
+    async listByWorkspace(ctx, { skip, take }, db = this.prisma) {
         return await db.lead.findMany({
+            where: {
+                workspace: {
+                    id: ctx.workspaceId,
+                    members: {
+                        some: {
+                            userId: ctx.ActorId,
+                            role: {
+                                in: ['member', 'admin', 'owner'],
+                            },
+                        },
+                    },
+                },
+            },
+            skip,
+            take
+        });
+    }
+    async allLeadsByWorkspace(ctx, db = this.prisma) {
+        return await db.lead.findMany({
+            where: {
+                workspace: {
+                    id: ctx.workspaceId,
+                    members: {
+                        some: {
+                            userId: ctx.ActorId,
+                            role: {
+                                in: ['member', 'admin', 'owner'],
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+    async countLeadsByWorkspace(ctx, db = this.prisma) {
+        return await db.lead.count({
             where: {
                 workspace: {
                     id: ctx.workspaceId,

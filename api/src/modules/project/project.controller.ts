@@ -14,6 +14,7 @@ import {
   ok,
   okEnvelopeSchema,
 } from '../../common/utils/response/format.js';
+import type { ResourceContext } from '../../common/types/common.types.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 
@@ -21,9 +22,12 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) { }
 
   create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
-    const workspaceId = req.params.workspaceId;
+    const ctx: ResourceContext = {
+      workspaceId: req.params.workspaceId,
+      ActorId: req.user!.id,
+    };
 
-    const project = await this.projectService.create(req.body, workspaceId, req.user!.id);
+    const project = await this.projectService.create(req.body, ctx);
 
     const safeProject: SafeProjectResponseType = {
       workspaceId: project.workspaceId,
@@ -42,11 +46,13 @@ export class ProjectController {
   };
 
   get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const project = await this.projectService.get(
-      req.params.projectId!,
-      req.params.workspaceId,
-      req.user!.id,
-    );
+    const ctx: ResourceContext = {
+      workspaceId: req.params.workspaceId,
+      projectId: req.params.projectId!,
+      ActorId: req.user!.id,
+    };
+
+    const project = await this.projectService.get(ctx);
 
     const safeProject: SafeProjectResponseType = {
       workspaceId: project.workspaceId,
@@ -66,12 +72,12 @@ export class ProjectController {
 
   listByWorkspace = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
     const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const ctx: ResourceContext = {
+      workspaceId: req.params.workspaceId,
+      ActorId: req.user!.id,
+    };
 
-    const { projects, paginationMeta } = await this.projectService.listByWorkspace(
-      req.params.workspaceId,
-      req.user!.id,
-      paginationQuery
-    );
+    const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, paginationQuery);
 
     const safeProjectResponse: ListProjectResponseType = {
       data:
@@ -94,12 +100,13 @@ export class ProjectController {
   };
 
   update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
-    const project = await this.projectService.update(
-      req.body,
-      req.params.workspaceId,
-      req.params.projectId!,
-      req.user!.id,
-    );
+    const ctx: ResourceContext = {
+      workspaceId: req.params.workspaceId,
+      projectId: req.params.projectId!,
+      ActorId: req.user!.id,
+    };
+
+    const project = await this.projectService.update(req.body, ctx);
 
     const safeProjectResponse: SafeProjectResponseType = {
       workspaceId: project.workspaceId,
@@ -118,7 +125,13 @@ export class ProjectController {
   };
 
   remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const project = await this.projectService.remove(req.params.projectId!, req.user!.id);
+    const ctx: ResourceContext = {
+      workspaceId: req.params.workspaceId,
+      projectId: req.params.projectId!,
+      ActorId: req.user!.id,
+    };
+
+    const project = await this.projectService.remove(ctx);
 
     const safeProjectResponse: SafeProjectResponseType = {
       workspaceId: project.workspaceId,

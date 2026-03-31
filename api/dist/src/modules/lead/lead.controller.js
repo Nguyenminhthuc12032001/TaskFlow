@@ -1,3 +1,4 @@
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
@@ -54,24 +55,28 @@ export class LeadController {
             return res.status(200).json(validatedEnvelop);
         };
         this.listByWorkspace = async (req, res) => {
+            const paginationQuery = paginationQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 ActorId: req.user.id,
             };
-            const leads = await this.leadService.listByWorkspace(ctx);
-            const safeLeads = leads.map((lead) => ({
-                id: lead.id,
-                workspaceId: lead.workspaceId,
-                name: lead.name,
-                stage: lead.stage,
-                note: lead.note,
-                createdBy: lead.createdBy,
-                createdAt: lead.createdAt,
-                updatedAt: lead.updatedAt,
-                ...(lead.email != null && { email: lead.email }),
-                ...(lead.phone != null && { phone: lead.phone }),
-                ...(lead.source != null && { source: lead.source }),
-            }));
+            const { leads, paginationMeta } = await this.leadService.listByWorkspace(ctx, paginationQuery);
+            const safeLeads = {
+                data: leads.map((lead) => ({
+                    id: lead.id,
+                    workspaceId: lead.workspaceId,
+                    name: lead.name,
+                    stage: lead.stage,
+                    note: lead.note,
+                    createdBy: lead.createdBy,
+                    createdAt: lead.createdAt,
+                    updatedAt: lead.updatedAt,
+                    ...(lead.email != null && { email: lead.email }),
+                    ...(lead.phone != null && { phone: lead.phone }),
+                    ...(lead.source != null && { source: lead.source }),
+                })),
+                paginationMeta,
+            };
             const envelop = ok(safeLeads);
             const envelopSchema = okEnvelopeSchema(safeLeadsSchema);
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);

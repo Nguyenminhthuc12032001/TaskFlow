@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class TaskService {
     constructor(prisma, activityService, taskRepo) {
         this.prisma = prisma;
@@ -8,7 +9,7 @@ export class TaskService {
     }
     async create(data, ctx) {
         const result = await this.prisma.$transaction(async (tx) => {
-            const tasks = await this.taskRepo.listByColumn(ctx, tx);
+            const tasks = await this.taskRepo.allTasksByColumn(ctx, tx);
             if (tasks.some((t) => t.title.toLowerCase() === data.title.toLowerCase())) {
                 throw new AppError('Duplicate task title is not allowed', 409);
             }
@@ -71,11 +72,15 @@ export class TaskService {
         }
         return task;
     }
-    async listByColumn(ctx) {
-        return await this.taskRepo.listByColumn(ctx);
+    async listByColumn(ctx, paginationQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
+        const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+        return { tasks, paginationMeta };
     }
     async update(data, ctx) {
-        const tasks = await this.taskRepo.listByColumn(ctx);
+        const tasks = await this.taskRepo.allTasksByColumn(ctx);
         if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ''))) {
             throw new AppError('Duplicate title is not allowed', 409);
         }
@@ -93,8 +98,8 @@ export class TaskService {
         });
         return result;
     }
-    async reOrder(data, ctx) {
-        return await this.prisma.$transaction(async (tx) => {
+    async reOrder(data, ctx, paginationQuery) {
+        await this.prisma.$transaction(async (tx) => {
             await Promise.all(data.map(async ({ taskId, position }) => {
                 return await this.taskRepo.update({ position: -(position + 1) }, { ...ctx, TaskId: taskId }, tx);
             }));
@@ -102,8 +107,12 @@ export class TaskService {
                 return await this.taskRepo.update({ position }, { ...ctx, TaskId: taskId }, tx);
             }));
             await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_TASK, 'tasks', ctx.ActorId, undefined, { result }, tx);
-            return result;
         });
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
+        const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+        return { tasks, paginationMeta };
     }
     async archivTask(ctx) {
         return await this.taskRepo.archivTask(ctx);

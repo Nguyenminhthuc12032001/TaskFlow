@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class CommentService {
     constructor(prisma, activityService, commentRepo) {
         this.prisma = prisma;
@@ -58,8 +59,12 @@ export class CommentService {
         }
         return comment;
     }
-    async listByTask(ctx) {
-        return await this.commentRepo.listByTask(ctx);
+    async listByTask(ctx, paginationQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countComments = await this.commentRepo.countCommentsByTask(ctx);
+        const paginationMeta = buildPaginationMeta(countComments, safePage, safeLimit);
+        const comments = await this.commentRepo.listByTask(ctx, { skip, take });
+        return { comments, paginationMeta };
     }
     async update(data, ctx) {
         const comment = await this.commentRepo.get(ctx);

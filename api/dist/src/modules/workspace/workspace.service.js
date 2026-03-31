@@ -6,6 +6,7 @@ import { env } from '../../config/env.js';
 import ms from 'ms';
 import { log } from '../../common/logger/logger.js';
 import { hashValue, verifyHash } from '../../common/utils/crypto.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class WorkspaceService {
     constructor(emailService, workspaceRepo, authRepo, projectRepo, activityService, prisma) {
         this.emailService = emailService;
@@ -16,7 +17,7 @@ export class WorkspaceService {
         this.prisma = prisma;
     }
     async create(workspaceData, actorId) {
-        const workspaces = await this.workspaceRepo.findByUserId(actorId);
+        const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
         if (workspaces.some((w) => w.name === workspaceData.name)) {
             throw new AppError('Workspace name already exists', 409);
         }
@@ -44,14 +45,22 @@ export class WorkspaceService {
         }
         return workspace;
     }
-    async getByUserId(actorId) {
-        return await this.workspaceRepo.findByUserId(actorId);
+    async getByUserId(actorId, paginationQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const workspaces = await this.workspaceRepo.findByUserId(actorId, { take, skip });
+        const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspacesByUser);
+        return { workspaces, paginationMeta };
     }
-    async listMembers(workspaceId) {
-        return await this.workspaceRepo.findMembers(workspaceId);
+    async listMembers(workspaceId, paginationQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const members = await this.workspaceRepo.findMembers(workspaceId, { take, skip });
+        const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
+        return { members, paginationMeta };
     }
     async update(workspaceId, workspaceData, actorId) {
-        const workspaces = await this.workspaceRepo.findByUserId(actorId);
+        const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
         if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
             throw new AppError('Workspace name already exists', 409);
         }

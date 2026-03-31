@@ -22,7 +22,7 @@ export class WorkspaceRepo {
             },
         });
     }
-    async findMembers(workspaceId, db = this.prisma) {
+    async findMembers(workspaceId, { take, skip }, db = this.prisma) {
         return db.workspaceMember.findMany({
             where: {
                 workspaceId,
@@ -32,6 +32,8 @@ export class WorkspaceRepo {
                     select: { id: true, name: true, email: true },
                 },
             },
+            skip,
+            take
         });
     }
     async findById(workspaceId, db = this.prisma) {
@@ -41,13 +43,24 @@ export class WorkspaceRepo {
             },
         });
     }
-    async findByUserId(userId, db = this.prisma) {
+    async findByUserId(userId, { take, skip }, db = this.prisma) {
         return db.workspace.findMany({
             where: {
                 members: {
                     some: { userId },
                 },
             },
+            skip,
+            take,
+        });
+    }
+    async findAllByUserId(userId, db = this.prisma) {
+        return db.workspace.findMany({
+            where: {
+                members: {
+                    some: { userId },
+                },
+            }
         });
     }
     async update(workspaceId, data, db = this.prisma) {
@@ -111,6 +124,22 @@ export class WorkspaceRepo {
                 workspaceId_userId: {
                     workspaceId,
                     userId,
+                },
+            },
+        });
+    }
+    async countWorkspaceMembers(workspaceId, db = this.prisma) {
+        return db.workspaceMember.count({
+            where: {
+                workspaceId,
+            },
+        });
+    }
+    async countWorkspacesByUserId(userId, db = this.prisma) {
+        return db.workspace.count({
+            where: {
+                members: {
+                    some: { userId },
                 },
             },
         });

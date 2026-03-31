@@ -1,3 +1,4 @@
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
@@ -43,6 +44,7 @@ registry.registerPath({
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
+        query: paginationQuerySchema
     },
     responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });

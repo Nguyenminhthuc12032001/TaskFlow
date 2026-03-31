@@ -1,6 +1,8 @@
 import { ActivityAction, type Prisma } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
 import type { TaskRepo } from './task.repo.js';
@@ -21,7 +23,7 @@ export class TaskService {
 
   async create(data: CreateBodyType, ctx: ResourceContext) {
     const result = await this.prisma.$transaction(async (tx) => {
-      const tasks = await this.taskRepo.listByColumn(ctx, tx);
+      const tasks = await this.taskRepo.allTasksByColumn(ctx, tx);
 
       if (tasks.some((t) => t.title.toLowerCase() === data.title.toLowerCase())) {
         throw new AppError('Duplicate task title is not allowed', 409);
@@ -117,12 +119,20 @@ export class TaskService {
     return task;
   }
 
-  async listByColumn(ctx: ResourceContext) {
-    return await this.taskRepo.listByColumn(ctx);
+  async listByColumn(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+
+    const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
+
+    const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+
+    return { tasks, paginationMeta };
   }
 
   async update(data: UpdateBodyType, ctx: ResourceContext) {
-    const tasks = await this.taskRepo.listByColumn(ctx);
+    const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
     if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ''))) {
       throw new AppError('Duplicate title is not allowed', 409);
@@ -155,8 +165,8 @@ export class TaskService {
     return result;
   }
 
-  async reOrder(data: ReOrderBodyType, ctx: ResourceContext) {
-    return await this.prisma.$transaction(async (tx) => {
+  async reOrder(data: ReOrderBodyType, ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+    await this.prisma.$transaction(async (tx) => {
       await Promise.all(
         data.map(async ({ taskId, position }) => {
           return await this.taskRepo.update(
@@ -182,9 +192,17 @@ export class TaskService {
         { result },
         tx,
       );
-
-      return result;
     });
+
+    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+
+    const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
+
+    const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+
+    return { tasks, paginationMeta };
   }
 
   async archivTask(ctx: ResourceContext) {

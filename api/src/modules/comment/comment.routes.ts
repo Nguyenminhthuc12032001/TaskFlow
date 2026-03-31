@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { CommentController } from './comment.controller.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
-import { validateBody } from '../../common/middlewares/validateRequest.middleware.js';
+import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
 import { createBodySchema, updateBodySchema } from './comment.schemas.js';
-import { emptyBodySchema } from '../../common/schemas/common.schemas.js';
+import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 import { CommentService } from './comment.service.js';
 import { prisma } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
@@ -23,6 +23,7 @@ router.post(
   defaultRoute,
   authMiddleware,
   requireWorkspaceRole('member'),
+  validateParams(workspaceParamsSchema),
   validateBody(createBodySchema),
   commentControlelr.create,
 );
@@ -31,6 +32,7 @@ router.post(
   defaultRoute + '/:commentId',
   authMiddleware,
   requireWorkspaceRole('member'),
+  validateParams(workspaceParamsSchema),
   validateBody(createBodySchema),
   commentControlelr.reply,
 );
@@ -39,6 +41,7 @@ router.get(
   defaultRoute + '/:commentId',
   authMiddleware,
   requireWorkspaceRole(),
+  validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
   commentControlelr.get,
 );
@@ -47,7 +50,9 @@ router.get(
   defaultRoute,
   authMiddleware,
   requireWorkspaceRole(),
+  validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
+  validateQuery(paginationQuerySchema),
   commentControlelr.listByTask,
 );
 
@@ -55,6 +60,7 @@ router.patch(
   defaultRoute + '/:commentId',
   authMiddleware,
   requireWorkspaceRole('member'),
+  validateParams(workspaceParamsSchema),
   validateBody(updateBodySchema),
   commentControlelr.update,
 );
@@ -63,6 +69,7 @@ router.delete(
   defaultRoute + '/:commentId',
   authMiddleware,
   requireWorkspaceRole('member'),
+  validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
   commentControlelr.remove,
 );

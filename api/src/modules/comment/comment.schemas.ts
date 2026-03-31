@@ -1,5 +1,6 @@
 // REQUEST
 
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 
 export const createBodySchema = z
@@ -43,18 +44,22 @@ export const safeCommentSchema = z
   .strict();
 export type SafeCommentType = z.infer<typeof safeCommentSchema>;
 
-export const safeCommentsSchema = z.array(safeCommentSchema).superRefine((items, ctx) => {
-  const idSet = new Set<string>();
+export const safeCommentsSchema = z.object({
+  data:
+    z.array(safeCommentSchema).superRefine((items, ctx) => {
+      const idSet = new Set<string>();
 
-  items.forEach((item, index) => {
-    if (idSet.has(item.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate id is not allowed',
-        path: [index, 'commentId'],
+      items.forEach((item, index) => {
+        if (idSet.has(item.id)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Duplicate id is not allowed',
+            path: [index, 'commentId'],
+          });
+        }
+        idSet.add(item.id);
       });
-    }
-    idSet.add(item.id);
-  });
-});
+    }),
+  paginationMeta: paginationMetaSchema
+}).strict();
 export type SafeCommentsType = z.infer<typeof safeCommentsSchema>;

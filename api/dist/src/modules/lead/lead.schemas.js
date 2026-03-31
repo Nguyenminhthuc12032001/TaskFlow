@@ -2,6 +2,7 @@ import { LeadStage, TaskPriority } from '../../../prisma/generated/client.js';
 import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // REQUEST
 export const createBodySchema = z.object({
     name: z
@@ -115,4 +116,7 @@ export const safeLeadTaskLinkSchema = z.object({
     leadId: z.uuid(),
     taskId: z.uuid(),
 });
-export const safeLeadsSchema = z.array(safeLeadSchema);
+export const safeLeadsSchema = z.object({
+    data: z.array(safeLeadSchema),
+    paginationMeta: paginationMetaSchema
+});

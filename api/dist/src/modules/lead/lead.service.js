@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class LeadService {
     constructor(prisma, leadRepo, taskRepo, activityService) {
         this.prisma = prisma;
@@ -37,8 +38,12 @@ export class LeadService {
         }
         return lead;
     }
-    async listByWorkspace(ctx) {
-        return await this.leadRepo.listByWorkspace(ctx);
+    async listByWorkspace(ctx, paginationQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
+        const leads = await this.leadRepo.listByWorkspace(ctx, { skip, take });
+        return { leads, paginationMeta };
     }
     async update(data, ctx) {
         if (data.email) {
@@ -99,7 +104,7 @@ export class LeadService {
         });
     }
     async createFollowUpTask(data, ctx) {
-        const tasks = await this.taskRepo.listByColumn(ctx);
+        const tasks = await this.taskRepo.allTasksByColumn(ctx);
         if (data.position) {
             if (tasks.some((t) => t.position === data.position)) {
                 throw new AppError('Duplicate task position is not allowed', 409);

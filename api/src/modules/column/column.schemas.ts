@@ -1,5 +1,6 @@
 import z from '../../docs/zod.js';
 import { ColumnType } from '../../../prisma/generated/enums.js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 
 // REQUEST
 
@@ -87,28 +88,31 @@ export const safeColumnSchema = z.object({
 });
 export type SafeColumnType = z.infer<typeof safeColumnSchema>;
 
-export const safeColumnsSchema = z.array(safeColumnSchema).superRefine((items, ctx) => {
-  const idSet = new Set<string>();
-  const positionSet = new Set<number>();
+export const safeColumnsSchema = z.object({
+  data: z.array(safeColumnSchema).superRefine((items, ctx) => {
+    const idSet = new Set<string>();
+    const positionSet = new Set<number>();
 
-  items.forEach((item, index) => {
-    if (idSet.has(item.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate id is not allowed',
-        path: [index, 'columnId'],
-      });
-    }
-    idSet.add(item.id);
+    items.forEach((item, index) => {
+      if (idSet.has(item.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Duplicate id is not allowed',
+          path: [index, 'columnId'],
+        });
+      }
+      idSet.add(item.id);
 
-    if (positionSet.has(item.position)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate position is not allowed',
-        path: [index, 'position'],
-      });
-    }
-    positionSet.add(item.position);
-  });
-});
+      if (positionSet.has(item.position)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Duplicate position is not allowed',
+          path: [index, 'position'],
+        });
+      }
+      positionSet.add(item.position);
+    });
+  }),
+  paginationMeta: paginationMetaSchema
+})
 export type SafeColumnsType = z.infer<typeof safeColumnsSchema>;

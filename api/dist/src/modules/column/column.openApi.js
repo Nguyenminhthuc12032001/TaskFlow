@@ -2,6 +2,7 @@ import z from '../../docs/zod.js';
 import { registry } from '../../docs/openapi.js';
 import { createBodySchema, reOrderBodySchema, safeColumnSchema, safeColumnsSchema, updateBodySchema, } from './column.schemas.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 const defaultPath = '/api/columns/{workspaceId}/{projectId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -30,6 +31,7 @@ registry.registerPath({
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
+        query: paginationQuerySchema
     },
     responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });
@@ -58,6 +60,7 @@ registry.registerPath({
             required: true,
         },
         params: defaultParams,
+        query: paginationQuerySchema
     },
     responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });

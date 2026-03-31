@@ -1,13 +1,14 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class ColumnService {
     constructor(prisma, columnRepo, activityService) {
         this.prisma = prisma;
         this.columnRepo = columnRepo;
         this.activityService = activityService;
     }
-    async create(data, workspaceId, projectId, actorId) {
-        const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+    async create(data, ctx) {
+        const columns = await this.columnRepo.allColumnsByProject(ctx);
         if (columns.some((c) => c.name === data.name)) {
             throw new AppError('Duplicate name is not allowed', 409);
         }
@@ -20,37 +21,41 @@ export class ColumnService {
             type: data.type,
             project: {
                 connect: {
-                    id: projectId,
+                    id: ctx.projectId,
                 },
             },
         };
         return await this.prisma.$transaction(async (tx) => {
             const column = await this.columnRepo.create(createData, tx);
-            await this.activityService.logActivity(workspaceId, ActivityAction.CREATE_COLUMN, 'column', actorId, column.id, { name: column.name }, tx);
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_COLUMN, 'column', ctx.ActorId, column.id, { name: column.name }, tx);
             return column;
         });
     }
-    async listByProjectId(workspaceId, projectId, actorId) {
-        return await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+    async listByProjectId(ctx, paginationQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
+        const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+        return { columns, paginationMeta };
     }
-    async get(workspaceId, projectId, columnId, actorId) {
-        const column = await this.columnRepo.get(workspaceId, projectId, columnId, actorId);
+    async get(ctx) {
+        const column = await this.columnRepo.get(ctx);
         if (!column) {
-            throw new AppError(`Column with id: ${columnId} not found`, 404);
+            throw new AppError(`Column with id: ${ctx.columnId} not found`, 404);
         }
         return column;
     }
-    async update(data, workspaceId, projectId, columnId, actorId) {
-        const columns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
-        if (columns.some((c) => c.name === data.name && c.id !== columnId)) {
+    async update(data, ctx) {
+        const columns = await this.columnRepo.allColumnsByProject(ctx);
+        if (columns.some((c) => c.name === data.name && c.id !== ctx.columnId)) {
             throw new AppError('Duplicate name is not allowed', 409);
         }
         const updateData = {
             name: data.name,
         };
         return await this.prisma.$transaction(async (tx) => {
-            const column = await this.columnRepo.update(updateData, workspaceId, projectId, columnId, actorId);
-            await this.activityService.logActivity(workspaceId, ActivityAction.UPDATE_COLUMN, 'column', actorId, column.id, {
+            const column = await this.columnRepo.update(updateData, ctx, tx);
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_COLUMN, 'column', ctx.ActorId, column.id, {
                 name: column.name,
                 position: column.position,
             }, tx);
@@ -58,8 +63,8 @@ export class ColumnService {
         });
     }
     async bulkUpdateStatus(data, ctx) { }
-    async reOrder(data, workspaceId, projectId, actorId) {
-        const oldColumns = await this.columnRepo.listByProject(workspaceId, projectId, actorId);
+    async reOrder(data, ctx, paginationQuery) {
+        const oldColumns = await this.columnRepo.allColumnsByProject(ctx);
         oldColumns.map((c) => {
             if (!data.some((d) => d.columnId === c.id)) {
                 throw new AppError(`Column with id: ${c.id} not found in request`, 404);
@@ -70,14 +75,14 @@ export class ColumnService {
                 throw new AppError(`Column with id: ${d.columnId} not found in database`, 404);
             }
         });
-        const result = await this.prisma.$transaction(async (tx) => {
+        await this.prisma.$transaction(async (tx) => {
             await Promise.all(data.map(async ({ columnId, position }) => {
-                return await this.columnRepo.update({ position: -(position + 1) }, workspaceId, projectId, columnId, actorId, tx);
+                return await this.columnRepo.update({ position: -(position + 1) }, { ...ctx, columnId }, tx);
             }));
             const columns = await Promise.all(data.map(async ({ columnId, position }) => {
-                return await this.columnRepo.update({ position }, workspaceId, projectId, columnId, actorId, tx);
+                return await this.columnRepo.update({ position }, { ...ctx, columnId }, tx);
             }));
-            await this.activityService.logActivity(workspaceId, ActivityAction.UPDATE_COLUMN, 'columns', actorId, undefined, {
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_COLUMN, 'columns', ctx.ActorId, undefined, {
                 new_columns: [
                     columns.map((c) => ({
                         id: c.id,
@@ -86,14 +91,17 @@ export class ColumnService {
                     })),
                 ],
             }, tx);
-            return columns;
         });
-        return result;
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
+        const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+        return { columns, paginationMeta };
     }
-    async remove(workspaceId, projectId, columnId, actorId) {
+    async remove(ctx) {
         return this.prisma.$transaction(async (tx) => {
-            const column = await this.columnRepo.remove(workspaceId, projectId, columnId, actorId, tx);
-            await this.activityService.logActivity(workspaceId, ActivityAction.DELETE_COLUMN, 'column', actorId, column.id, {
+            const column = await this.columnRepo.remove(ctx, tx);
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.DELETE_COLUMN, 'column', ctx.ActorId, column.id, {
                 name: column.name,
                 position: column.position,
             }, tx);

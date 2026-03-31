@@ -1,4 +1,5 @@
 import type { Prisma } from '../../../prisma/generated/client.js';
+import type { ResourceContext } from '../../common/types/common.types.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class ProjectRepo {
@@ -8,20 +9,15 @@ export class ProjectRepo {
     return await db.project.create({ data });
   }
 
-  async get(
-    id: string,
-    workspaceId: string,
-    actorId: string,
-    db: DbOrTxClient = this.prisma,
-  ) {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.project.findFirst({
       where: {
-        id,
-        workspaceId,
+        id: ctx.projectId,
+        workspaceId: ctx.workspaceId,
         workspace: {
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
             },
           },
         },
@@ -30,43 +26,47 @@ export class ProjectRepo {
   }
 
   async listByWorkspace(
-    workspaceId: string,
-    actorId: string,
+    ctx: ResourceContext,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.project.findMany({
       where: {
-        workspaceId,
+        workspaceId: ctx.workspaceId,
         workspace: {
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
             },
           },
         },
       },
       skip,
       take,
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }
 
   async allProjectsByWorkspace(
-    workspaceId: string,
-    actorId: string,
+    ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.project.findMany({
       where: {
-        workspaceId,
+        workspaceId: ctx.workspaceId,
         workspace: {
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
             },
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }
 
@@ -81,24 +81,25 @@ export class ProjectRepo {
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
   }
 
   async update(
     data: Prisma.ProjectUpdateInput,
-    workspaceId: string,
-    projectId: string,
-    actorId: string,
+    ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.project.update({
       where: {
-        id: projectId,
+        id: ctx.projectId,
         workspace: {
-          id: workspaceId,
+          id: ctx.workspaceId,
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
               role: {
                 in: ['admin', 'owner'],
               },
@@ -110,14 +111,15 @@ export class ProjectRepo {
     });
   }
 
-  async remove(id: string, actorId: string, db: DbOrTxClient = this.prisma) {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.project.delete({
       where: {
-        id,
+        id: ctx.projectId,
         workspace: {
+          id: ctx.workspaceId,
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
               role: {
                 in: ['admin', 'owner'],
               },
@@ -128,14 +130,14 @@ export class ProjectRepo {
     });
   }
 
-  async countProjectsByWorkspace(workspaceId: string, actorId: string, db: DbOrTxClient = this.prisma) {
+  async countProjectsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.project.count({
       where: {
-        workspaceId,
+        workspaceId: ctx.workspaceId,
         workspace: {
           members: {
             some: {
-              userId: actorId,
+              userId: ctx.ActorId,
             },
           },
         },

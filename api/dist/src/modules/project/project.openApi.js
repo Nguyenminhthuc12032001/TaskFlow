@@ -2,6 +2,7 @@ import { registry } from '../../docs/openapi.js';
 import { createBodySchema, listProjectsResponseSchema, safeProjectResponseSchema, updateBodySchema, } from './project.schemas.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 const defaultPath = '/api/projects/{workspaceId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -42,6 +43,7 @@ registry.registerPath({
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
+        query: paginationQuerySchema
     },
     responses: defaultResponse(listProjectsResponseSchema, [201, 409]),
 });

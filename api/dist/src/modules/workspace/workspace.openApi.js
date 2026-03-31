@@ -2,6 +2,7 @@ import { registry } from '../../docs/openapi.js';
 import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, } from './workspace.schemas.js';
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200, } from '../auth/auth.openApi.js';
 import z from '../../docs/zod.js';
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 export const defaultResponse = (schema, exclude = []) => {
     const responses = {
         200: ok200(schema),
@@ -38,6 +39,9 @@ registry.registerPath({
     tags: ['Workspace'],
     summary: 'Get list workspace by user ID',
     security: [{ bearerAuth: [] }],
+    request: {
+        query: paginationQuerySchema,
+    },
     responses: defaultResponse(getByUserIdResponseSchema, [201, 404, 409]),
 });
 registry.registerPath({
@@ -63,6 +67,7 @@ registry.registerPath({
         params: z.object({
             workspaceId: z.uuid(),
         }),
+        query: paginationQuerySchema
     },
     responses: defaultResponse(membersResponseSchema, [201, 409]),
 });

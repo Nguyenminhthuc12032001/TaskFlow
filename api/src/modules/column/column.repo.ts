@@ -1,28 +1,78 @@
 import type { Prisma } from '../../../prisma/generated/client.js';
+import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class ColumnRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.column.create({ data });
   }
 
   async listByProject(
-    workspaceId: string,
-    projectId: string,
-    actorId: string,
+    ctx: ResourceContext,
+    { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.column.findMany({
       where: {
         project: {
-          id: projectId,
+          id: ctx.projectId,
           workspace: {
-            id: workspaceId,
+            id: ctx.workspaceId,
             members: {
               some: {
-                userId: actorId,
+                userId: ctx.ActorId,
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  async allColumnsByProject(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma,
+  ) {
+    return await db.column.findMany({
+      where: {
+        project: {
+          id: ctx.projectId,
+          workspace: {
+            id: ctx.workspaceId,
+            members: {
+              some: {
+                userId: ctx.ActorId,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  async countColumnsByProject(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma,
+  ) {
+    return await db.column.count({
+      where: {
+        project: {
+          id: ctx.projectId,
+          workspace: {
+            id: ctx.workspaceId,
+            members: {
+              some: {
+                userId: ctx.ActorId,
               },
             },
           },
@@ -31,23 +81,17 @@ export class ColumnRepo {
     });
   }
 
-  async get(
-    workspaceId: string,
-    projectId: string,
-    columnId: string,
-    actorId: string,
-    db: DbOrTxClient = this.prisma,
-  ) {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.column.findFirst({
       where: {
-        id: columnId,
+        id: ctx.columnId,
         project: {
-          id: projectId,
+          id: ctx.projectId,
           workspace: {
-            id: workspaceId,
+            id: ctx.workspaceId,
             members: {
               some: {
-                userId: actorId,
+                userId: ctx.ActorId,
               },
             },
           },
@@ -58,22 +102,19 @@ export class ColumnRepo {
 
   async update(
     data: Prisma.ColumnUpdateInput,
-    workspaceId: string,
-    projectId: string,
-    columnId: string,
-    actorId: string,
+    ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.column.update({
       where: {
-        id: columnId,
+        id: ctx.columnId,
         project: {
-          id: projectId,
+          id: ctx.projectId,
           workspace: {
-            id: workspaceId,
+            id: ctx.workspaceId,
             members: {
               some: {
-                userId: actorId,
+                userId: ctx.ActorId,
                 role: {
                   in: ['admin', 'owner'],
                 },
@@ -87,22 +128,19 @@ export class ColumnRepo {
   }
 
   async remove(
-    workspaceId: string,
-    projectId: string,
-    columnId: string,
-    actorId: string,
+    ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.column.delete({
       where: {
-        id: columnId,
+        id: ctx.columnId,
         project: {
-          id: projectId,
+          id: ctx.projectId,
           workspace: {
-            id: workspaceId,
+            id: ctx.workspaceId,
             members: {
               some: {
-                userId: actorId,
+                userId: ctx.ActorId,
                 role: {
                   in: ['admin', 'owner'],
                 },

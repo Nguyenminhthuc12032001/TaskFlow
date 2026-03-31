@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { WorkspaceParams } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
+import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import {
   safeCommentSchema,
   safeCommentsSchema,
@@ -19,9 +19,9 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 
 export class CommentController {
-  constructor(readonly commentService: CommentService) {}
+  constructor(readonly commentService: CommentService) { }
 
-  create = async (req: Request<WorkspaceParams, {}, CreateBodyType, {}, {}>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -48,7 +48,7 @@ export class CommentController {
     return res.status(201).json(validatedEnvelop);
   };
 
-  get = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -77,7 +77,9 @@ export class CommentController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  listByTask = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
+  listByTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -86,17 +88,21 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const comments = await this.commentService.listByTask(ctx);
+    const { comments, paginationMeta } = await this.commentService.listByTask(ctx, paginationQuery);
 
-    const safeComments: SafeCommentsType = comments.map((comment) => ({
-      id: comment.id,
-      taskId: comment.taskId,
-      authorId: comment.authorId,
-      parentId: comment.parentId ?? '',
-      content: comment.content,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-    }));
+    const safeComments: SafeCommentsType = {
+      data:
+        comments.map((comment) => ({
+          id: comment.id,
+          taskId: comment.taskId,
+          authorId: comment.authorId,
+          parentId: comment.parentId ?? '',
+          content: comment.content,
+          createdAt: comment.createdAt,
+          updatedAt: comment.updatedAt,
+        })),
+      paginationMeta,
+    };
 
     const envelop = ok(safeComments);
     const envelopSchema = okEnvelopeSchema(safeCommentsSchema);
@@ -105,7 +111,7 @@ export class CommentController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  update = async (req: Request<WorkspaceParams, {}, UpdateBodyType, {}, {}>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -134,7 +140,7 @@ export class CommentController {
     return res.status(200).json(validatedEnvelop);
   };
 
-  reply = async (req: Request<WorkspaceParams, {}, CreateBodyType, {}, {}>, res: Response) => {
+  reply = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -163,7 +169,7 @@ export class CommentController {
     return res.status(201).json(validatedEnvelop);
   };
 
-  remove = async (req: Request<WorkspaceParams, {}, {}, {}, {}>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

@@ -42,7 +42,10 @@ export class WorkspaceRepo {
         },
       },
       skip,
-      take
+      take,
+      orderBy: {
+        joinedAt: 'desc',
+      }
     });
   }
 
@@ -63,6 +66,9 @@ export class WorkspaceRepo {
       },
       skip,
       take,
+       orderBy: {
+        createdAt: 'desc'
+       }
     });
   }
 
@@ -72,6 +78,9 @@ export class WorkspaceRepo {
         members: {
           some: { userId },
         },
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
   }

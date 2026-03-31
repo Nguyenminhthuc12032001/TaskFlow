@@ -3,7 +3,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class TaskRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(data: Prisma.TaskCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.task.create({ data });
@@ -67,8 +67,58 @@ export class TaskRepo {
     });
   }
 
-  async listByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async listByColumn(ctx: ResourceContext, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
     return await db.task.findMany({
+      where: {
+        column: {
+          id: ctx.columnId,
+          project: {
+            id: ctx.projectId,
+            workspace: {
+              id: ctx.workspaceId,
+              members: {
+                some: {
+                  userId: ctx.ActorId,
+                },
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  async allTasksByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.task.findMany({
+      where: {
+        column: {
+          id: ctx.columnId,
+          project: {
+            id: ctx.projectId,
+            workspace: {
+              id: ctx.workspaceId,
+              members: {
+                some: {
+                  userId: ctx.ActorId,
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        position: 'asc'
+      }
+    });
+  }
+
+  async countTasksByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.task.count({
       where: {
         column: {
           id: ctx.columnId,

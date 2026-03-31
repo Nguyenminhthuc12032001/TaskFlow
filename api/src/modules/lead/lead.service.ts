@@ -1,6 +1,8 @@
 import { ActivityAction, Prisma } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { TaskRepo } from '../task/task.repo.js';
@@ -67,8 +69,16 @@ export class LeadService {
     return lead;
   }
 
-  async listByWorkspace(ctx: ResourceContext) {
-    return await this.leadRepo.listByWorkspace(ctx);
+  async listByWorkspace(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx);
+
+    const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
+
+    const leads = await this.leadRepo.listByWorkspace(ctx, { skip, take });
+
+    return { leads, paginationMeta };
   }
 
   async update(data: UpdateBodyType, ctx: ResourceContext) {
@@ -183,7 +193,7 @@ export class LeadService {
   }
 
   async createFollowUpTask(data: CreateFollowUpBodyType, ctx: ResourceContext) {
-    const tasks = await this.taskRepo.listByColumn(ctx);
+    const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
     if (data.position) {
       if (tasks.some((t) => t.position === data.position)) {

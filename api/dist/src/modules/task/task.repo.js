@@ -56,8 +56,50 @@ export class TaskRepo {
             },
         });
     }
-    async listByColumn(ctx, db = this.prisma) {
+    async listByColumn(ctx, { take, skip }, db = this.prisma) {
         return await db.task.findMany({
+            where: {
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            skip,
+            take
+        });
+    }
+    async allTasksByColumn(ctx, db = this.prisma) {
+        return await db.task.findMany({
+            where: {
+                column: {
+                    id: ctx.columnId,
+                    project: {
+                        id: ctx.projectId,
+                        workspace: {
+                            id: ctx.workspaceId,
+                            members: {
+                                some: {
+                                    userId: ctx.ActorId,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+    async countTasksByColumn(ctx, db = this.prisma) {
+        return await db.task.count({
             where: {
                 column: {
                     id: ctx.columnId,

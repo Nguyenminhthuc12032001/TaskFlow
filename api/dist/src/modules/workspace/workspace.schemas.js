@@ -1,6 +1,7 @@
 import z from '../../docs/zod.js';
 import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
+import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // ========= REQUEST ==========
 // POST workspace/create
 export const createBodySchema = z.object({
@@ -39,7 +40,10 @@ export const createResponseSchema = z.object({
     updatedAt: z.date(),
 });
 // Get workspace/list
-export const getByUserIdResponseSchema = z.array(createResponseSchema);
+export const getByUserIdResponseSchema = z.object({
+    data: z.array(createResponseSchema),
+    paginationMeta: paginationMetaSchema,
+});
 // Get workspace/:workspaceId
 export const getByIdResponseSchema = createResponseSchema;
 // Put workspace/:workspaceId
@@ -52,7 +56,10 @@ export const safeMemberResponseSchema = z.object({
     joinedAt: z.date(),
 });
 // GET workspace/members/:workspaceId
-export const membersResponseSchema = z.array(safeMemberResponseSchema);
+export const membersResponseSchema = z.object({
+    data: z.array(safeMemberResponseSchema),
+    paginationMeta: paginationMetaSchema,
+});
 // POST workspace/invite/:workspaceId
 export const inviteResponseSchema = z.object({
     id: z.string(),

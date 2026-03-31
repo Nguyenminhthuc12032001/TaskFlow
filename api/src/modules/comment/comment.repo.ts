@@ -3,7 +3,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class CommentRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma) {
     return await db.comment.create({ data });
@@ -38,8 +38,64 @@ export class CommentRepo {
     });
   }
 
-  async listByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async listByTask(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
     return await db.comment.findMany({
+      where: {
+        task: {
+          id: ctx.TaskId,
+          column: {
+            id: ctx.columnId,
+            project: {
+              id: ctx.projectId,
+              workspace: {
+                id: ctx.workspaceId,
+                members: {
+                  some: {
+                    userId: ctx.ActorId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
+
+  async allCommentsByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.comment.findMany({
+      where: {
+        task: {
+          id: ctx.TaskId,
+          column: {
+            id: ctx.columnId,
+            project: {
+              id: ctx.projectId,
+              workspace: {
+                id: ctx.workspaceId,
+                members: {
+                  some: {
+                    userId: ctx.ActorId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+  }
+
+  async countCommentsByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+    return await db.comment.count({
       where: {
         task: {
           id: ctx.TaskId,

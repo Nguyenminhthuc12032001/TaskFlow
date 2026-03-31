@@ -1,3 +1,4 @@
+import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { safeCommentSchema, safeCommentsSchema, } from './comment.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
@@ -51,6 +52,7 @@ export class CommentController {
             return res.status(200).json(validatedEnvelop);
         };
         this.listByTask = async (req, res) => {
+            const paginationQuery = paginationQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
@@ -58,16 +60,19 @@ export class CommentController {
                 TaskId: req.params.taskId,
                 ActorId: req.user.id,
             };
-            const comments = await this.commentService.listByTask(ctx);
-            const safeComments = comments.map((comment) => ({
-                id: comment.id,
-                taskId: comment.taskId,
-                authorId: comment.authorId,
-                parentId: comment.parentId ?? '',
-                content: comment.content,
-                createdAt: comment.createdAt,
-                updatedAt: comment.updatedAt,
-            }));
+            const { comments, paginationMeta } = await this.commentService.listByTask(ctx, paginationQuery);
+            const safeComments = {
+                data: comments.map((comment) => ({
+                    id: comment.id,
+                    taskId: comment.taskId,
+                    authorId: comment.authorId,
+                    parentId: comment.parentId ?? '',
+                    content: comment.content,
+                    createdAt: comment.createdAt,
+                    updatedAt: comment.updatedAt,
+                })),
+                paginationMeta,
+            };
             const envelop = ok(safeComments);
             const envelopSchema = okEnvelopeSchema(safeCommentsSchema);
             const validatedEnvelop = validateResponse(envelopSchema)(envelop);
