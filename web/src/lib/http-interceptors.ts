@@ -1,30 +1,12 @@
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
-
-let accessToken: string | null = null;
+import { clearAuth, getAccessToken, setAccessToken } from "./auth";
+import { normalizeHttpError, type ApiErrorResponse } from "./http-error";
 
 let refreshPromise: Promise<string> | null = null;
 
-type ApiErrorResponse = {
-    message: string;
-    code: string;
-    detail: unknown;
-};
-
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
     _retry?: boolean;
-};
-
-function getAccessToken(): string | null {
-    return accessToken;
-};
-
-function setAccessToken(token: string): void {
-    accessToken = token;
-};
-
-function clearAuth(): void {
-    accessToken = null;
 };
 
 export const http = axios.create({
@@ -118,21 +100,3 @@ http.interceptors.response.use(
     }
 );
 
-function normalizeHttpError(error: unknown) {
-    if (axios.isAxiosError<ApiErrorResponse>(error)) {
-        return {
-            status: error.response?.status,
-            message:
-                error.response?.data?.message || error.message || 'Request failed',
-            code: error.response?.data?.code || 'UNKNOWN_ERROR',
-            detail: error.response?.data?.detail || null,
-        };
-    }
-
-    return {
-        status: 500,
-        message: 'Unexpected error',
-        code: 'UNKNOWN_ERROR',
-        detail: 'An unexpected error occurred',
-    };
-};

@@ -122,6 +122,13 @@ export class AuthController {
   resetPassword = async (req: Request<{}, {}, ResetPasswordBody>, res: Response) => {
     await this.authService.resetPassword(req.body);
 
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/api/auth',
+    });
+
     return res.sendStatus(204);
   };
 

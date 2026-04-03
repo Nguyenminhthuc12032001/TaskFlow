@@ -45,11 +45,11 @@ export class WorkspaceController {
       updatedAt: workspace.updatedAt,
     };
 
-    const envelop = created(workspaceResponse);
-    const envelopSchema = createdEnvelopeSchema(createResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(workspaceResponse);
+    const envelopeSchema = createdEnvelopeSchema(createResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   getById = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -63,11 +63,11 @@ export class WorkspaceController {
       updatedAt: workspace.updatedAt,
     };
 
-    const envelop = ok(workspaceResponse);
-    const envelopSchema = okEnvelopeSchema(getByIdResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(workspaceResponse);
+    const envelopeSchema = okEnvelopeSchema(getByIdResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   getByUserId = async (req: Request, res: Response) => {
@@ -87,11 +87,11 @@ export class WorkspaceController {
       paginationMeta
     };
 
-    const envelop = ok(workspacesResponse);
-    const envelopSchema = okEnvelopeSchema(getByUserIdResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(workspacesResponse);
+    const envelopeSchema = okEnvelopeSchema(getByUserIdResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   getMembersById = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -113,11 +113,11 @@ export class WorkspaceController {
       paginationMeta
     };
 
-    const envelop = ok(membersResponse);
-    const envelopSchema = okEnvelopeSchema(membersResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(membersResponse);
+    const envelopeSchema = okEnvelopeSchema(membersResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response) => {
@@ -136,11 +136,11 @@ export class WorkspaceController {
       updatedAt: result.updatedAt,
     };
 
-    const envelop = ok(safeWorkspaceResponse);
-    const envelopSchema = okEnvelopeSchema(updateResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeWorkspaceResponse);
+    const envelopeSchema = okEnvelopeSchema(updateResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   remove = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -154,11 +154,11 @@ export class WorkspaceController {
       updatedAt: result.updatedAt,
     };
 
-    const envelop = ok(safeWorkspaceResponse);
-    const envelopSchema = okEnvelopeSchema(deleteResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeWorkspaceResponse);
+    const envelopeSchema = okEnvelopeSchema(deleteResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response) => {
@@ -180,11 +180,11 @@ export class WorkspaceController {
       createdBy: result.createdBy,
     };
 
-    const envelop = ok(inviteResponse);
-    const envelopShcema = okEnvelopeSchema(inviteResponseSchema);
-    const validatedEnvelop = validateResponse(envelopShcema)(envelop);
+    const envelope = ok(inviteResponse);
+    const envelopeSchema = okEnvelopeSchema(inviteResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   accept = async (req: Request<{}, {}, AcceptBody>, res: Response) => {
@@ -197,11 +197,11 @@ export class WorkspaceController {
       joinedAt: result.joinedAt,
     };
 
-    const envelop = created(acceptResponse);
-    const envelopSchema = createdEnvelopeSchema(acceptResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(acceptResponse);
+    const envelopeSchema = createdEnvelopeSchema(acceptResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   removeMember = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -219,11 +219,11 @@ export class WorkspaceController {
       joinedAt: result.joinedAt,
     };
 
-    const envelop = ok(removeMemberResponse);
-    const envelopSchema = okEnvelopeSchema(removeMemberResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(removeMemberResponse);
+    const envelopeSchema = okEnvelopeSchema(removeMemberResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   changeRole = async (req: Request, res: Response) => { };

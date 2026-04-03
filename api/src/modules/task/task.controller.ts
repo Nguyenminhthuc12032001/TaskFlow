@@ -51,11 +51,11 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = created(safeTask);
-    const envelopSchema = createdEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeTask);
+    const envelopeSchema = createdEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -83,11 +83,11 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = ok(safeTask);
-    const envelpoSchema = okEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelpoSchema)(envelop);
+    const envelope = ok(safeTask);
+    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   listByColumn = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -120,11 +120,11 @@ export class TaskController {
       paginationMeta
     };
 
-    const envelop = ok(safeTasks);
-    const envelopSchema = okEnvelopeSchema(safeTasksSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTasks);
+    const envelopeSchema = okEnvelopeSchema(safeTasksSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
@@ -152,11 +152,11 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = ok(safeTask);
-    const envelopSchema = okEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTask);
+    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response) => {
@@ -188,11 +188,11 @@ export class TaskController {
       paginationMeta
     };
 
-    const envelop = ok(safeTasks);
-    const envelopSchema = okEnvelopeSchema(safeTasksSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTasks);
+    const envelopeSchema = okEnvelopeSchema(safeTasksSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -220,11 +220,11 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = ok(safeTask);
-    const envelopSchema = okEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTask);
+    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   bulkRemove = async (
@@ -264,11 +264,11 @@ export class TaskController {
       }
     };
 
-    const envelop = ok(safeTasks);
-    const envelopSchema = okEnvelopeSchema(safeTasksSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTasks);
+    const envelopeSchema = okEnvelopeSchema(safeTasksSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   assign = async (req: Request<WorkspaceParamsType, {}, AssignBodyType, {}, {}>, res: Response) => {
@@ -287,11 +287,11 @@ export class TaskController {
       userId: assignee.taskId,
     };
 
-    const envelop = created(safeAssignee);
-    const envelopSchema = createdEnvelopeSchema(safeAssigneeSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeAssignee);
+    const envelopeSchema = createdEnvelopeSchema(safeAssigneeSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   archivTask = async (req: Request<WorkspaceParamsType, {}, {}, {}>, res: Response) => {
@@ -319,11 +319,11 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = ok(safeTask);
-    const envelopSchema = okEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTask);
+    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   restoreTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -351,10 +351,10 @@ export class TaskController {
       dueDate: task.dueDate ?? undefined,
     };
 
-    const envelop = ok(safeTask);
-    const envelopSchema = okEnvelopeSchema(safeTaskSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeTask);
+    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 }

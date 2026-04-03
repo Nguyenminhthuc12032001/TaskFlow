@@ -38,11 +38,11 @@ export class ProjectController {
       createdBy: project.createdBy,
     };
 
-    const envelop = created(safeProject);
-    const envelopSchema = createdEnvelopeSchema(safeProjectResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeProject);
+    const envelopeSchema = createdEnvelopeSchema(safeProjectResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -63,11 +63,11 @@ export class ProjectController {
       createdBy: project.createdBy,
     };
 
-    const envelop = ok(safeProject);
-    const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeProject);
+    const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   listByWorkspace = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -92,11 +92,11 @@ export class ProjectController {
         paginationMeta
     };
 
-    const envelop = ok(safeProjectResponse);
-    const envelopSchema = okEnvelopeSchema(listProjectsResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeProjectResponse);
+    const envelopeSchema = okEnvelopeSchema(listProjectsResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
@@ -117,11 +117,11 @@ export class ProjectController {
       createdBy: project.createdBy,
     };
 
-    const envelop = ok(safeProjectResponse);
-    const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeProjectResponse);
+    const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
@@ -142,10 +142,10 @@ export class ProjectController {
       createdBy: project.createdBy,
     };
 
-    const envelop = ok(safeProjectResponse);
-    const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeProjectResponse);
+    const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 }

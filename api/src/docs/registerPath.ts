@@ -10,6 +10,7 @@ registry.registerPath({
   path: '/csurf-token',
   tags: ['Security'],
   summary: 'Get CSRF token',
+  security: [{ csrfToken: [] }],
   responses: {
     200: {
       description: 'CSRF token issued',

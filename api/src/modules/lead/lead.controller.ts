@@ -43,11 +43,11 @@ export class LeadController {
       ...(lead.source != null && { source: lead.source }),
     };
 
-    const envelop = created(safeLead);
-    const envelopSchema = createdEnvelopeSchema(safeLeadSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeLead);
+    const envelopeSchema = createdEnvelopeSchema(safeLeadSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   get = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -73,11 +73,11 @@ export class LeadController {
       ...(lead.source != null && { source: lead.source }),
     };
 
-    const envelop = ok(safeLead);
-    const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLead);
+    const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   listByWorkspace = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -107,11 +107,11 @@ export class LeadController {
       paginationMeta,
     };
 
-    const envelop = ok(safeLeads);
-    const envelopSchema = okEnvelopeSchema(safeLeadsSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLeads);
+    const envelopeSchema = okEnvelopeSchema(safeLeadsSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   update = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -137,11 +137,11 @@ export class LeadController {
       ...(lead.source != null && { source: lead.source }),
     };
 
-    const envelop = ok(safeLead);
-    const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLead);
+    const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   updateStage = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -167,11 +167,11 @@ export class LeadController {
       ...(lead.source != null && { source: lead.source }),
     };
 
-    const envelop = ok(safeLead);
-    const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLead);
+    const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   linkTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -189,11 +189,11 @@ export class LeadController {
       taskId: leadTaskLink.taskId,
     };
 
-    const envelop = created(safeLeadTaskLink);
-    const envelopSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeLeadTaskLink);
+    const envelopeSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   unlinkTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -211,11 +211,11 @@ export class LeadController {
       taskId: leadTaskLink.taskId,
     };
 
-    const envelop = ok(safeLeadTaskLink);
-    const envelopSchema = okEnvelopeSchema(safeLeadTaskLinkSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLeadTaskLink);
+    const envelopeSchema = okEnvelopeSchema(safeLeadTaskLinkSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 
   createFollowUpTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -234,11 +234,11 @@ export class LeadController {
       taskId: leadTaskLink.taskId,
     };
 
-    const envelop = created(safeLeadTaskLink);
-    const envelopSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = created(safeLeadTaskLink);
+    const envelopeSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(201).json(validatedEnvelop);
+    return res.status(201).json(validatedEnvelope);
   };
 
   remove = async (req: Request<WorkspaceParamsType>, res: Response) => {
@@ -264,10 +264,10 @@ export class LeadController {
       ...(lead.source != null && { source: lead.source }),
     };
 
-    const envelop = ok(safeLead);
-    const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-    const validatedEnvelop = validateResponse(envelopSchema)(envelop);
+    const envelope = ok(safeLead);
+    const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
-    return res.status(200).json(validatedEnvelop);
+    return res.status(200).json(validatedEnvelope);
   };
 }
