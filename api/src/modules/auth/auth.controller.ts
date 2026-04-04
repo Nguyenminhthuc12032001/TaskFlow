@@ -103,7 +103,14 @@ export class AuthController {
       path: '/api/auth',
     });
 
+    const user: SafeUserResponse = {
+      id: result.user.id,
+      name: result.user.name,
+      email: result.user.email
+    }
+
     const refreshResponse: RefreshResponse = {
+      user,
       accessToken: result.accessToken,
     };
 

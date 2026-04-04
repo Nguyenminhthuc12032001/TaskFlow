@@ -24,10 +24,10 @@ export class LeadController {
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
             };
-            const envelop = created(safeLead);
-            const envelopSchema = createdEnvelopeSchema(safeLeadSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeLead);
+            const envelopeSchema = createdEnvelopeSchema(safeLeadSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.get = async (req, res) => {
             const ctx = {
@@ -49,10 +49,10 @@ export class LeadController {
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
             };
-            const envelop = ok(safeLead);
-            const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLead);
+            const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.listByWorkspace = async (req, res) => {
             const paginationQuery = paginationQuerySchema.parse(req.query);
@@ -77,10 +77,10 @@ export class LeadController {
                 })),
                 paginationMeta,
             };
-            const envelop = ok(safeLeads);
-            const envelopSchema = okEnvelopeSchema(safeLeadsSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLeads);
+            const envelopeSchema = okEnvelopeSchema(safeLeadsSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.update = async (req, res) => {
             const ctx = {
@@ -102,10 +102,10 @@ export class LeadController {
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
             };
-            const envelop = ok(safeLead);
-            const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLead);
+            const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.updateStage = async (req, res) => {
             const ctx = {
@@ -127,10 +127,10 @@ export class LeadController {
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
             };
-            const envelop = ok(safeLead);
-            const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLead);
+            const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.linkTask = async (req, res) => {
             const ctx = {
@@ -144,10 +144,10 @@ export class LeadController {
                 leadId: leadTaskLink.leadId,
                 taskId: leadTaskLink.taskId,
             };
-            const envelop = created(safeLeadTaskLink);
-            const envelopSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeLeadTaskLink);
+            const envelopeSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.unlinkTask = async (req, res) => {
             const ctx = {
@@ -161,10 +161,10 @@ export class LeadController {
                 leadId: leadTaskLink.leadId,
                 taskId: leadTaskLink.taskId,
             };
-            const envelop = ok(safeLeadTaskLink);
-            const envelopSchema = okEnvelopeSchema(safeLeadTaskLinkSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLeadTaskLink);
+            const envelopeSchema = okEnvelopeSchema(safeLeadTaskLinkSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.createFollowUpTask = async (req, res) => {
             const ctx = {
@@ -179,10 +179,10 @@ export class LeadController {
                 leadId: leadTaskLink.leadId,
                 taskId: leadTaskLink.taskId,
             };
-            const envelop = created(safeLeadTaskLink);
-            const envelopSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeLeadTaskLink);
+            const envelopeSchema = createdEnvelopeSchema(safeLeadTaskLinkSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.remove = async (req, res) => {
             const ctx = {
@@ -204,10 +204,10 @@ export class LeadController {
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
             };
-            const envelop = ok(safeLead);
-            const envelopSchema = okEnvelopeSchema(safeLeadSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeLead);
+            const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
     }
 }

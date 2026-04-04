@@ -71,6 +71,7 @@ export const loginResponseSchema = z
 // REFRESH
 export const refreshResponseSchema = z
     .object({
+    user: safeUserSchema,
     accessToken: z.string(),
 })
     .strict();

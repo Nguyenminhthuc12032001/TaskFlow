@@ -1,9 +1,12 @@
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
-import { clearAuth, getAccessToken, setAccessToken } from "./auth";
 import { normalizeHttpError, type ApiErrorResponse } from "./http-error";
+import { clearAuth, getAuthState, setAuthState, type AuthState } from "../features/auth/auth.store"
+import { okEnvelopeSchema } from "./response.schemas";
+import { refreshResponseSchema } from "../features/auth/auth.schemas";
+import { validate } from "./validate";
 
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
     _retry?: boolean;
@@ -29,7 +32,7 @@ const refreshClient = axios.create({
 
 http.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = getAccessToken();
+        const token = getAuthState().accessToken;
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -40,28 +43,48 @@ http.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<string | null> {
     if (!refreshPromise) {
-        refreshPromise = refreshClient
-            .post('/auth/refresh')
-            .then((response) => {
-                const newAccessToken = response.data?.data?.accessToken ?? null;
 
-                if (!newAccessToken) {
+        refreshPromise = (async () => {
+            try {
+                const csrfToken = await refreshClient.get('/csurf-token').then(res => res.data.csrfToken);
+
+                const response = await refreshClient.post('/auth/refresh', {}, {
+                    headers: {
+                        'x-csrf-token': csrfToken,
+                    }
+                });
+
+                if (response.status !== 200) {
+                    throw new Error(`Refresh failed with status ${response.status}`);
+                }
+
+                const envelope = response.data;
+                const envelopeSchema = okEnvelopeSchema(refreshResponseSchema);
+                const validatedEnvelope = validate(envelopeSchema)(envelope)
+
+                if (!validatedEnvelope.data.accessToken) {
                     clearAuth();
                     return null;
                 }
 
-                setAccessToken(newAccessToken);
-                return newAccessToken;
-            })
-            .catch(() => {
+                const authState: AuthState = {
+                    status: "authenticated",
+                    accessToken: validatedEnvelope.data.accessToken,
+                    user: validatedEnvelope.data.user
+                }
+
+                setAuthState(authState);
+
+                return validatedEnvelope.data.accessToken;
+            } catch {
                 clearAuth();
                 return null;
-            })
-            .finally(() => {
+            } finally {
                 refreshPromise = null;
-            })
+            }
+        })();
     }
 
     return refreshPromise;

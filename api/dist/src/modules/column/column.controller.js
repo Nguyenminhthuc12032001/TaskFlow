@@ -20,10 +20,10 @@ export class ColumnController {
                 type: column.type,
                 createdAt: column.createdAt,
             };
-            const envelop = created(safeColumn);
-            const envelopSchema = createdEnvelopeSchema(safeColumnSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeColumn);
+            const envelopeSchema = createdEnvelopeSchema(safeColumnSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.listByProject = async (req, res) => {
             const paginationQuery = paginationQuerySchema.parse(req.query);
@@ -44,10 +44,10 @@ export class ColumnController {
                 })),
                 paginationMeta
             };
-            const envelop = ok(safeColumns);
-            const envelopSchema = okEnvelopeSchema(safeColumnsSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeColumns);
+            const envelopeSchema = okEnvelopeSchema(safeColumnsSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.get = async (req, res) => {
             const ctx = {
@@ -65,10 +65,10 @@ export class ColumnController {
                 type: column.type,
                 createdAt: column.createdAt,
             };
-            const envelop = ok(safeColumn);
-            const envelopSchema = okEnvelopeSchema(safeColumnSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeColumn);
+            const envelopeSchema = okEnvelopeSchema(safeColumnSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.update = async (req, res) => {
             const ctx = {
@@ -86,10 +86,10 @@ export class ColumnController {
                 type: column.type,
                 createdAt: column.createdAt,
             };
-            const envelop = ok(safeColumn);
-            const envelopSchema = okEnvelopeSchema(safeColumnSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeColumn);
+            const envelopeSchema = okEnvelopeSchema(safeColumnSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.reOrder = async (req, res) => {
             const paginationQuery = paginationQuerySchema.parse(req.query);
@@ -110,10 +110,10 @@ export class ColumnController {
                 })),
                 paginationMeta
             };
-            const envelop = ok(safeColumns);
-            const envelopSchema = okEnvelopeSchema(safeColumnsSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeColumns);
+            const envelopeSchema = okEnvelopeSchema(safeColumnsSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.remove = async (req, res) => {
             const ctx = {
@@ -131,10 +131,10 @@ export class ColumnController {
                 type: column.type,
                 createdAt: column.createdAt,
             };
-            const envelop = ok(safeColumn);
-            const envelopSchema = okEnvelopeSchema(safeColumnSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeColumn);
+            const envelopeSchema = okEnvelopeSchema(safeColumnSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
     }
 }

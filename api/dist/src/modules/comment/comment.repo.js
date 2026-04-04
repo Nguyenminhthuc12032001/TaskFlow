@@ -54,7 +54,10 @@ export class CommentRepo {
                 },
             },
             skip,
-            take
+            take,
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async allCommentsByTask(ctx, db = this.prisma) {
@@ -78,6 +81,9 @@ export class CommentRepo {
                     },
                 },
             },
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async countCommentsByTask(ctx, db = this.prisma) {

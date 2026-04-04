@@ -92,6 +92,7 @@ export type LoginResponse = z.infer<typeof loginResponseSchema>;
 // REFRESH
 export const refreshResponseSchema = z
   .object({
+    user: safeUserSchema,
     accessToken: z.string(),
   })
   .strict();

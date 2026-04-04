@@ -39,7 +39,10 @@ export class LeadRepo {
                 },
             },
             skip,
-            take
+            take,
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async allLeadsByWorkspace(ctx, db = this.prisma) {
@@ -57,6 +60,9 @@ export class LeadRepo {
                     },
                 },
             },
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async countLeadsByWorkspace(ctx, db = this.prisma) {

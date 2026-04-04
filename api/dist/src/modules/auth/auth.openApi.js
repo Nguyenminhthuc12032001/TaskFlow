@@ -72,7 +72,6 @@ registry.registerPath({
     path: '/api/auth/register',
     tags: ['Auth'],
     summary: 'Register',
-    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { 'application/json': { schema: registerBodySchema } },
@@ -102,7 +101,6 @@ registry.registerPath({
     path: '/api/auth/login',
     tags: ['Auth'],
     summary: 'Login',
-    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { 'application/json': { schema: loginBodySchema } },
@@ -198,7 +196,6 @@ registry.registerPath({
     path: '/api/auth/forgot-password',
     tags: ['Auth'],
     summary: 'Forgot-password',
-    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { 'application/json': { schema: forgotPasswordBodySchema } },
@@ -217,7 +214,6 @@ registry.registerPath({
     path: '/api/auth/reset-password',
     tags: ['Auth'],
     summary: 'Reset password',
-    security: [{ csrfToken: [] }],
     request: {
         body: {
             content: { 'application/json': { schema: resetPasswordBodySchema } },
@@ -237,7 +233,7 @@ registry.registerPath({
     path: '/api/auth/change-password',
     tags: ['Auth'],
     summary: 'Change password',
-    security: [{ csrfToken: [] }, { bearerAuth: [] }],
+    security: [{ bearerAuth: [] }],
     request: {
         body: {
             content: { 'application/json': { schema: changePasswordBodySchema } },

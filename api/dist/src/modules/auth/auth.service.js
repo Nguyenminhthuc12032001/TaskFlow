@@ -146,7 +146,7 @@ export class AuthService {
             name: user.name,
         };
         const accessToken = signAccessToken(accessTokenPayload);
-        return { accessToken, refreshToken: newRefreshToken };
+        return { accessToken, refreshToken: newRefreshToken, user };
     }
     ;
     async forgotPassword(data) {

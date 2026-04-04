@@ -22,6 +22,9 @@ export class ColumnRepo {
             },
             skip,
             take,
+            orderBy: {
+                position: 'asc'
+            }
         });
     }
     async allColumnsByProject(ctx, db = this.prisma) {
@@ -39,6 +42,9 @@ export class ColumnRepo {
                     },
                 },
             },
+            orderBy: {
+                position: 'asc'
+            }
         });
     }
     async countColumnsByProject(ctx, db = this.prisma) {

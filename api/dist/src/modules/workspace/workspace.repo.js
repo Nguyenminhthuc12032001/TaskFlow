@@ -33,7 +33,10 @@ export class WorkspaceRepo {
                 },
             },
             skip,
-            take
+            take,
+            orderBy: {
+                joinedAt: 'desc',
+            }
         });
     }
     async findById(workspaceId, db = this.prisma) {
@@ -52,6 +55,9 @@ export class WorkspaceRepo {
             },
             skip,
             take,
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async findAllByUserId(userId, db = this.prisma) {
@@ -60,6 +66,9 @@ export class WorkspaceRepo {
                 members: {
                     some: { userId },
                 },
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
     }

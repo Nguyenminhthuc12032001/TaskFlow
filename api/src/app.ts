@@ -61,7 +61,7 @@ app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ ok: true });
 });
 
-app.get('/csurf-token', csrfProtection, (req, res) => {
+app.get('/api/csurf-token', csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 

@@ -75,7 +75,10 @@ export class TaskRepo {
                 },
             },
             skip,
-            take
+            take,
+            orderBy: {
+                position: 'asc'
+            }
         });
     }
     async allTasksByColumn(ctx, db = this.prisma) {
@@ -96,6 +99,9 @@ export class TaskRepo {
                     },
                 },
             },
+            orderBy: {
+                position: 'asc'
+            }
         });
     }
     async countTasksByColumn(ctx, db = this.prisma) {

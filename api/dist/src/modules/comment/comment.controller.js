@@ -22,10 +22,10 @@ export class CommentController {
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
             };
-            const envelop = created(safeComment);
-            const envelopSchema = createdEnvelopeSchema(safeCommentSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeComment);
+            const envelopeSchema = createdEnvelopeSchema(safeCommentSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.get = async (req, res) => {
             const ctx = {
@@ -46,10 +46,10 @@ export class CommentController {
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
             };
-            const envelop = ok(safeComment);
-            const envelopSchema = okEnvelopeSchema(safeCommentSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeComment);
+            const envelopeSchema = okEnvelopeSchema(safeCommentSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.listByTask = async (req, res) => {
             const paginationQuery = paginationQuerySchema.parse(req.query);
@@ -73,10 +73,10 @@ export class CommentController {
                 })),
                 paginationMeta,
             };
-            const envelop = ok(safeComments);
-            const envelopSchema = okEnvelopeSchema(safeCommentsSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeComments);
+            const envelopeSchema = okEnvelopeSchema(safeCommentsSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.update = async (req, res) => {
             const ctx = {
@@ -97,10 +97,10 @@ export class CommentController {
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
             };
-            const envelop = ok(safeComment);
-            const envelopSchema = okEnvelopeSchema(safeCommentSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeComment);
+            const envelopeSchema = okEnvelopeSchema(safeCommentSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.reply = async (req, res) => {
             const ctx = {
@@ -121,10 +121,10 @@ export class CommentController {
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
             };
-            const envelop = created(safeComment);
-            const envelopSchema = createdEnvelopeSchema(safeCommentSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeComment);
+            const envelopeSchema = createdEnvelopeSchema(safeCommentSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.remove = async (req, res) => {
             const ctx = {
@@ -145,10 +145,10 @@ export class CommentController {
                 createdAt: comment.createdAt,
                 updatedAt: comment.updatedAt,
             };
-            const envelop = ok(safeComment);
-            const envelopSchema = okEnvelopeSchema(safeCommentSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeComment);
+            const envelopeSchema = okEnvelopeSchema(safeCommentSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
     }
 }

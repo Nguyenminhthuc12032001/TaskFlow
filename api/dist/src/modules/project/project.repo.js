@@ -34,6 +34,9 @@ export class ProjectRepo {
             },
             skip,
             take,
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async allProjectsByWorkspace(ctx, db = this.prisma) {
@@ -48,6 +51,9 @@ export class ProjectRepo {
                     },
                 },
             },
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async listByUser(actorId, db = this.prisma) {
@@ -61,6 +67,9 @@ export class ProjectRepo {
                     },
                 },
             },
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
     async update(data, ctx, db = this.prisma) {

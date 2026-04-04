@@ -19,10 +19,10 @@ export class ProjectController {
                 createdAt: project.createdAt,
                 createdBy: project.createdBy,
             };
-            const envelop = created(safeProject);
-            const envelopSchema = createdEnvelopeSchema(safeProjectResponseSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(201).json(validatedEnvelop);
+            const envelope = created(safeProject);
+            const envelopeSchema = createdEnvelopeSchema(safeProjectResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(201).json(validatedEnvelope);
         };
         this.get = async (req, res) => {
             const ctx = {
@@ -39,10 +39,10 @@ export class ProjectController {
                 createdAt: project.createdAt,
                 createdBy: project.createdBy,
             };
-            const envelop = ok(safeProject);
-            const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeProject);
+            const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.listByWorkspace = async (req, res) => {
             const paginationQuery = paginationQuerySchema.parse(req.query);
@@ -62,10 +62,10 @@ export class ProjectController {
                 })),
                 paginationMeta
             };
-            const envelop = ok(safeProjectResponse);
-            const envelopSchema = okEnvelopeSchema(listProjectsResponseSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeProjectResponse);
+            const envelopeSchema = okEnvelopeSchema(listProjectsResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.update = async (req, res) => {
             const ctx = {
@@ -82,10 +82,10 @@ export class ProjectController {
                 createdAt: project.createdAt,
                 createdBy: project.createdBy,
             };
-            const envelop = ok(safeProjectResponse);
-            const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeProjectResponse);
+            const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
         this.remove = async (req, res) => {
             const ctx = {
@@ -102,10 +102,10 @@ export class ProjectController {
                 createdAt: project.createdAt,
                 createdBy: project.createdBy,
             };
-            const envelop = ok(safeProjectResponse);
-            const envelopSchema = okEnvelopeSchema(safeProjectResponseSchema);
-            const validatedEnvelop = validateResponse(envelopSchema)(envelop);
-            return res.status(200).json(validatedEnvelop);
+            const envelope = ok(safeProjectResponse);
+            const envelopeSchema = okEnvelopeSchema(safeProjectResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
         };
     }
 }

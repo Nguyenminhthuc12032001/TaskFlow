@@ -1,4 +1,4 @@
-import { clearAuth, setAccessToken, setUser } from "../../lib/auth";
+import { clearAuth, setAuthState, type AuthState } from "./auth.store";
 import { http } from "../../lib/http-interceptors";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../lib/response.schemas";
 import { validate } from "../../lib/validate";
@@ -21,8 +21,13 @@ export const authApi = {
 
         const result = validatedEnvelope.data;
 
-        setAccessToken(result.accessToken);
-        setUser(result.user);
+        const authState: AuthState = {
+            status: "authenticated",
+            accessToken: result.accessToken,
+            user: result.user
+        };
+
+        setAuthState(authState);
     },
 
     login: async (data: unknown) => {
@@ -41,14 +46,19 @@ export const authApi = {
 
         const result = validatedEnvelope.data;
 
-        setAccessToken(result.accessToken);
-        setUser(result.user);
+        const authState: AuthState = {
+            status: "authenticated",
+            accessToken: result.accessToken,
+            user: result.user
+        }
+
+        setAuthState(authState);
     },
 
     logout: async () => {
-        const csrfToken = await http.get('/csurf-token').then(res => res.data.csrfToken);
+        const csrfToken = await http.get('/csurf-token').then(res => res.data.csrfToken);   
 
-        const response = await http.post('/auth/logout', {}, {
+        const response = await http.post('/auth/logout', {}, {  
             headers: {
                 'x-csrf-token': csrfToken,
             }
@@ -97,7 +107,5 @@ export const authApi = {
         }
 
         clearAuth();
-    },
-
-    
+    }
 }

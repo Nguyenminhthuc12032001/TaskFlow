@@ -64,6 +64,7 @@ export class AuthController {
                 path: '/api/auth',
             });
             const refreshResponse = {
+                user: result.user,
                 accessToken: result.accessToken,
             };
             const envelope = ok(refreshResponse);
@@ -76,6 +77,12 @@ export class AuthController {
         };
         this.resetPassword = async (req, res) => {
             await this.authService.resetPassword(req.body);
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                path: '/api/auth',
+            });
             return res.sendStatus(204);
         };
         this.changePassword = async (req, res) => {

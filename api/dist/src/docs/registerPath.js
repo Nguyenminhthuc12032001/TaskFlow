@@ -5,9 +5,10 @@ export const csrfTokenResponseSchema = z.object({
 });
 registry.registerPath({
     method: 'get',
-    path: '/csurf-token',
+    path: '/api/csurf-token',
     tags: ['Security'],
     summary: 'Get CSRF token',
+    security: [{ csrfToken: [] }],
     responses: {
         200: {
             description: 'CSRF token issued',

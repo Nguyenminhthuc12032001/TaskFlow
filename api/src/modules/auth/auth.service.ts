@@ -222,7 +222,7 @@ export class AuthService {
     };
     const accessToken = signAccessToken(accessTokenPayload);
 
-    return { accessToken, refreshToken: newRefreshToken };
+    return { accessToken, refreshToken: newRefreshToken, user };
   };
 
   async forgotPassword(data: ForgotPasswordBody) {

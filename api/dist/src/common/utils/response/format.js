@@ -16,6 +16,7 @@ export const failEnvelopeSchema = z
     .object({
     ok: z.literal(false),
     message: z.string().min(1),
+    code: z.string().optional(),
     details: z.unknown().optional(),
 })
     .strict();
