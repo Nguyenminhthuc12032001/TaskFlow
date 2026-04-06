@@ -1,6 +1,6 @@
 import { Form, Link } from "react-router-dom";
 
-export function LoginPage() {
+export function ForgotPassword() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-neutral-200">
@@ -8,17 +8,15 @@ export function LoginPage() {
         {/* Title */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-neutral-900">
-            Sign in to your account
+            Forgot your password?
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
-            Welcome back
+            Enter your email and we’ll send you a reset link
           </p>
         </div>
 
         {/* Form */}
         <Form method="post" className="space-y-4">
-          
-          {/* Email */}
           <div>
             <label
               htmlFor="email"
@@ -36,51 +34,22 @@ export function LoginPage() {
             />
           </div>
 
-          {/* Password */}
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-neutral-700"
-              >
-                Password
-              </label>
-
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm font-medium text-neutral-500 transition hover:text-black hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              placeholder="••••••••"
-              className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-black focus:ring-1 focus:ring-black"
-            />
-          </div>
-
-          {/* Button */}
           <button
             type="submit"
             className="mt-2 w-full rounded-xl bg-black py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800 active:scale-[0.98]"
           >
-            Sign in
+            Send reset link
           </button>
         </Form>
 
         {/* Footer */}
         <p className="mt-6 text-center text-sm text-neutral-500">
-          Don’t have an account?{" "}
+          Remember your password?{" "}
           <Link
-            to="/auth/register"
+            to="/auth/login"
             className="cursor-pointer font-medium text-black hover:underline"
           >
-            Sign up
+            Back to sign in
           </Link>
         </p>
       </div>

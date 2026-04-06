@@ -67,6 +67,17 @@ export function UserMenu() {
 
                     <div className="mx-3 h-px bg-neutral-200" />
 
+                    <div className="py-1">
+                        <Link
+                            to="/auth/change-password"
+                            className="block w-full px-4 py-3 text-left text-sm font-medium text-neutral-700 transition-colors duration-200 hover:bg-neutral-50 hover:text-neutral-900"
+                        >
+                            Change password
+                        </Link>
+                    </div>
+
+                    <div className="mx-3 h-px bg-neutral-200" />
+
                     <Form method="post" action="/auth/logout">
                         <button
                             type="submit"

@@ -11,6 +11,9 @@ import { AuthLayout } from "../components/layout/AuthLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicOnlyRoute } from "./routes/PublicOnlyRoute";
 import { authApi } from "../features/auth/auth.api";
+import { ForgotPassword } from "../pages/auth/ForgotPassword";
+import { ResetPassword } from "../pages/auth/ResetPassword";
+import { ChangePassword } from "../pages/auth/ChangePassword";
 
 export const router = createBrowserRouter([
   {
@@ -22,11 +25,30 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/board" replace /> },
       {
-        path: "auth/logout", element: <Navigate to="/auth/login" replace />,
-        action: async () => {
-          await authApi.logout();
-          return redirect("/auth/login")
-        }
+        path: "auth", element: <AuthLayout />,
+        children: [
+          { index: true, element: <Navigate to="/" replace /> },
+          {
+            path: "logout",
+            action: async () => {
+              await authApi.logout();
+              return redirect("/auth/login")
+            }
+          },
+          {
+            path: "change-password", element: <ChangePassword />,
+            action: async ({ request }) => {
+              const formData = await request.formData();
+
+              const data: unknown = {
+                currentPassword: formData.get('currentPassword'),
+                newPassword: formData.get('newPassword'),
+              }
+
+              await authApi.changePassword(data);
+            }
+          }
+        ]
       },
       { path: "board", element: <BoardPage /> },
       { path: "leads", element: <LeadsPage /> },
@@ -77,8 +99,37 @@ export const router = createBrowserRouter([
           await authApi.register(data);
 
           return redirect("/")
+        },
+      },
+      {
+        path: "forgot-password", element: <ForgotPassword />,
+        action: async ({ request }) => {
+          const formData = await request.formData();
+
+          const data: unknown = {
+            email: formData.get('email'),
+          }
+
+          await authApi.forgotPassword(data);
+
+          return redirect("/auth/login")
         }
-      }
+      },
+      {
+        path: "reset-password", element: <ResetPassword />,
+        action: async ({ request }) => {
+          const formData = await request.formData();
+
+          const data: unknown = {
+            resetToken: formData.get('resetToken'),
+            newPassword: formData.get('newPassword'),
+          }
+
+          await authApi.resetPassword(data);
+
+          return redirect("/auth/login")
+        }
+      },
     ]
   },
   {

@@ -245,7 +245,7 @@ export class AuthService {
       new Date(Date.now() + ms(env.TTL_RESET_TOKEN as ms.StringValue)),
     );
 
-    const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
+    const resetLink = `${env.FRONTEND_URL}/auth/reset-password#token=${encodeURIComponent(resetToken)}`;
     await this.emailService.sendPasswordResetEmail(user.email, resetLink);
     log.info({ userId: user.id }, 'Password reset email sent');
   };
