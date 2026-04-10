@@ -14,6 +14,11 @@ import { authApi } from "../features/auth/auth.api";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
 import { ResetPassword } from "../pages/auth/ResetPassword";
 import { ChangePassword } from "../pages/auth/ChangePassword";
+import { LoginAction } from "./routeAction/auth/login";
+import { RegisterAction } from "./routeAction/auth/register";
+import { LogoutAction } from "./routeAction/auth/logout";
+import { ChangePasswordAction } from "./routeAction/auth/changePassword";
+import { ForgotPasswordAction } from "./routeAction/auth/forgotPassword";
 
 export const router = createBrowserRouter([
   {
@@ -30,23 +35,11 @@ export const router = createBrowserRouter([
           { index: true, element: <Navigate to="/" replace /> },
           {
             path: "logout",
-            action: async () => {
-              await authApi.logout();
-              return redirect("/auth/login")
-            }
+            action: LogoutAction
           },
           {
             path: "change-password", element: <ChangePassword />,
-            action: async ({ request }) => {
-              const formData = await request.formData();
-
-              const data: unknown = {
-                currentPassword: formData.get('currentPassword'),
-                newPassword: formData.get('newPassword'),
-              }
-
-              await authApi.changePassword(data);
-            }
+            action: ChangePasswordAction
           }
         ]
       },
@@ -67,53 +60,15 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/auth/login" replace /> },
       {
         path: "login", element: <LoginPage />,
-        action: async ({ request }) => {
-          const formData = await request.formData();
-
-          const data: unknown = {
-            email: formData.get('email'),
-            password: formData.get('password'),
-          }
-
-          await authApi.login(data);
-
-          return redirect("/")
-        }
+        action: LoginAction
       },
       {
         path: "register", element: <RegisterPage />,
-        action: async ({ request }) => {
-          const formData = await request.formData();
-
-          if (formData.get('password') !== formData.get('confirmPassword')) {
-            throw new Error('passwords do not match');
-            // Need to handle this error properly in the UI
-          }
-
-          const data: unknown = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            password: formData.get('password'),
-          }
-
-          await authApi.register(data);
-
-          return redirect("/")
-        },
+        action: RegisterAction,
       },
       {
         path: "forgot-password", element: <ForgotPassword />,
-        action: async ({ request }) => {
-          const formData = await request.formData();
-
-          const data: unknown = {
-            email: formData.get('email'),
-          }
-
-          await authApi.forgotPassword(data);
-
-          return redirect("/auth/login")
-        }
+        action: ForgotPasswordAction
       },
       {
         path: "reset-password", element: <ResetPassword />,

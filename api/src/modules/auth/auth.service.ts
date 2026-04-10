@@ -310,7 +310,7 @@ export class AuthService {
       return user;
     });
 
-    return { id: user.id, name: user.name, updatedAt: user.updatedAt };
+    return result;
   };
 
   async me(userId: string) {

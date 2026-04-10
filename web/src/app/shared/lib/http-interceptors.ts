@@ -1,9 +1,9 @@
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 import { normalizeHttpError, type ApiErrorResponse } from "./http-error";
-import { clearAuth, getAuthState, setAuthState, type AuthState } from "../features/auth/auth.store"
+import { clearAuth, getAuthState, setAuthState, type AuthState } from "../../../features/auth/auth.store";
 import { okEnvelopeSchema } from "./response.schemas";
-import { refreshResponseSchema } from "../features/auth/auth.schemas";
+import { refreshResponseSchema } from "../../../features/auth/auth.schemas";
 import { validate } from "./validate";
 
 let refreshPromise: Promise<string | null> | null = null;

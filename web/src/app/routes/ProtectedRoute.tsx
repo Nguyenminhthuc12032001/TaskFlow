@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react"
 import { Navigate, useLocation } from "react-router-dom";
-import { refreshAccessToken } from "../../lib/http-interceptors";
+import { refreshAccessToken } from "../shared/lib/http-interceptors";
 import { useAuth } from "../../features/auth/auth.store";
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -21,5 +21,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
         return <Navigate to='/auth/login' state={{ from: location }} replace />
     }
 
-    return <>{children}</>
+    return <>
+        {children}
+    </>
 }

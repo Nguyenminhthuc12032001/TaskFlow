@@ -24,3 +24,10 @@ export const failEnvelopeSchema = z
     details: z.unknown().optional(),
   })
   .strict();
+
+export const zodTreeErrorSchema = z
+  .object({
+    errors: z.array(z.string()).optional(),
+    // properties: z.record()
+  })
+  .strict();

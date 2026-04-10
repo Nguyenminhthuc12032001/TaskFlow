@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../features/auth/auth.store";
 import { useEffect } from "react";
-import { refreshAccessToken } from "../../lib/http-interceptors";
+import { refreshAccessToken } from "../shared/lib/http-interceptors";
 
 export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
     const auth = useAuth();
@@ -16,5 +16,6 @@ export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
         return <Navigate to="/" replace />;
     }
 
-    return <>{children}</>;
+    return <>
+        {children}</>;
 }
