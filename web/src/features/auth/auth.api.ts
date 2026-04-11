@@ -1,6 +1,6 @@
 import { clearAuth, setAuthState, type AuthState } from "./auth.store";
 import { http } from "../../app/shared/lib/http-interceptors";
-import { createdEnvelopeSchema, okEnvelopeSchema } from "../../app/shared/lib/response.schemas";
+import { createdEnvelopeSchema, okEnvelopeSchema } from "../../app/shared/lib/schemas/response.schemas";
 import { validate } from "../../app/shared/lib/validate";
 import { changePasswordBodySchema, forgotPasswordBodySchema, loginBodySchema, loginResponseSchema, registerBodySchema, registerResponseSchema, resetPasswordBodySchema, type ForgotPasswordBody, type LoginBody, type RegisterBody } from "./auth.schemas";
 
