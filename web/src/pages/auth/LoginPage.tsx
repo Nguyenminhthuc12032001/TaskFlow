@@ -1,5 +1,5 @@
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
-import type { ActionError } from "../../app/routeAction/type";
+import type { ActionError } from "../../features/type";
 
 export function LoginPage() {
   const actionError: ActionError | undefined = useActionData();

@@ -1,12 +1,12 @@
 import { redirect } from "react-router-dom";
-import { feedbackMessage } from "../../shared/constants/feedback-messages";
-import { notify } from "../../shared/lib/notify";
-import { authApi } from "../../../features/auth/auth.api";
-import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../shared/lib/http-error";
-import type { ActionError } from "../type";
+import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
+import { notify } from "../../../app/shared/lib/notify";
+import { authApi } from "../auth.api";
+import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
+import type { ActionError } from "../../type";
 import z, { ZodError } from "zod";
 
-export async function ForgotPasswordAction({ request } : { request: Request }) {
+export async function ForgotPasswordAction({ request }: { request: Request }) {
     const formData = await request.formData();
 
     const data: unknown = {

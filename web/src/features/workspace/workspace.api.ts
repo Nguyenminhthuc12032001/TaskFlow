@@ -36,7 +36,7 @@ export const workspaceApi = {
         const response = await http.get(`/workspaces/${id}`);
 
         const envelop = response.data;
-        const envelopSchema = createdEnvelopeSchema(getByIdResponseSchema);
+        const envelopSchema = okEnvelopeSchema(getByIdResponseSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;

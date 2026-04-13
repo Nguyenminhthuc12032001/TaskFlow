@@ -1,10 +1,10 @@
 import { redirect } from "react-router-dom";
-import { authApi } from "../../../features/auth/auth.api";
-import { feedbackMessage } from "../../shared/constants/feedback-messages";
-import { notify } from "../../shared/lib/notify";
-import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../shared/lib/http-error";
-import type { ActionError } from "../type";
+import { authApi } from "../../../features/auth/auth.api"; 
 import z, { ZodError } from "zod";
+import { notify } from "../../../app/shared/lib/notify";
+import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
+import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
+import type { ActionError } from "../../type";
 
 export async function ResetPasswordAction({ request } : { request: Request }) {
     const formData = await request.formData();

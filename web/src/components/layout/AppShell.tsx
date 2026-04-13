@@ -4,13 +4,13 @@ import { Outlet } from "react-router-dom"
 
 export function AppShell() {
     return (
-        <main className="h-screen w-full">
+        <div className="h-screen w-full">
             <Sidebar />
             <Topbar />
 
             <main>
                 <Outlet />
             </main>
-        </main>
+        </div>
     )
 }

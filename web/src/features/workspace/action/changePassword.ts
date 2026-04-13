@@ -1,9 +1,9 @@
 import z, { ZodError } from "zod";
-import { authApi } from "../../../features/auth/auth.api";
-import { feedbackMessage } from "../../shared/constants/feedback-messages";
-import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../shared/lib/http-error";
-import { notify } from "../../shared/lib/notify";
-import type { ActionError } from "../type";
+import { authApi } from "../../auth/auth.api";
+import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
+import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
+import { notify } from "../../../app/shared/lib/notify";
+import type { ActionError } from "../../type";
 import { redirect } from "react-router-dom";
 
 export async function ChangePasswordAction({ request }: { request: Request }) {
@@ -35,12 +35,7 @@ export async function ChangePasswordAction({ request }: { request: Request }) {
 
         return redirect("/");
     } catch (error) {
-        if (error instanceof HttpError) {
-            if (error.status === 401) {
-                return {
-                    errorMessage: error.message
-                } satisfies ActionError
-            }
+        if (error instanceof HttpError) { 
 
             if (error.status === 400) {
                 return {

@@ -11,7 +11,7 @@ const WorkspaceRole = {
 
 // ========= REQUEST ==========
 
-// POST workspace/create
+// POST workspace  
 export const createBodySchema = z.object({
   name: z
     .string()
@@ -54,8 +54,8 @@ export const createResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
   createdBy: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
@@ -78,7 +78,7 @@ export const deleteResponseSchema = createResponseSchema;
 export const safeMemberResponseSchema = z.object({
   user: safeUserSchema,
   role: z.enum(WorkspaceRole),
-  joinedAt: z.date(),
+  joinedAt: z.coerce.date(),
 });
 export type SafeMemberResponse = z.infer<typeof safeMemberResponseSchema>;
 
@@ -97,7 +97,7 @@ export const inviteResponseSchema = z.object({
   role: z.enum(WorkspaceRole),
   jti: z.string(),
   tokenHash: z.string(),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   createdBy: z.uuid(),
 });
 export type InviteResponse = z.infer<typeof inviteResponseSchema>;
@@ -107,16 +107,16 @@ export const acceptResponseSchema = z.object({
   role: z.enum(WorkspaceRole),
   userId: z.uuid(),
   workspaceId: z.uuid(),
-  joinedAt: z.date(),
+  joinedAt: z.coerce.date(),
 });
 export type AcceptResponse = z.infer<typeof acceptResponseSchema>;
 
 // DELETE workspace/remove_member/:workspaceId/:memberId
 export const removeMemberResponseSchema = z.object({
   userId: z.uuid(),
-  deletedAt: z.date(),
+  deletedAt: z.coerce.date(),
   workspaceId: z.uuid(),
   role: z.enum(WorkspaceRole),
-  joinedAt: z.date(),
+  joinedAt: z.coerce.date(),
 });
 export type RemoveMemberResponse = z.infer<typeof removeMemberResponseSchema>;

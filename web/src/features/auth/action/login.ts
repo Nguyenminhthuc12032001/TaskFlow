@@ -1,10 +1,10 @@
 import { redirect } from "react-router-dom";
-import { authApi } from "../../../features/auth/auth.api";
-import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../shared/lib/http-error";
+import { authApi } from "../auth.api";
+import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import z, { ZodError } from "zod";
-import type { ActionError } from "../type";
-import { notify } from "../../shared/lib/notify";
-import { feedbackMessage } from "../../shared/constants/feedback-messages";
+import type { ActionError } from "../../type";
+import { notify } from "../../../app/shared/lib/notify";
+import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 
 export async function LoginAction({ request }: { request: Request }) {
     const formData = await request.formData();
@@ -28,11 +28,6 @@ export async function LoginAction({ request }: { request: Request }) {
         return redirect("/");
     } catch (error) {
         if (error instanceof HttpError) {
-            if (error.status === 401) {
-                return {
-                    errorMessage: error.message
-                }
-            }
 
             if (error.status === 400) {
                 return {

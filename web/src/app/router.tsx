@@ -4,7 +4,7 @@ import { RegisterPage } from "../pages/auth/RegisterPage";
 import { BoardPage } from "../pages/board/BoardPage";
 import { LeadsPage } from "../pages/leads/LeadsPage";
 import { MembersPage } from "../pages/members/MembersPage";
-import { CreateWorkspacePage } from "../pages/onboarding/CreateWorkspacePage";
+import { CreateWorkspacePage } from "../pages/workspace/Create.page";
 import { ProjectsPage } from "../pages/onboarding/ProjectsPage";
 import { AppShell } from "../components/layout/AppShell";
 import { AuthLayout } from "../components/layout/AuthLayout";
@@ -14,11 +14,16 @@ import { authApi } from "../features/auth/auth.api";
 import { ForgotPassword } from "../pages/auth/ForgotPassword";
 import { ResetPassword } from "../pages/auth/ResetPassword";
 import { ChangePassword } from "../pages/auth/ChangePassword";
-import { LoginAction } from "./routeAction/auth/login";
-import { RegisterAction } from "./routeAction/auth/register";
-import { LogoutAction } from "./routeAction/auth/logout";
-import { ChangePasswordAction } from "./routeAction/auth/changePassword";
-import { ForgotPasswordAction } from "./routeAction/auth/forgotPassword";
+import { LoginAction } from "../features/auth/action/login";
+import { RegisterAction } from "../features/auth/action/register";
+import { LogoutAction } from "../features/auth/action/logout";
+import { ChangePasswordAction } from "../features/workspace/action/changePassword";
+import { ForgotPasswordAction } from "../features/auth/action/forgotPassword";
+import { CreateWorkspaceAction } from "../features/workspace/action/create";
+import { WorkspaceDetailPage } from "../pages/workspace/Detail.page";
+import { GetByIdLoader } from "../features/workspace/loader/getById";
+import { ListWorkspacePage } from "../pages/workspace/List.page,";
+import { ListByUserLoader } from "../features/workspace/loader/listByUser";
 
 export const router = createBrowserRouter([
   {
@@ -43,10 +48,24 @@ export const router = createBrowserRouter([
           }
         ]
       },
-      { path: "board", element: <BoardPage /> },
+      {
+        path: "board", element: <BoardPage />,
+        children: [
+          { index: true, element: <Navigate to="/board/workspaces/create" replace /> },
+          { path: "workspaces/create", element: <CreateWorkspacePage />, action: CreateWorkspaceAction },
+          {
+            path: "workspaces/:workspaceId", element: <WorkspaceDetailPage />,
+            loader: GetByIdLoader
+          },
+          {
+            path: "workspaces", element: <ListWorkspacePage />,
+            loader: ListByUserLoader
+          }
+        ]
+      },
       { path: "leads", element: <LeadsPage /> },
       { path: "members", element: <MembersPage /> },
-      { path: "workspace/create", element: <CreateWorkspacePage /> },
+      { path: "workspace/create", element: <Navigate to="/board" replace /> },
       { path: "projects", element: <ProjectsPage /> },
     ],
   },

@@ -20,5 +20,13 @@ export const feedbackMessage = {
         forgotPasswordFailed: "Failed to send reset password link",
         resetPasswordSuccess: "Successfully reset password",
         resetPasswordFailed: "Failed to reset password"
+    }, 
+    workspace: {
+        createSuccess: "Successfully created workspace",
+        createFailed: "Failed to create workspace",
+        listByUserSuccess: "Successfully listed workspaces",
+        listByUserFailed: "Failed to list workspaces",
+        getByIdSuccess: "Successfully got workspace",
+        getByIdFailed: "Failed to get workspace"
     }
 }
