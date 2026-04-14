@@ -18,7 +18,14 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     }
 
     if (auth.status === "unauthenticated") {
-        return <Navigate to='/auth/login' state={{ from: location }} replace />
+        const redirectTo = `${location.pathname}${location.search}${location.hash}`;
+
+        return (
+            <Navigate
+                to={`/auth/login?redirectTo=${encodeURIComponent(redirectTo)}`}
+                replace
+            />
+        ); 
     }
 
     return <>

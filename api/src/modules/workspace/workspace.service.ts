@@ -154,7 +154,7 @@ export class WorkspaceService {
 
   async inviteMember(
     workspaceId: string,
-    inviteeId: string,
+    email: string,
     role: WorkspaceRole,
     actorId: string,
   ) {
@@ -168,14 +168,14 @@ export class WorkspaceService {
         throw new AppError('Forbidden', 403);
       }
 
-      const existInvitee = await this.authRepo.findUserById(inviteeId, tx);
+      const existInvitee = await this.authRepo.findUserByEmail(email, tx);
       if (!existInvitee) {
         throw new AppError('Invitee with the provided ID does not exist', 404);
       }
 
       const existingMembership = await this.workspaceRepo.findMembership(
         workspaceId,
-        inviteeId,
+        existInvitee.id,
         tx,
       );
       if (existingMembership) {
@@ -207,7 +207,7 @@ export class WorkspaceService {
       const tokenJti = randomUUID();
 
       const token = signInviteToken({
-        inviteeId: inviteeId,
+        inviteeId: existInvitee.id,
         jti: tokenJti,
         email: existInvitee.email,
         workspaceId: workspace.id,
@@ -239,7 +239,7 @@ export class WorkspaceService {
       return { invite, token, workspace };
     });
 
-    const inviteLink = `${env.FRONTEND_URL}/invite?token=${encodeURIComponent(result.token)}`;
+    const inviteLink = `${env.FRONTEND_URL}/accept-invite?token=${encodeURIComponent(result.token)}`;
 
     try {
       await this.emailService.sendInviteEmail(
@@ -271,7 +271,7 @@ export class WorkspaceService {
       throw error;
     }
 
-    log.info({ inviteeId }, 'Invited member for workspace successfully');
+    log.info({ email }, 'Invited member for workspace successfully');
 
     return result.invite;
   }

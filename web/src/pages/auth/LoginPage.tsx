@@ -1,9 +1,12 @@
-import { Form, Link, useActionData, useNavigation } from "react-router-dom";
+import { Form, Link, useActionData, useNavigation, useSearchParams } from "react-router-dom";
 import type { ActionError } from "../../features/type";
 
 export function LoginPage() {
   const actionError: ActionError | undefined = useActionData();
   const navigation = useNavigation();
+
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? "/";
 
   const isSubmitting = navigation.state === "submitting";
 
@@ -42,6 +45,8 @@ export function LoginPage() {
               {errorMessage}
             </div>
           ) : null}
+
+          <input type="hidden" name="redirectTo" value={redirectTo} /> 
 
           <div>
             <label

@@ -1,4 +1,3 @@
-import { redirect } from "react-router-dom";
 import { authApi } from "../auth.api";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import z, { ZodError } from "zod";
@@ -24,8 +23,6 @@ export async function LoginAction({ request }: { request: Request }) {
         });
 
         await loginPromise;
-
-        return redirect("/");
     } catch (error) {
         if (error instanceof HttpError) {
 

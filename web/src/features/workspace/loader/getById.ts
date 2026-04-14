@@ -1,6 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router-dom";
-import { workspaceParamsSchema } from "../../../app/shared/lib/schemas/request.schema";
-import { validate } from "../../../app/shared/lib/validate";
+import type { LoaderFunctionArgs } from "react-router-dom"; 
 import { workspaceApi } from "../workspace.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
@@ -14,8 +12,8 @@ import { ZodError } from "zod";
 import z from "zod";
 import type { SafeWorkspaceResponse } from "../workspace.schema";
 
-export async function GetByIdLoader({ params }: LoaderFunctionArgs) {
-    const { workspaceId } = validate(workspaceParamsSchema)(params);
+export async function GetByIdLoader({ params }: LoaderFunctionArgs) { 
+    const workspaceId = params.workspaceId;
 
     try {
         const promise = workspaceApi.getById(workspaceId);

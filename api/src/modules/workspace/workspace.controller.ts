@@ -164,7 +164,7 @@ export class WorkspaceController {
   invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response) => {
     const result = await this.workspaceService.inviteMember(
       req.params.workspaceId,
-      req.body.inviteeId,
+      req.body.email,
       req.body.role,
       req.user!.id,
     );

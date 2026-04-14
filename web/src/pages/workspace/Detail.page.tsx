@@ -73,9 +73,9 @@ export function WorkspaceDetailPage() {
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
-              <button className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+              <Link to={`/board/workspaces/${workspace.id}/invite`} className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
                 Invite member
-              </button>
+              </Link>
 
               <button className="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
                 New project

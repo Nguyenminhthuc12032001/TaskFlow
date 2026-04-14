@@ -1,8 +1,8 @@
 import { http } from "../../app/shared/lib/http-interceptors";
-import { paginationQuerySchema, type PaginationQueryType } from "../../app/shared/lib/schemas/request.schema";
+import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType } from "../../app/shared/lib/schemas/request.schema";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../app/shared/lib/schemas/response.schemas";
 import { validate } from "../../app/shared/lib/validate"
-import { acceptBodySchema, createBodySchema, createResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, updateBodySchema, updateResponseSchema, type CreateWorkspaceBody } from "./workspace.schema"
+import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, updateBodySchema, updateResponseSchema, type CreateWorkspaceBody } from "./workspace.schema"
 
 export const workspaceApi = {
     create: async (data: unknown) => {
@@ -32,8 +32,9 @@ export const workspaceApi = {
         return validatedEnvelop.data;
     },
 
-    getById: async (id: string) => {
-        const response = await http.get(`/workspaces/${id}`);
+    getById: async (id: unknown) => {
+        const validatedId = validate(workspaceParamsSchema)({workspaceId: id});
+        const response = await http.get(`/workspaces/${validatedId.workspaceId}`);
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(getByIdResponseSchema);
@@ -64,27 +65,29 @@ export const workspaceApi = {
         return validatedEnvelop.data;
     },
 
-    listMember: async (id: string, query: unknown) => {
+    listMember: async (id: unknown, query: unknown) => {
+        const validatedId = validate(workspaceParamsSchema)({ workspaceId: id });
         const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
 
-        const response = await http.get(`/workspaces/members/${id}`, 
+        const response = await http.get(`/workspaces/members/${validatedId.workspaceId}`, 
             { params: validatedQuery }
         );
 
         const envelop = response.data;
-        const envelopSchema = okEnvelopeSchema(getByUserIdResponseSchema);
+        const envelopSchema = okEnvelopeSchema(membersResponseSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;
     },
 
-    invite: async (id: string, data: unknown) => {
+    invite: async (id: unknown, data: unknown) => {
+        const validatedId = validate(workspaceParamsSchema)({ workspaceId: id });
         const validatedData = validate(inviteBodySchema)(data);
 
-        const response = await http.post(`/workspaces/invite/${id}`, validatedData);
+        const response = await http.post(`/workspaces/invite/${validatedId.workspaceId}`, validatedData);
 
         const envelop = response.data;
-        const envelopSchema = createdEnvelopeSchema(updateResponseSchema);
+        const envelopSchema = okEnvelopeSchema(inviteResponseSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;
@@ -93,10 +96,10 @@ export const workspaceApi = {
     accept: async (data: unknown) => {
         const validatedData = validate(acceptBodySchema)(data);
 
-        const response = await http.post('/workspaces/accept', validatedData);
+        const response = await http.post('/workspaces/accept_invite', validatedData);
 
         const envelop = response.data;
-        const envelopSchema = createdEnvelopeSchema(updateResponseSchema);
+        const envelopSchema = createdEnvelopeSchema(acceptResponseSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;

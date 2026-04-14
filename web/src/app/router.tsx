@@ -22,8 +22,14 @@ import { ForgotPasswordAction } from "../features/auth/action/forgotPassword";
 import { CreateWorkspaceAction } from "../features/workspace/action/create";
 import { WorkspaceDetailPage } from "../pages/workspace/Detail.page";
 import { GetByIdLoader } from "../features/workspace/loader/getById";
-import { ListWorkspacePage } from "../pages/workspace/List.page,";
+import { ListWorkspacePage } from "../pages/workspace/List.page";
 import { ListByUserLoader } from "../features/workspace/loader/listByUser";
+import { ListMemberPage } from "../pages/workspace/ListMember.page";
+import { ListMemberLoader } from "../features/workspace/loader/listMember";
+import { InviteAction } from "../features/workspace/action/invite";
+import { InvitePage } from "../pages/workspace/Invite.page";
+import { AcceptInvitePage } from "../pages/workspace/Accept.page";
+import { AcceptInviteAction } from "../features/workspace/action/accept";
 
 export const router = createBrowserRouter([
   {
@@ -55,13 +61,29 @@ export const router = createBrowserRouter([
           { path: "workspaces/create", element: <CreateWorkspacePage />, action: CreateWorkspaceAction },
           {
             path: "workspaces/:workspaceId", element: <WorkspaceDetailPage />,
-            loader: GetByIdLoader
+            loader: GetByIdLoader,
+            children: [
+              // This place is for projects
+              //{ index: true, element: <Navigate to="/board" replace /> },
+              {
+                path: "members", element: <ListMemberPage />,
+                loader: ListMemberLoader
+              },
+              {
+                path: "invite", element: <InvitePage />,
+                action: InviteAction
+              },
+            ]
           },
           {
             path: "workspaces", element: <ListWorkspacePage />,
             loader: ListByUserLoader
-          }
+          },
         ]
+      },
+      {
+        path: "accept-invite", element: <AcceptInvitePage />,
+        action: AcceptInviteAction
       },
       { path: "leads", element: <LeadsPage /> },
       { path: "members", element: <MembersPage /> },

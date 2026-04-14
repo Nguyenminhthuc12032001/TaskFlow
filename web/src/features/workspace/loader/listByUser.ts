@@ -43,7 +43,7 @@ export async function ListByUserLoader({ request }: LoaderFunctionArgs) {
             }
         }
 
-        if (error instanceof ZodError) {
+        if (error instanceof ZodError) { 
             return { 
                 errorMessage: error.message
             } satisfies ActionError

@@ -1,31 +1,32 @@
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import type { ActionError } from "../../features/type";
+import { WorkspaceRole } from "../../../../api/prisma/generated/enums";
 
-export function CreateWorkspacePage() {
+export function InvitePage() {
   const actionError: ActionError | undefined = useActionData();
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
 
-  const nameError = actionError?.fieldErrors?.name?.[0];
+  const emailError = actionError?.fieldErrors?.email?.[0];
+  const roleError = actionError?.fieldErrors?.role?.[0];
   const formError = actionError?.formErrors?.[0];
   const errorMessage = actionError?.errorMessage;
 
   return (
     <section className="min-h-full bg-linear-to-b from-white via-slate-50 to-slate-100 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-2xl"> 
-
+      <div className="mx-auto max-w-2xl">
         <div className="overflow-hidden rounded-4xl border border-white/70 bg-white/80 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl">
           <div className="border-b border-slate-200/70 px-6 py-6 sm:px-8">
             <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
-              Workspace
+              Member invitation
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-              Create a new workspace
+              Invite a new member
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-              Give your workspace a clear, simple name so your projects, members,
-              and tasks stay easy to manage.
+              Add a teammate to your workspace by entering their email address
+              and selecting the right role.
             </p>
           </div>
 
@@ -53,42 +54,84 @@ export function CreateWorkspacePage() {
 
               <div>
                 <label
-                  htmlFor="name"
+                  htmlFor="email"
                   className="mb-2 block text-sm font-medium text-slate-800"
                 >
-                  Workspace name
+                  Invitee email
                 </label>
 
                 <input
-                  type="text"
-                  name="name"
-                  id="name"
+                  type="email"
+                  name="email"
+                  id="email"
                   required
-                  maxLength={60}
-                  placeholder="Example: TaskFlow Team"
-                  aria-invalid={!!nameError}
-                  aria-describedby={nameError ? "name-error" : undefined}
+                  placeholder="Example: teammate@email.com"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "invitee-error" : undefined}
                   className={[
                     "block h-14 w-full rounded-2xl border bg-white px-4 text-[15px] text-slate-900 shadow-sm outline-none transition",
                     "placeholder:text-slate-400",
-                    nameError
+                    emailError
                       ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
                       : "border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/70",
                   ].join(" ")}
                 />
 
                 <div className="mt-2 min-h-5">
-                  {nameError ? (
+                  {emailError ? (
                     <p
-                      id="name-error"
+                      id="invitee-error"
                       className="text-sm text-red-600"
                       role="alert"
                     >
-                      {nameError}
+                      {emailError}
                     </p>
                   ) : (
                     <p className="text-sm text-slate-500">
-                      Keep it short and recognizable.
+                      Use the email address your teammate signs in with.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="role"
+                  className="mb-2 block text-sm font-medium text-slate-800"
+                >
+                  Member role
+                </label>
+
+                <select
+                  name="role"
+                  id="role"
+                  defaultValue="member"
+                  aria-invalid={!!roleError}
+                  aria-describedby={roleError ? "role-error" : undefined}
+                  className={[
+                    "block h-14 w-full rounded-2xl border bg-white px-4 text-[15px] text-slate-900 shadow-sm outline-none transition",
+                    roleError
+                      ? "border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100"
+                      : "border-slate-200 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/70",
+                  ].join(" ")}
+                >
+                  <option value={WorkspaceRole.admin}>Admin</option>
+                  <option value={WorkspaceRole.member}>Member</option>
+                  <option value={WorkspaceRole.viewer}>Viewer</option>
+                </select>
+
+                <div className="mt-2 min-h-5">
+                  {roleError ? (
+                    <p
+                      id="role-error"
+                      className="text-sm text-red-600"
+                      role="alert"
+                    >
+                      {roleError}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      Choose permissions carefully based on what they need to access.
                     </p>
                   )}
                 </div>
@@ -96,10 +139,11 @@ export function CreateWorkspacePage() {
 
               <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
                 <Link
-                  to="/board/workspaces"
+                  to=".."
+                  relative="path"
                   className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                 >
-                  Your workspaces
+                  Back
                 </Link>
 
                 <button
@@ -107,7 +151,7 @@ export function CreateWorkspacePage() {
                   disabled={isSubmitting}
                   className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-900 px-5 text-sm font-medium text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmitting ? "Creating..." : "Create workspace"}
+                  {isSubmitting ? "Sending invite..." : "Send invitation"}
                 </button>
               </div>
             </Form>

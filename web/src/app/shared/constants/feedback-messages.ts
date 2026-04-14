@@ -27,6 +27,12 @@ export const feedbackMessage = {
         listByUserSuccess: "Successfully listed workspaces",
         listByUserFailed: "Failed to list workspaces",
         getByIdSuccess: "Successfully got workspace",
-        getByIdFailed: "Failed to get workspace"
+        getByIdFailed: "Failed to get workspace",
+        listMemberSuccess: "Successfully listed workspace members",
+        listMemberFailed: "Failed to list workspace members",
+        inviteSuccess: "Successfully invited user",
+        inviteFailed: "Failed to invite user",
+        acceptInviteSuccess: "Successfully accepted invite",
+        acceptInviteFailed: "Failed to accept invite", 
     }
 }

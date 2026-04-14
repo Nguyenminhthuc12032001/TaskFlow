@@ -1,5 +1,5 @@
 import z, { type ZodType } from '../../docs/zod.js';
-import { safeUserSchema } from '../auth/auth.schemas.js';
+import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 
@@ -27,7 +27,7 @@ export type UpdateWorkspaceBody = z.infer<typeof updateBodySchema>;
 
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
-  inviteeId: z.uuid(),
+  email: emailSchema,
   role: z.enum(WorkspaceRole),
 });
 export type InviteBody = z.infer<typeof inviteBodySchema>;
