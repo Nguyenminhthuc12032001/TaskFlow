@@ -6,18 +6,6 @@ import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * Deletes a column by its ID.
- *
- * @param {ActionFunctionArgs} params - Params from the router.
- * @param {string} params.workspaceId - Workspace ID.
- * @param {string} params.projectId - Project ID.
- * @param {string} params.columnId - Column ID.
- * @returns {Promise<void>} - A promise that resolves when the column is deleted.
- * @throws {ActionError} - If the column cannot be deleted.
- */
-/*******  ce55d320-6c7b-402a-80a9-69733823b7d7  *******/
 export async function DeleteColumnAction({ params }: ActionFunctionArgs) {
     const workspaceId = params.workspaceId;
     const projectId = params.projectId;
@@ -26,7 +14,7 @@ export async function DeleteColumnAction({ params }: ActionFunctionArgs) {
     try {
         const promise = columnApi.delete(workspaceId, projectId, columnId);
 
-        notify.promise(promise, {
+        notify.promise(promise, {add
             loading: "Deleting column... ",
             success: feedbackMessage.column.deleteSuccess,
             error: feedbackMessage.column.deleteFailed
