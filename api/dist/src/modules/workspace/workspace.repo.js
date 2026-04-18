@@ -20,6 +20,11 @@ export class WorkspaceRepo {
                     userId,
                 },
             },
+            include: {
+                user: {
+                    select: { id: true, name: true, email: true },
+                },
+            },
         });
     }
     async findMembers(workspaceId, { take, skip }, db = this.prisma) {

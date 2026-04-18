@@ -5,7 +5,7 @@ import { feedbackMessage } from "../../../app/shared/constants/feedback-messages
 import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { ZodError } from "zod";
-import type { SafeWorkspacesResponse } from "../workspace.schema";
+import type { SafeWorkspacesResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
 
 export async function ListByUserLoader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);

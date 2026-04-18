@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useLoaderData } from "react-router-dom";
-import { GetByIdLoader } from "../../features/workspace/loader/getById";
-import type { SafeWorkspaceResponse } from "../../features/workspace/workspace.schema";
+import { GetByIdLoader } from "../../../features/workspace/loader/getById";
+import type { SafeMemberResponse, SafeWorkspaceResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
+import { WorkspaceNameSection } from "./Name.section";
 
 const tabs = [
   { to: "", label: "Overview", end: true },
@@ -36,12 +37,28 @@ export function WorkspaceDetailPage() {
   }
 
   const workspace: SafeWorkspaceResponse = {
-    id: data.id,
-    name: data.name,
-    createdBy: data.createdBy,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
+    id: data.workspace.id,
+    name: data.workspace.name,
+    createdBy: data.workspace.createdBy,
+    createdAt: data.workspace.createdAt,
+    updatedAt: data.workspace.updatedAt,
   };
+
+  const myMembership: SafeMemberResponse = {
+    user: {
+      id: data.myMembership.user.id,
+      name: data.myMembership.user.name,
+      email: data.myMembership.user.email
+    },
+    role: data.myMembership.role,
+    joinedAt: data.myMembership.joinedAt
+  };
+
+  const role = myMembership.role;
+
+  const canManageWorkspace = role === "owner" || role === "admin";
+  const canInviteMember = canManageWorkspace;
+  const canRenameWorkspace = canManageWorkspace;
 
   return (
     <section className="min-h-full bg-linear-to-b from-white via-slate-50 to-slate-100 px-4 py-6 sm:px-6 lg:px-8">
@@ -63,9 +80,11 @@ export function WorkspaceDetailPage() {
                 Workspace
               </div>
 
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                {workspace.name}
-              </h1>
+              <WorkspaceNameSection
+                workspaceId={workspace.id}
+                initialName={workspace.name}
+                canRenameWorkspace={canRenameWorkspace}
+              />
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
                 Workspace information and management area.
@@ -73,13 +92,18 @@ export function WorkspaceDetailPage() {
             </div>
 
             <div className="flex shrink-0 items-center gap-3">
-              <Link to={`/board/workspaces/${workspace.id}/invite`} className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
-                Invite member
-              </Link>
+              {canInviteMember && (
+                <Link
+                  to={`/board/workspaces/${workspace.id}/invite`}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                >
+                  Invite member
+                </Link>
+              )}
 
-              <button className="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+              <Link to={`/board/workspaces/${workspace.id}/projects/new`} className="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
                 New project
-              </button>
+              </Link>
             </div>
           </div>
 

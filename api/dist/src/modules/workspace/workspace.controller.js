@@ -1,4 +1,4 @@
-import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateResponseSchema, } from './workspace.schemas.js';
+import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, safeMemberResponseSchema, updateResponseSchema, } from './workspace.schemas.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
@@ -71,6 +71,22 @@ export class WorkspaceController {
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(200).json(validatedEnvelope);
         };
+        this.getMemberByUserId = async (req, res) => {
+            const member = await this.workspaceService.getMemberByUserId(req.params.workspaceId, req.user.id);
+            const memberResponse = {
+                user: {
+                    id: member.user.id,
+                    name: member.user.name,
+                    email: member.user.email,
+                },
+                role: member.role,
+                joinedAt: member.joinedAt,
+            };
+            const envelope = ok(memberResponse);
+            const envelopeSchema = okEnvelopeSchema(safeMemberResponseSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
+        };
         this.update = async (req, res) => {
             const updateData = { name: req.body.name };
             const result = await this.workspaceService.update(req.params.workspaceId, updateData, req.user.id);
@@ -101,7 +117,7 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelope);
         };
         this.invinte = async (req, res) => {
-            const result = await this.workspaceService.inviteMember(req.params.workspaceId, req.body.inviteeId, req.body.role, req.user.id);
+            const result = await this.workspaceService.inviteMember(req.params.workspaceId, req.body.email, req.body.role, req.user.id);
             const inviteResponse = {
                 id: result.id,
                 workspaceId: result.workspaceId,

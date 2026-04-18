@@ -63,6 +63,15 @@ router.get(
   workspaceController.getMembersById,
 );
 
+router.get(
+  '/membership/:workspaceId',
+  authMiddleware,
+  validateParams(workspaceParamsSchema),
+  validateBody(emptyBodySchema),
+  requireWorkspaceRole(),
+  workspaceController.getMemberByUserId,
+);
+
 router.patch(
   '/:workspaceId',
   authMiddleware,

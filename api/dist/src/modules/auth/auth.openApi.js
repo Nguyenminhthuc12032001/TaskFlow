@@ -120,7 +120,7 @@ registry.registerPath({
             },
         },
         400: fail400,
-        401: { ...fail401, description: 'Invalid Credentials' },
+        401: fail401,
         500: fail500,
     },
 });
@@ -205,6 +205,7 @@ registry.registerPath({
         204: {
             description: 'No content',
         },
+        400: fail400,
         500: fail500,
     },
 });
@@ -223,7 +224,7 @@ registry.registerPath({
         204: {
             description: 'No content',
         },
-        401: { ...fail401, description: 'Invalid reset token' },
+        400: fail400,
         500: fail500,
     },
 });
@@ -243,8 +244,8 @@ registry.registerPath({
         204: {
             description: 'No content',
         },
-        400: { ...fail400, description: 'New password must be different' },
-        401: { ...fail401, description: 'Invalid current password' },
+        400: { ...fail400, description: 'Invalid request body' },
+        401: { ...fail401, description: 'Invalid Credentials' },
         404: fail404,
         500: fail500,
     },

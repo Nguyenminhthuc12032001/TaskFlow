@@ -106,6 +106,14 @@ export class WorkspaceService {
     return { members, paginationMeta };
   }
 
+  async getMemberByUserId(workspaceId: string, actorId: string) {
+    const member = await this.workspaceRepo.findMembership(workspaceId, actorId);
+    if (!member) {
+      throw new AppError('Member not found', 404);
+    }
+    return member;
+  }
+
   async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) {
     const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
 

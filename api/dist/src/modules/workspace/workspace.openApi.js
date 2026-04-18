@@ -72,6 +72,19 @@ registry.registerPath({
     responses: defaultResponse(membersResponseSchema, [201, 409]),
 });
 registry.registerPath({
+    method: 'get',
+    path: defaultPath + '/membership/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Get member by workspace ID and User ID',
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(membersResponseSchema, [201, 409]),
+});
+registry.registerPath({
     method: 'patch',
     path: defaultPath + '/{workspaceId}',
     tags: ['Workspace'],

@@ -1,8 +1,8 @@
 import { clearAuth, setAuthState, type AuthState } from "./auth.store";
 import { http } from "../../app/shared/lib/http-interceptors";
-import { createdEnvelopeSchema, okEnvelopeSchema } from "../../app/shared/lib/schemas/response.schemas";
+import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
 import { validate } from "../../app/shared/lib/validate";
-import { changePasswordBodySchema, forgotPasswordBodySchema, loginBodySchema, loginResponseSchema, registerBodySchema, registerResponseSchema, resetPasswordBodySchema, type ForgotPasswordBody, type LoginBody, type RegisterBody } from "./auth.schemas";
+import { changePasswordBodySchema, forgotPasswordBodySchema, loginBodySchema, loginResponseSchema, registerBodySchema, registerResponseSchema, resetPasswordBodySchema, type ForgotPasswordBody, type LoginBody, type RegisterBody } from "../../../../api/src/modules/auth/auth.schemas";
 
 export const authApi = {
     register: async (data: unknown) => {

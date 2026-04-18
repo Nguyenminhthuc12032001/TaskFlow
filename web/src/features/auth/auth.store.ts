@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { SafeUserResponse } from "./auth.schemas";
+import type { SafeUserResponse } from "../../../../api/src/modules/auth/auth.schemas";
 
 export type AuthStatus = "checking" | "authenticated" | "unauthenticated";
 

@@ -1,31 +1,35 @@
-import { type ActionFunctionArgs } from "react-router-dom";
-import { workspaceApi } from "../workspace.api";
+import { redirect, type ActionFunctionArgs } from "react-router-dom";
+import { columnApi } from "../column.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
-export async function UpdateWorkspaceAction({ request, params }: ActionFunctionArgs) {
+export async function CreateColumnAction({ request, params }: ActionFunctionArgs) {
     const formData = await request.formData();
 
-    const workspaceId = params.workspaceId
+    const projectId = params.projectId;
+    const workspaceId = params.workspaceId;
 
     const data: unknown = {
         name: formData.get('name'),
-    }
+        position: formData.get('position'),
+        type: formData.get('type'),
+    } 
 
     try {
-        const promise = workspaceApi.update(workspaceId, data);
+        const promise = columnApi.create(workspaceId, projectId, data);
 
         notify.promise(promise, {
-            loading: "Updating workspace... ",
-            success: feedbackMessage.workspace.updateSuccess,
-            error: feedbackMessage.workspace.updateFailed
-        })
+            loading: "Creating column... ",
+            success: feedbackMessage.column.createSuccess,
+            error: feedbackMessage.column.createFailed
+        });
 
-        await promise;
+        const column = await promise;
 
+        return redirect(`/board/workspaces/${workspaceId}/projects/${projectId}/columns/${column.id}`);
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

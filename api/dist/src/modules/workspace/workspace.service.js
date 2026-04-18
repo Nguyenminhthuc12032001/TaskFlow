@@ -59,6 +59,13 @@ export class WorkspaceService {
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
         return { members, paginationMeta };
     }
+    async getMemberByUserId(workspaceId, actorId) {
+        const member = await this.workspaceRepo.findMembership(workspaceId, actorId);
+        if (!member) {
+            throw new AppError('Member not found', 404);
+        }
+        return member;
+    }
     async update(workspaceId, workspaceData, actorId) {
         const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
         if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
@@ -79,7 +86,7 @@ export class WorkspaceService {
         });
         return result;
     }
-    async inviteMember(workspaceId, inviteeId, role, actorId) {
+    async inviteMember(workspaceId, email, role, actorId) {
         const result = await this.prisma.$transaction(async (tx) => {
             const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
             if (!actor) {
@@ -88,11 +95,11 @@ export class WorkspaceService {
             if (!['admin', 'owner'].includes(actor.role)) {
                 throw new AppError('Forbidden', 403);
             }
-            const existInvitee = await this.authRepo.findUserById(inviteeId, tx);
+            const existInvitee = await this.authRepo.findUserByEmail(email, tx);
             if (!existInvitee) {
                 throw new AppError('Invitee with the provided ID does not exist', 404);
             }
-            const existingMembership = await this.workspaceRepo.findMembership(workspaceId, inviteeId, tx);
+            const existingMembership = await this.workspaceRepo.findMembership(workspaceId, existInvitee.id, tx);
             if (existingMembership) {
                 throw new AppError('User is already a member of the workspace', 409);
             }
@@ -112,7 +119,7 @@ export class WorkspaceService {
             }
             const tokenJti = randomUUID();
             const token = signInviteToken({
-                inviteeId: inviteeId,
+                inviteeId: existInvitee.id,
                 jti: tokenJti,
                 email: existInvitee.email,
                 workspaceId: workspace.id,
@@ -131,7 +138,7 @@ export class WorkspaceService {
             await this.activityService.logActivity(workspaceId, ActivityAction.INVITE_MEMBER, 'invite', actorId, invite.id, { email: invite.email, role: invite.role }, tx);
             return { invite, token, workspace };
         });
-        const inviteLink = `${env.FRONTEND_URL}/invite?token=${encodeURIComponent(result.token)}`;
+        const inviteLink = `${env.FRONTEND_URL}/accept-invite?token=${encodeURIComponent(result.token)}`;
         try {
             await this.emailService.sendInviteEmail(result.invite.email, result.workspace.name, inviteLink);
             log.info({
@@ -151,7 +158,7 @@ export class WorkspaceService {
             }, 'Failed to send invite email');
             throw error;
         }
-        log.info({ inviteeId }, 'Invited member for workspace successfully');
+        log.info({ email }, 'Invited member for workspace successfully');
         return result.invite;
     }
     async acceptInvite(token, actorId) {

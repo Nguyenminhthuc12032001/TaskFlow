@@ -14,7 +14,8 @@ export const createBodySchema = z
     position: z
       .number()
       .int('Position must be an integer')
-      .min(0, 'Position must be greater than or equal to 0'),
+      .min(0, 'Position must be greater than or equal to 0')
+      .optional(),
     type: z.enum(ColumnType),
   })
   .strict();
@@ -84,7 +85,7 @@ export const safeColumnSchema = z.object({
     .int('Position must be an integer')
     .min(0, 'Position must be greater than or equal to 0'),
   type: z.enum(ColumnType),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
 });
 export type SafeColumnType = z.infer<typeof safeColumnSchema>;
 

@@ -19,6 +19,7 @@ router.post('', authMiddleware, validateBody(createBodySchema), workspaceControl
 router.get('', authMiddleware, validateBody(emptyBodySchema), validateQuery(paginationQuerySchema), workspaceController.getByUserId);
 router.get('/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(emptyBodySchema), requireWorkspaceRole(), workspaceController.getById);
 router.get('/members/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(emptyBodySchema), validateQuery(paginationQuerySchema), requireWorkspaceRole(), workspaceController.getMembersById);
+router.get('/membership/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(emptyBodySchema), requireWorkspaceRole(), workspaceController.getMemberByUserId);
 router.patch('/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(updateBodySchema), requireWorkspaceRole('admin'), workspaceController.update);
 router.delete('/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(emptyBodySchema), requireWorkspaceRole('admin'), workspaceController.remove);
 router.post('/invite/:workspaceId', authMiddleware, validateParams(workspaceParamsSchema), validateBody(inviteBodySchema), requireWorkspaceRole('admin'), workspaceController.invinte);

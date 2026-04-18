@@ -1,5 +1,5 @@
 import z from '../../docs/zod.js';
-import { safeUserSchema } from '../auth/auth.schemas.js';
+import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // ========= REQUEST ==========
@@ -21,7 +21,7 @@ export const updateBodySchema = z.object({
 });
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
-    inviteeId: z.uuid(),
+    email: emailSchema,
     role: z.enum(WorkspaceRole),
 });
 // POST workspace/accept_invite
@@ -36,8 +36,8 @@ export const createResponseSchema = z.object({
     id: z.string(),
     name: z.string(),
     createdBy: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
 });
 // Get workspace/list
 export const getByUserIdResponseSchema = z.object({
@@ -53,7 +53,7 @@ export const deleteResponseSchema = createResponseSchema;
 export const safeMemberResponseSchema = z.object({
     user: safeUserSchema,
     role: z.enum(WorkspaceRole),
-    joinedAt: z.date(),
+    joinedAt: z.coerce.date(),
 });
 // GET workspace/members/:workspaceId
 export const membersResponseSchema = z.object({
@@ -68,7 +68,7 @@ export const inviteResponseSchema = z.object({
     role: z.enum(WorkspaceRole),
     jti: z.string(),
     tokenHash: z.string(),
-    createdAt: z.date(),
+    createdAt: z.coerce.date(),
     createdBy: z.uuid(),
 });
 // POST workspace/accept_invite
@@ -76,13 +76,13 @@ export const acceptResponseSchema = z.object({
     role: z.enum(WorkspaceRole),
     userId: z.uuid(),
     workspaceId: z.uuid(),
-    joinedAt: z.date(),
+    joinedAt: z.coerce.date(),
 });
 // DELETE workspace/remove_member/:workspaceId/:memberId
 export const removeMemberResponseSchema = z.object({
     userId: z.uuid(),
-    deletedAt: z.date(),
+    deletedAt: z.coerce.date(),
     workspaceId: z.uuid(),
     role: z.enum(WorkspaceRole),
-    joinedAt: z.date(),
+    joinedAt: z.coerce.date(),
 });

@@ -20,7 +20,7 @@ export const feedbackMessage = {
         forgotPasswordFailed: "Failed to send reset password link",
         resetPasswordSuccess: "Successfully reset password",
         resetPasswordFailed: "Failed to reset password"
-    }, 
+    },
     workspace: {
         createSuccess: "Successfully created workspace",
         createFailed: "Failed to create workspace",
@@ -33,6 +33,36 @@ export const feedbackMessage = {
         inviteSuccess: "Successfully invited user",
         inviteFailed: "Failed to invite user",
         acceptInviteSuccess: "Successfully accepted invite",
-        acceptInviteFailed: "Failed to accept invite", 
+        acceptInviteFailed: "Failed to accept invite",
+        updateSuccess: "Successfully updated workspace",
+        updateFailed: "Failed to update workspace",
+        deleteSuccess: "Successfully deleted workspace",
+        deleteFailed: "Failed to delete workspace",
+        getMyMembershipSuccess: "Successfully got workspace membership",
+        getMyMembershipFailed: "Failed to get workspace membership"
+    },
+    project: {
+        createSuccess: "Successfully created project",
+        createFailed: "Failed to create project",
+        updateSuccess: "Successfully updated project",
+        updateFailed: "Failed to update project",
+        deleteSuccess: "Successfully deleted project",
+        deleteFailed: "Failed to delete project",
+        listByWorkspaceSuccess: "Successfully listed projects",
+        listByWorkspaceFailed: "Failed to list projects",
+        getByIdSuccess: "Successfully got project",
+        getByIdFailed: "Failed to get project"
+    },
+    column: {
+        createSuccess: "Successfully created column",
+        createFailed: "Failed to create column",
+        updateSuccess: "Successfully updated column",
+        updateFailed: "Failed to update column",
+        deleteSuccess: "Successfully deleted column",
+        deleteFailed: "Failed to delete column",
+        listByProjectSuccess: "Successfully listed columns",
+        listByProjectFailed: "Failed to list columns",
+        getByIdSuccess: "Successfully got column",
+        getByIdFailed: "Failed to get column"
     }
 }

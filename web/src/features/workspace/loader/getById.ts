@@ -10,22 +10,33 @@ import {
 import type { ActionError } from "../../type";
 import { ZodError } from "zod";
 import z from "zod";
-import type { SafeWorkspaceResponse } from "../workspace.schema";
+import type { SafeMemberResponse, SafeWorkspaceResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
 
 export async function GetByIdLoader({ params }: LoaderFunctionArgs) { 
     const workspaceId = params.workspaceId;
 
     try {
         const promise = workspaceApi.getById(workspaceId);
+        const promiseMyMembership = workspaceApi.getMyMembership(workspaceId);
 
         notify.promise(promise, {
             loading: "Loading workspace...",
             success: feedbackMessage.workspace.getByIdSuccess,
             error: feedbackMessage.workspace.getByIdFailed,
-        });
-        const data = await promise;
+        }); 
 
-        return data as SafeWorkspaceResponse;
+        notify.promise(promiseMyMembership, {
+            loading: "Loading workspace membership...",
+            success: feedbackMessage.workspace.getMyMembershipSuccess,
+            error: feedbackMessage.workspace.getMyMembershipFailed,
+        });
+        
+        const [workspace, myMembership] = await Promise.all([promise, promiseMyMembership]);
+
+        return {
+            workspace: workspace as SafeWorkspaceResponse,
+            myMembership: myMembership as SafeMemberResponse,
+        };
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

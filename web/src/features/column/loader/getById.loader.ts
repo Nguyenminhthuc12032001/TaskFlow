@@ -1,34 +1,28 @@
 import type { LoaderFunctionArgs } from "react-router-dom";
-import { workspaceApi } from "../workspace.api";
+import { columnApi } from "../column.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
-import type { SafeMembersResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
 import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
-import { ZodError } from "zod"; 
+import z, { ZodError } from "zod";
 
-export async function ListMemberLoader({ params, request }: LoaderFunctionArgs) { 
-    const workspaceId = params.workspaceId
-
-    const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get('page') ?? undefined,
-        limit: url.searchParams.get('limit') ?? undefined
-    };
+export async function GetColumnByIdLoader({ params }: LoaderFunctionArgs) {
+    const workspaceId = params.workspaceId;
+    const projectId = params.projectId;
+    const columnId = params.columnId;
 
     try {
-        const promise = workspaceApi.listMember(workspaceId, query);
+        const promise = columnApi.getById(workspaceId, projectId, columnId); 
 
         notify.promise(promise, {
-            loading: "Loading workspace members... ",
-            success: feedbackMessage.workspace.listMemberSuccess,
-            error: feedbackMessage.workspace.listMemberFailed
-        })
+            loading: "Loading column... ",
+            success: feedbackMessage.column.getByIdSuccess,
+            error: feedbackMessage.column.getByIdFailed
+        });
 
-        const data = await promise;
+        const column = await promise;
 
-        return data satisfies SafeMembersResponse
+        return column;
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {
@@ -50,13 +44,13 @@ export async function ListMemberLoader({ params, request }: LoaderFunctionArgs) 
             }
         }
 
-        if (error instanceof ZodError) { 
+        if (error instanceof ZodError) {
+            const { formErrors, fieldErrors } = z.flattenError(error);
+
             return {
-                errorMessage: error.message
+                fieldErrors,
+                formErrors
             } satisfies ActionError
         }
-
-        throw error
-        // need to handle other errors
-    } 
+    }
 }

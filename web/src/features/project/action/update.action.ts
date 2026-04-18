@@ -1,31 +1,31 @@
-import { type ActionFunctionArgs } from "react-router-dom";
-import { workspaceApi } from "../workspace.api";
+import type { ActionFunctionArgs } from "react-router-dom";
+import { projectApi } from "../project.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
-import { z, ZodError } from "zod";
 
-export async function UpdateWorkspaceAction({ request, params }: ActionFunctionArgs) {
+export async function UpdateProjectAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
-    const workspaceId = params.workspaceId
+    const projectId = params.projectId;
+    const workspaceId = params.workspaceId;
 
     const data: unknown = {
         name: formData.get('name'),
+        description: formData.get('description'),
     }
 
     try {
-        const promise = workspaceApi.update(workspaceId, data);
+        const promise = projectApi.update(workspaceId, projectId, data);
 
         notify.promise(promise, {
-            loading: "Updating workspace... ",
-            success: feedbackMessage.workspace.updateSuccess,
-            error: feedbackMessage.workspace.updateFailed
-        })
+            loading: "Updating project... ",
+            success: feedbackMessage.project.updateSuccess,
+            error: feedbackMessage.project.updateFailed
+        });
 
-        await promise;
-
+        await promise; 
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {
@@ -53,15 +53,5 @@ export async function UpdateWorkspaceAction({ request, params }: ActionFunctionA
                 } satisfies ActionError
             }
         }
-
-        if (error instanceof ZodError) {
-            const { fieldErrors, formErrors } = z.flattenError(error);
-            return {
-                fieldErrors,
-                formErrors
-            } satisfies ActionError
-        }
-
-        throw error;
     }
 }

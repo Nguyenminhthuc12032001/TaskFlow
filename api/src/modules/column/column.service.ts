@@ -21,13 +21,15 @@ export class ColumnService {
   ) {
     const columns = await this.columnRepo.allColumnsByProject(ctx);
 
-    if (columns.some((c) => c.name === data.name)) {
-      throw new AppError('Duplicate name is not allowed', 409);
+    if (columns.length >= 10) {
+      throw new AppError('Maximum number of columns reached', 409);
     }
 
-    if (columns.some((c) => c.position === data.position)) {
-      throw new AppError('Duplicate position is not allowed', 409);
+    if (columns.some((c) => c.name.toLowerCase() === data.name.toLowerCase())) {
+      throw new AppError('Duplicate name is not allowed', 409);
     }
+    
+    data.position = Math.max(...columns.map((c) => c.position)) + 1;  
 
     const createData: Prisma.ColumnCreateInput = {
       name: data.name,

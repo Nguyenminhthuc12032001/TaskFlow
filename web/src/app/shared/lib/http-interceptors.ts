@@ -2,8 +2,8 @@ import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axio
 import axios from "axios";
 import { normalizeHttpError, type ApiErrorResponse } from "./http-error";
 import { clearAuth, getAuthState, setAuthState, type AuthState } from "../../../features/auth/auth.store";
-import { okEnvelopeSchema } from "./schemas/response.schemas";
-import { refreshResponseSchema } from "../../../features/auth/auth.schemas";
+import { okEnvelopeSchema } from "../../../../../api/src/common/utils/response/format";
+import { refreshResponseSchema } from "../../../../../api/src/modules/auth/auth.schemas";
 import { validate } from "./validate";
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -54,7 +54,7 @@ export async function refreshAccessToken(): Promise<string | null> {
                     headers: {
                         'x-csrf-token': csrfToken,
                     }
-                });
+                }); 
 
                 if (response.status !== 200) {
                     throw new Error(`Refresh failed with status ${response.status}`);

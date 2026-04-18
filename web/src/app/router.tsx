@@ -4,8 +4,7 @@ import { RegisterPage } from "../pages/auth/RegisterPage";
 import { BoardPage } from "../pages/board/BoardPage";
 import { LeadsPage } from "../pages/leads/LeadsPage";
 import { MembersPage } from "../pages/members/MembersPage";
-import { CreateWorkspacePage } from "../pages/workspace/Create.page";
-import { ProjectsPage } from "../pages/onboarding/ProjectsPage";
+import { CreateWorkspacePage } from "../pages/workspace/Create.page"; 
 import { AppShell } from "../components/layout/AppShell";
 import { AuthLayout } from "../components/layout/AuthLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
@@ -20,7 +19,7 @@ import { LogoutAction } from "../features/auth/action/logout";
 import { ChangePasswordAction } from "../features/workspace/action/changePassword";
 import { ForgotPasswordAction } from "../features/auth/action/forgotPassword";
 import { CreateWorkspaceAction } from "../features/workspace/action/create";
-import { WorkspaceDetailPage } from "../pages/workspace/Detail.page";
+import { WorkspaceDetailPage } from "../pages/workspace/detail/Detail.page";
 import { GetByIdLoader } from "../features/workspace/loader/getById";
 import { ListWorkspacePage } from "../pages/workspace/List.page";
 import { ListByUserLoader } from "../features/workspace/loader/listByUser";
@@ -30,6 +29,15 @@ import { InviteAction } from "../features/workspace/action/invite";
 import { InvitePage } from "../pages/workspace/Invite.page";
 import { AcceptInvitePage } from "../pages/workspace/Accept.page";
 import { AcceptInviteAction } from "../features/workspace/action/accept";
+import { UpdateWorkspaceAction } from "../features/workspace/action/update";
+import { CreateProjectPage } from "../pages/project/Create.page";
+import { CreateProjectAction } from "../features/project/action/create.action";
+import { ProjectsByWorkspaceLoader } from "../features/project/loader/listByWorkspace.loader";
+import { ProjectsPage } from "../pages/project/Project.page";
+import { ListProjectsPage } from "../pages/project/List.page";
+import { ProjectPage } from "../pages/project/detail/Detail.page";
+import { ProjectByIdLoader } from "../features/project/loader/getById.loader";
+import { UpdateProjectAction } from "../features/project/action/update.action";
 
 export const router = createBrowserRouter([
   {
@@ -60,8 +68,10 @@ export const router = createBrowserRouter([
           { index: true, element: <Navigate to="/board/workspaces/create" replace /> },
           { path: "workspaces/create", element: <CreateWorkspacePage />, action: CreateWorkspaceAction },
           {
+            id: "workspace-detail",
             path: "workspaces/:workspaceId", element: <WorkspaceDetailPage />,
-            loader: GetByIdLoader,
+            action: UpdateWorkspaceAction,
+            loader: GetByIdLoader, 
             children: [
               // This place is for projects
               //{ index: true, element: <Navigate to="/board" replace /> },
@@ -72,6 +82,24 @@ export const router = createBrowserRouter([
               {
                 path: "invite", element: <InvitePage />,
                 action: InviteAction
+              },
+              {
+                path: "projects", element: <ProjectsPage />,
+                children: [ 
+                  {
+                    index: true, element: <ListProjectsPage />,
+                    loader: ProjectsByWorkspaceLoader
+                  },
+                  {
+                    path: "new", element: <CreateProjectPage />,
+                    action: CreateProjectAction
+                  },
+                  {
+                    path: ":projectId", element: <ProjectPage />,
+                    loader: ProjectByIdLoader,
+                    action: UpdateProjectAction
+                  }
+                ]
               },
             ]
           },
@@ -88,7 +116,6 @@ export const router = createBrowserRouter([
       { path: "leads", element: <LeadsPage /> },
       { path: "members", element: <MembersPage /> },
       { path: "workspace/create", element: <Navigate to="/board" replace /> },
-      { path: "projects", element: <ProjectsPage /> },
     ],
   },
   {

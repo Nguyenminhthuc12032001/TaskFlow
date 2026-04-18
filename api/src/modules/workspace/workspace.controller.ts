@@ -9,6 +9,7 @@ import {
   inviteResponseSchema,
   membersResponseSchema,
   removeMemberResponseSchema,
+  safeMemberResponseSchema,
   updateResponseSchema,
   type AcceptBody,
   type AcceptResponse,
@@ -119,6 +120,26 @@ export class WorkspaceController {
 
     return res.status(200).json(validatedEnvelope);
   };
+
+  getMemberByUserId = async (req: Request<WorkspaceParamsType>, res: Response) => {
+    const member = await this.workspaceService.getMemberByUserId(req.params.workspaceId, req.user!.id);
+
+    const memberResponse: SafeMemberResponse = {
+      user: {
+        id: member.user.id,
+        name: member.user.name,
+        email: member.user.email,
+      },
+      role: member.role,
+      joinedAt: member.joinedAt,
+    };
+
+    const envelope = ok(memberResponse);
+    const envelopeSchema = okEnvelopeSchema(safeMemberResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+
+    return res.status(200).json(validatedEnvelope);
+  }
 
   update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response) => {
     const updateData: UpdateWorkspaceBody = { name: req.body.name };

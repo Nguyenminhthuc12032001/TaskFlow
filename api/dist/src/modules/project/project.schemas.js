@@ -41,7 +41,7 @@ export const safeProjectResponseSchema = z.object({
         .trim()
         .min(10, 'Name must be at least 10 characters long')
         .max(100, 'Name must be at most 100 characters long'),
-    createdAt: z.date(),
+    createdAt: z.coerce.date(),
     createdBy: z.uuid(),
 });
 export const listProjectsResponseSchema = z.object({

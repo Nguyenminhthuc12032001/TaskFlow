@@ -161,7 +161,7 @@ export class AuthService {
         };
         const resetToken = signResetToken(resetTokenPayload);
         await this.authRepo.saveResetToken(user.id, resetTokenPayload.jti, await hashValue(resetToken), new Date(Date.now() + ms(env.TTL_RESET_TOKEN)));
-        const resetLink = `${env.FRONTEND_URL}/reset-password#token=${encodeURIComponent(resetToken)}`;
+        const resetLink = `${env.FRONTEND_URL}/auth/reset-password#token=${encodeURIComponent(resetToken)}`;
         await this.emailService.sendPasswordResetEmail(user.email, resetLink);
         log.info({ userId: user.id }, 'Password reset email sent');
     }
@@ -211,7 +211,7 @@ export class AuthService {
             log.info({ userId }, 'Password change successfully');
             return user;
         });
-        return { id: user.id, name: user.name, updatedAt: user.updatedAt };
+        return result;
     }
     ;
     async me(userId) {
