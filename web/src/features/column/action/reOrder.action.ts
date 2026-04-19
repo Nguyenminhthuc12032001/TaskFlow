@@ -1,5 +1,4 @@
-import type { ActionFunctionArgs } from "react-router-dom";
-import type { ReOrderBodyType } from "../../../../../api/src/modules/column/column.schemas";
+import type { ActionFunctionArgs } from "react-router-dom"; 
 import { notify } from "../../../app/shared/lib/notify";
 import { columnApi } from "../column.api";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
@@ -8,13 +7,23 @@ import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
 export async function ReOrderColumnAction({ params, request }: ActionFunctionArgs) {
-    const formData = await request.json() as ReOrderBodyType;
+    const formData = await request.formData(); 
 
     const projectId = params.projectId;
     const workspaceId = params.workspaceId;
 
+    const rawItems = formData.get('items'); 
+
+    if (typeof rawItems !== 'string') {
+        return {
+            errorMessage: 'Invalid items'
+        } satisfies ActionError
+    }
+
+    const data: unknown = JSON.parse(rawItems);
+
     try {
-        const promise = columnApi.reOrder(workspaceId, projectId, formData);
+        const promise = columnApi.reOrder(workspaceId, projectId, data);
 
         notify.promise(promise, {
             loading: "Updating column...",

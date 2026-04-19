@@ -59,7 +59,7 @@ export const columnApi = {
         const validatedId = validate(workspaceParamsSchema)({ workspaceId: workspaceId, projectId: projectId }); 
         const validatedData = validate(reOrderBodySchema)(data);
 
-        const response = await http.patch(`/columns/reorder/${validatedId.workspaceId}/${validatedId.projectId}`, validatedData);
+        const response = await http.patch(`/columns/${validatedId.workspaceId}/${validatedId.projectId}/re_order`, validatedData);
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeColumnsSchema);

@@ -124,15 +124,15 @@ export function ProjectIdentitySection({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             readOnly={isReadOnly}
-            rows={4}
+            rows={isReadOnly ? 1 : 2}
             aria-invalid={!!descriptionError}
             aria-describedby={
               descriptionError ? "project-description-error" : undefined
             }
             className={[
-              "w-full rounded-2xl border px-4 py-3 text-base leading-8 outline-none transition resize-none",
+              "w-full rounded-2xl border px-4 py-2.5 text-[15px] leading-6 outline-none transition resize-none",
               isReadOnly
-                ? "border-transparent bg-transparent text-slate-600"
+                ? "border-transparent bg-transparent text-slate-600 shadow-none"
                 : descriptionError
                   ? "border-red-300 bg-white text-slate-900 shadow-sm focus:border-red-400"
                   : "border-slate-200 bg-white text-slate-900 shadow-sm focus:border-slate-300",

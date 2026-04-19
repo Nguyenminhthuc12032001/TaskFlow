@@ -7,7 +7,7 @@ import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
 export async function UpdateColumnAction({ params, request }: ActionFunctionArgs) {
-    const formData = await request.formData();
+    const formData = await request.formData(); 
 
     const columnId = params.columnId;
     const projectId = params.projectId;

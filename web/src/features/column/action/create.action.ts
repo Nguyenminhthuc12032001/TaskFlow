@@ -14,9 +14,8 @@ export async function CreateColumnAction({ request, params }: ActionFunctionArgs
 
     const data: unknown = {
         name: formData.get('name'),
-        position: formData.get('position'),
         type: formData.get('type'),
-    } 
+    }
 
     try {
         const promise = columnApi.create(workspaceId, projectId, data);
@@ -26,10 +25,10 @@ export async function CreateColumnAction({ request, params }: ActionFunctionArgs
             success: feedbackMessage.column.createSuccess,
             error: feedbackMessage.column.createFailed
         });
+        
+        await promise;
 
-        const column = await promise;
-
-        return redirect(`/board/workspaces/${workspaceId}/projects/${projectId}/columns/${column.id}`);
+        return redirect(`/board/workspaces/${workspaceId}/projects/${projectId}/columns`);
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

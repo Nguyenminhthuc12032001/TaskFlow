@@ -4,7 +4,7 @@ import { RegisterPage } from "../pages/auth/RegisterPage";
 import { BoardPage } from "../pages/board/BoardPage";
 import { LeadsPage } from "../pages/leads/LeadsPage";
 import { MembersPage } from "../pages/members/MembersPage";
-import { CreateWorkspacePage } from "../pages/workspace/Create.page"; 
+import { CreateWorkspacePage } from "../pages/workspace/Create.page";
 import { AppShell } from "../components/layout/AppShell";
 import { AuthLayout } from "../components/layout/AuthLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
@@ -38,6 +38,14 @@ import { ListProjectsPage } from "../pages/project/List.page";
 import { ProjectPage } from "../pages/project/detail/Detail.page";
 import { ProjectByIdLoader } from "../features/project/loader/getById.loader";
 import { UpdateProjectAction } from "../features/project/action/update.action";
+import { ProjectOverviewPage } from "../pages/project/detail/OverView.page";
+import { ListColumnPage } from "../pages/project/Column/List.page";
+import { ListByProjectLoader } from "../features/column/loader/listByProject.loader";
+import { ReOrderColumnAction } from "../features/column/action/reOrder.action";
+import { UpdateColumnAction } from "../features/column/action/update.action";
+import { CreateColumnPage } from "../pages/project/Column/Create.page";
+import { CreateColumnAction } from "../features/column/action/create.action";
+import { ColumnPage } from "../pages/project/Column/Column.page";
 
 export const router = createBrowserRouter([
   {
@@ -71,7 +79,7 @@ export const router = createBrowserRouter([
             id: "workspace-detail",
             path: "workspaces/:workspaceId", element: <WorkspaceDetailPage />,
             action: UpdateWorkspaceAction,
-            loader: GetByIdLoader, 
+            loader: GetByIdLoader,
             children: [
               // This place is for projects
               //{ index: true, element: <Navigate to="/board" replace /> },
@@ -85,7 +93,7 @@ export const router = createBrowserRouter([
               },
               {
                 path: "projects", element: <ProjectsPage />,
-                children: [ 
+                children: [
                   {
                     index: true, element: <ListProjectsPage />,
                     loader: ProjectsByWorkspaceLoader
@@ -95,9 +103,33 @@ export const router = createBrowserRouter([
                     action: CreateProjectAction
                   },
                   {
+                    id: "project-detail",
                     path: ":projectId", element: <ProjectPage />,
                     loader: ProjectByIdLoader,
-                    action: UpdateProjectAction
+                    action: UpdateProjectAction,
+                    children: [
+                      {
+                        index: true, element: <ProjectOverviewPage />,
+                      },
+                      {
+                        path: "columns", element: <ColumnPage />,
+                        children: [
+                          {
+                            index: true, element: <ListColumnPage />,
+                            loader: ListByProjectLoader,
+                            action: ReOrderColumnAction,
+                          },
+                          {
+                            path: ":columnId/rename",
+                            action: UpdateColumnAction
+                          },
+                          {
+                            path: "create", element: <CreateColumnPage />,
+                            action: CreateColumnAction
+                          }
+                        ]
+                      },
+                    ]
                   }
                 ]
               },
