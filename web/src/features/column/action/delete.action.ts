@@ -14,7 +14,7 @@ export async function DeleteColumnAction({ params }: ActionFunctionArgs) {
     try {
         const promise = columnApi.delete(workspaceId, projectId, columnId);
 
-        notify.promise(promise, {add
+        notify.promise(promise, { 
             loading: "Deleting column... ",
             success: feedbackMessage.column.deleteSuccess,
             error: feedbackMessage.column.deleteFailed
