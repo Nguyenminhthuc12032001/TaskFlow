@@ -64,5 +64,27 @@ export const feedbackMessage = {
         listByProjectFailed: "Failed to list columns",
         getByIdSuccess: "Successfully got column",
         getByIdFailed: "Failed to get column"
+    },
+    task: {
+        createSuccess: "Successfully created task",
+        createFailed: "Failed to create task",
+        updateSuccess: "Successfully updated task",
+        updateFailed: "Failed to update task",
+        deleteSuccess: "Successfully deleted task",
+        deleteFailed: "Failed to delete task",
+        listByColumnSuccess: "Successfully listed tasks",
+        listByColumnFailed: "Failed to list tasks",
+        getByIdSuccess: "Successfully got task",
+        getByIdFailed: "Failed to get task",
+        archiveSuccess: "Successfully archived task",
+        archiveFailed: "Failed to archive task",
+        reStoreSuccess: "Successfully restored task",
+        reStoreFailed: "Failed to restore task",
+        assignSuccess: "Successfully assigned task",
+        assignFailed: "Failed to assign task",
+        bulkDeleteSuccess: "Successfully deleted tasks",
+        bulkDeleteFailed: "Failed to delete tasks",
+        reorderSuccess: "Successfully reordered tasks",
+        reorderFailed: "Failed to reorder tasks"
     }
 }
