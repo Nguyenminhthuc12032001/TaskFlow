@@ -30,22 +30,29 @@ import { InvitePage } from "../pages/workspace/Invite.page";
 import { AcceptInvitePage } from "../pages/workspace/Accept.page";
 import { AcceptInviteAction } from "../features/workspace/action/accept";
 import { UpdateWorkspaceAction } from "../features/workspace/action/update";
-import { CreateProjectPage } from "../pages/project/Create.page";
+import { CreateProjectPage } from "../pages/workspace/project/Create.page";
 import { CreateProjectAction } from "../features/project/action/create.action";
 import { ProjectsByWorkspaceLoader } from "../features/project/loader/listByWorkspace.loader";
-import { ProjectsPage } from "../pages/project/Project.page";
-import { ListProjectsPage } from "../pages/project/List.page";
-import { ProjectPage } from "../pages/project/detail/Detail.page";
+import { ProjectsPage } from "../pages/workspace/project/Project.page";
+import { ListProjectsPage } from "../pages/workspace/project/List.page";
+import { ProjectPage } from "../pages/workspace/project/detail/Detail.page";
 import { ProjectByIdLoader } from "../features/project/loader/getById.loader";
 import { UpdateProjectAction } from "../features/project/action/update.action";
-import { ProjectOverviewPage } from "../pages/project/detail/OverView.page";
-import { ListColumnPage } from "../pages/project/Column/List.page";
+import { ProjectOverviewPage } from "../pages/workspace/project/detail/OverView.page";
+import { ListColumnPage } from "../pages/workspace/project/Column/List.page";
 import { ListByProjectLoader } from "../features/column/loader/listByProject.loader";
 import { ReOrderColumnAction } from "../features/column/action/reOrder.action";
 import { UpdateColumnAction } from "../features/column/action/update.action";
-import { CreateColumnPage } from "../pages/project/Column/Create.page";
+import { CreateColumnPage } from "../pages/workspace/project/Column/Create.page";
 import { CreateColumnAction } from "../features/column/action/create.action";
-import { ColumnPage } from "../pages/project/Column/Column.page";
+import { ColumnPage } from "../pages/workspace/project/Column/Column.page";
+import { ListTaskPage } from "../pages/workspace/project/Column/task/List.page";
+import { ListByColumnLoader } from "../features/task/loader/listByColumn.loader";
+import { CreateTaskAction } from "../features/task/action/create.action";
+import { CreateTaskPage } from "../pages/workspace/project/Column/task/Create.page";
+import { DetailColumnPage } from "../pages/workspace/project/Column/Detail.page";
+import { GetColumnByIdLoader } from "../features/column/loader/getById.loader";
+import { ReorderTaskAction } from "../features/task/action/reorder.action";
 
 export const router = createBrowserRouter([
   {
@@ -120,8 +127,28 @@ export const router = createBrowserRouter([
                             action: ReOrderColumnAction,
                           },
                           {
-                            path: ":columnId/rename",
-                            action: UpdateColumnAction
+                            path: ":columnId",
+                            element: <DetailColumnPage />,
+                            loader: GetColumnByIdLoader,
+                            children: [
+                              {
+                                path: "rename",
+                                action: UpdateColumnAction
+                              },
+                              {
+                                path: "tasks",
+                                element: <ListTaskPage />,
+                                loader: ListByColumnLoader,
+                                action: ReorderTaskAction,
+                                children: [
+                                  {
+                                    path: "create",
+                                    element: <CreateTaskPage />,
+                                    action: CreateTaskAction
+                                  }
+                                ]
+                              }
+                            ]
                           },
                           {
                             path: "create", element: <CreateColumnPage />,

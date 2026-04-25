@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useFetcher } from "react-router-dom";
-import type { ActionError } from "../../../features/type";
+import type { ActionError } from "../../../../features/type";
 
 type RenameColumnActionData = ActionError | undefined;
 

@@ -1,6 +1,6 @@
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
-import type { CreateColumnAction } from "../../../features/column/action/create.action";
-import type { ActionError } from "../../../features/type";
+import type { CreateColumnAction } from "../../../../features/column/action/create.action";
+import type { ActionError } from "../../../../features/type";
 
 const columnTypeOptions = [
   {

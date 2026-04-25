@@ -1,5 +1,5 @@
 import { Link, useRouteLoaderData } from "react-router-dom";
-import type { ProjectByIdLoader } from "../../../features/project/loader/getById.loader";
+import type { ProjectByIdLoader } from "../../../../features/project/loader/getById.loader";
 
 export function ProjectOverviewPage() {
   const project = useRouteLoaderData<typeof ProjectByIdLoader>("project-detail");

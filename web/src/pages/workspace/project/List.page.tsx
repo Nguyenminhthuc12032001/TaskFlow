@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useNavigation, useParams } from "react-router-dom";
-import type { ProjectsByWorkspaceLoader } from "../../features/project/loader/listByWorkspace.loader";
+import type { ProjectsByWorkspaceLoader } from "../../../features/project/loader/listByWorkspace.loader";
 
 function formatDate(value: string | Date) {
     return new Intl.DateTimeFormat("en-GB", {

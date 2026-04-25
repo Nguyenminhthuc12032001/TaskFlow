@@ -25,9 +25,9 @@ import {
 
 import { CSS } from "@dnd-kit/utilities";
 
-import { ListByProjectLoader } from "../../../features/column/loader/listByProject.loader";
-import type { GetByIdLoader } from "../../../features/workspace/loader/getById";
-import type { ColumnType } from "../../../../../api/prisma/generated/enums";
+import { ListByProjectLoader } from "../../../../features/column/loader/listByProject.loader";
+import type { GetByIdLoader } from "../../../../features/workspace/loader/getById";
+import type { ColumnType } from "../../../../../../api/prisma/generated/enums";
 import { ColumnNameSection } from "./Name.section";
 
 type LoaderData = Awaited<ReturnType<typeof ListByProjectLoader>>;
@@ -143,8 +143,15 @@ function SortableColumnCard({
       <div className="mt-5 rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/70 px-4 py-8 text-center">
         <p className="text-sm font-medium text-zinc-700">Kanban lane</p>
         <p className="mt-1 text-xs leading-5 text-zinc-500">
-          Later, task cards for this column will appear here 
+          Later, task cards for this column will appear here
         </p>
+
+        <Link
+          to={`${column.id}/tasks`}
+          className="mt-4 inline-flex items-center justify-center rounded-2xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-100 hover:text-zinc-900"
+        >
+          Open tasks
+        </Link>
       </div>
     </article>
   );

@@ -83,7 +83,7 @@ export const taskApi = {
         const validatedParams = validate(workspaceParamsSchema)(ctx);
         const validatedData = validate(reOrderBodySchema)(data);
 
-        const response = await http.put(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`, validatedData);
+        const response = await http.patch(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`, validatedData);
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeTasksSchema);

@@ -8,6 +8,15 @@ import { z, ZodError } from "zod";
 
 export async function ReorderTaskAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
+    const rawItems = formData.get("items");
+
+    if (typeof rawItems !== "string") {
+        return {
+            errorMessage: "Invalid items"
+        } satisfies ActionError
+    }
+
+    const data: unknown = JSON.parse(rawItems);
 
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
@@ -16,7 +25,7 @@ export async function ReorderTaskAction({ params, request }: ActionFunctionArgs)
     };
 
     try {
-        const promise = taskApi.reOrder(paramsData, formData);
+        const promise = taskApi.reOrder(paramsData, data);
 
         notify.promise(promise, {
             loading: "Reordering tasks... ",

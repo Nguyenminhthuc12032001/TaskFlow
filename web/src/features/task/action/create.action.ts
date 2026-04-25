@@ -33,7 +33,7 @@ export async function CreateTaskAction({ params, request }: ActionFunctionArgs) 
         
         await promise;
 
-        return redirect(`/workspaces/${params.workspaceId}/projects/${params.projectId}/columns/${params.columnId}/tasks/${params.taskId}`);
+        return redirect(`/board/workspaces/${params.workspaceId}/projects/${params.projectId}/columns/${params.columnId}/tasks`);
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

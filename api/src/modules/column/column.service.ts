@@ -29,7 +29,7 @@ export class ColumnService {
       throw new AppError('Duplicate name is not allowed', 409);
     }
     
-    data.position = Math.max((Math.max(...columns.map((c) => c.position)) + 1), 0);  
+    data.position = Math.max(...columns.map((c) => c.position), -1) + 1;
 
     const createData: Prisma.ColumnCreateInput = {
       name: data.name,

@@ -12,7 +12,7 @@ function App() {
       richColors
       closeButton
       expand={true}
-      visibleToasts={10}
+      visibleToasts={3}
       toastOptions={
         { duration: 3000 }
       }

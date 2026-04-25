@@ -132,14 +132,15 @@ export const safeTaskSchema = z.object({
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
   priority: z.enum(TaskPriority),
-  dueDate: z.date().optional(),
+  dueDate: z.coerce.date().optional(),
   position: z
     .number()
     .int('Position must be an integer')
-    .min(0, 'Position must be a positive number'),
+    .min(0, 'Position must be a positive number')
+    .optional(),
   createdBy: z.uuid(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 export type SafeTask = z.infer<typeof safeTaskSchema>;
 

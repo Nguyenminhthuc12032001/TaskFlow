@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLoaderData, useRouteLoaderData } from "react-router-dom";
-import type { ProjectByIdLoader } from "../../../features/project/loader/getById.loader";
-import type { GetByIdLoader } from "../../../features/workspace/loader/getById";
+import type { ProjectByIdLoader } from "../../../../features/project/loader/getById.loader";
+import type { GetByIdLoader } from "../../../../features/workspace/loader/getById";
 import { ProjectIdentitySection } from "./ProjectIdentity.section";
 
 const tabs = [
@@ -42,7 +42,7 @@ export function ProjectPage() {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <div className="overflow-hidden rounded-[32px] border border-red-100 bg-white shadow-[0_20px_60px_rgba(239,68,68,0.08)]">
+          <div className="overflow-hidden rounded-4xl border border-red-100 bg-white shadow-[0_20px_60px_rgba(239,68,68,0.08)]">
             <div className="border-b border-red-100 bg-red-50/70 px-6 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-500">
                 Project load error

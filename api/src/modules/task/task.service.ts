@@ -29,6 +29,8 @@ export class TaskService {
         throw new AppError('Duplicate task title is not allowed', 409);
       }
 
+      data.position = Math.max(...tasks.map((t) => t.position), -1) + 1;
+
       const createData: Prisma.TaskCreateInput = {
         title: data.title,
         priority: data.priority,
