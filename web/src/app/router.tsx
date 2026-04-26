@@ -27,6 +27,7 @@ import { ListMemberPage } from "../pages/workspace/ListMember.page";
 import { ListMemberLoader } from "../features/workspace/loader/listMember";
 import { InviteAction } from "../features/workspace/action/invite";
 import { InvitePage } from "../pages/workspace/Invite.page";
+import { InviteCandidatesLoader } from "../features/workspace/loader/inviteCandidates";
 import { AcceptInvitePage } from "../pages/workspace/Accept.page";
 import { AcceptInviteAction } from "../features/workspace/action/accept";
 import { UpdateWorkspaceAction } from "../features/workspace/action/update";
@@ -53,6 +54,18 @@ import { CreateTaskPage } from "../pages/workspace/project/Column/task/Create.pa
 import { DetailColumnPage } from "../pages/workspace/project/Column/Detail.page";
 import { GetColumnByIdLoader } from "../features/column/loader/getById.loader";
 import { ReorderTaskAction } from "../features/task/action/reorder.action";
+import { AssignTaskAction } from "../features/task/action/assign.action";
+import { TaskPage } from "../pages/workspace/project/Column/task/Task.page";
+import { GetTaskByIdLoader } from "../features/task/loader/getById.loader";
+import { UpdateTaskAction } from "../features/task/action/update.action";
+import { TaskDetailPage } from "../pages/workspace/project/Column/task/Detail.page";
+import { CommentPage } from "../pages/workspace/project/Column/task/comment/Comment.page";
+import { ListCommentPage } from "../pages/workspace/project/Column/task/comment/List.page";
+import { ListByTaskLoader } from "../features/comment/loader/listByTask.loader"; 
+import { CreateCommentAction } from "../features/comment/action/create.action"; 
+import { GetCommentByIdLoader } from "../features/comment/loader/getById.loader"; 
+import { ReplyCommentAction } from "../features/comment/action/reply.action";
+import { UpdateCommentAction } from "../features/comment/action/update.action";
 
 export const router = createBrowserRouter([
   {
@@ -80,7 +93,7 @@ export const router = createBrowserRouter([
       {
         path: "board", element: <BoardPage />,
         children: [
-          { index: true, element: <Navigate to="/board/workspaces/create" replace /> },
+          { index: true, element: <Navigate to="/board/workspaces" replace /> },
           { path: "workspaces/create", element: <CreateWorkspacePage />, action: CreateWorkspaceAction },
           {
             id: "workspace-detail",
@@ -96,6 +109,7 @@ export const router = createBrowserRouter([
               },
               {
                 path: "invite", element: <InvitePage />,
+                loader: InviteCandidatesLoader,
                 action: InviteAction
               },
               {
@@ -137,14 +151,58 @@ export const router = createBrowserRouter([
                               },
                               {
                                 path: "tasks",
-                                element: <ListTaskPage />,
-                                loader: ListByColumnLoader,
-                                action: ReorderTaskAction,
+                                element: <TaskPage />,
                                 children: [
+                                  {
+                                    index: true, element: <ListTaskPage />,
+                                    loader: ListByColumnLoader,
+                                    action: ReorderTaskAction,
+                                  },
                                   {
                                     path: "create",
                                     element: <CreateTaskPage />,
                                     action: CreateTaskAction
+                                  },
+                                  {
+                                    path: ":taskId",
+                                    element: <TaskDetailPage />,
+                                    loader: GetTaskByIdLoader,
+                                    action: UpdateTaskAction,
+                                    children: [
+                                      {
+                                        path: "assign",
+                                        action: AssignTaskAction
+                                      },
+                                      {
+                                        path: "comment",
+                                        element: <CommentPage />,
+                                        children: [
+                                          {
+                                            index: true,
+                                            element: <ListCommentPage />,
+                                            loader: ListByTaskLoader
+                                          },
+                                          {
+                                            path: "create",
+                                            action: CreateCommentAction
+                                          },
+                                          {
+                                            path: ":commentId",
+                                            loader: GetCommentByIdLoader,
+                                            children: [
+                                              {
+                                                path: "reply",
+                                                action: ReplyCommentAction
+                                              },
+                                              {
+                                                path: "update",
+                                                action: UpdateCommentAction
+                                              }
+                                            ]
+                                          },
+                                        ] 
+                                      }
+                                    ]
                                   }
                                 ]
                               }

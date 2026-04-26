@@ -1,7 +1,36 @@
-import { safeAssigneeSchema, safeTaskSchema, safeTasksSchema, } from './task.schemas.js';
+import { safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, } from './task.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
+const toSafeTask = (task) => ({
+    id: task.id,
+    projectId: task.projectId,
+    columnId: task.columnId,
+    title: task.title,
+    priority: task.priority,
+    position: task.position,
+    createdBy: task.createdBy,
+    createdAt: task.createdAt,
+    updatedAt: task.updatedAt,
+    description: task.description ?? '',
+    dueDate: task.dueDate ?? undefined,
+    assignees: task.assignees?.map((assignee) => ({
+        taskId: assignee.taskId,
+        userId: assignee.userId,
+    })),
+});
+const toSafeTaskDetail = (task) => ({
+    ...toSafeTask(task),
+    assignees: task.assignees.map((assignee) => ({
+        taskId: assignee.taskId,
+        userId: assignee.userId,
+        user: {
+            id: assignee.user.id,
+            name: assignee.user.name,
+            email: assignee.user.email,
+        },
+    })),
+});
 export class TaskController {
     constructor(taskService) {
         this.taskService = taskService;
@@ -13,19 +42,7 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.create(req.body, ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTask(task);
             const envelope = created(safeTask);
             const envelopeSchema = createdEnvelopeSchema(safeTaskSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
@@ -40,21 +57,9 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.get(ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTaskDetail(task);
             const envelope = ok(safeTask);
-            const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+            const envelopeSchema = okEnvelopeSchema(safeTaskDetailSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(200).json(validatedEnvelope);
         };
@@ -68,19 +73,7 @@ export class TaskController {
             };
             const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, paginationQuery);
             const safeTasks = {
-                data: tasks.map((task) => ({
-                    id: task.id,
-                    projectId: task.projectId,
-                    columnId: task.columnId,
-                    title: task.title,
-                    priority: task.priority,
-                    position: task.position,
-                    createdBy: task.createdBy,
-                    createdAt: task.createdAt,
-                    updatedAt: task.updatedAt,
-                    description: task.description ?? '',
-                    dueDate: task.dueDate ?? undefined,
-                })),
+                data: tasks.map(toSafeTask),
                 paginationMeta
             };
             const envelope = ok(safeTasks);
@@ -97,19 +90,7 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.update(req.body, ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTask(task);
             const envelope = ok(safeTask);
             const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
@@ -125,19 +106,7 @@ export class TaskController {
             };
             const { tasks, paginationMeta } = await this.taskService.reOrder(req.body, ctx, paginationQuery);
             const safeTasks = {
-                data: tasks.map((task) => ({
-                    id: task.id,
-                    projectId: task.projectId,
-                    columnId: task.columnId,
-                    title: task.title,
-                    priority: task.priority,
-                    position: task.position,
-                    createdBy: task.createdBy,
-                    createdAt: task.createdAt,
-                    updatedAt: task.updatedAt,
-                    description: task.description ?? '',
-                    dueDate: task.dueDate ?? undefined,
-                })),
+                data: tasks.map(toSafeTask),
                 paginationMeta
             };
             const envelope = ok(safeTasks);
@@ -154,19 +123,7 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.remove(ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTask(task);
             const envelope = ok(safeTask);
             const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
@@ -181,19 +138,7 @@ export class TaskController {
             };
             const tasks = await this.taskService.bulkRemove(req.body, ctx);
             const safeTasks = {
-                data: tasks.map((task) => ({
-                    id: task.id,
-                    projectId: task.projectId,
-                    columnId: task.columnId,
-                    title: task.title,
-                    priority: task.priority,
-                    position: task.position,
-                    createdBy: task.createdBy,
-                    createdAt: task.createdAt,
-                    updatedAt: task.updatedAt,
-                    description: task.description ?? '',
-                    dueDate: task.dueDate ?? undefined,
-                })),
+                data: tasks.map(toSafeTask),
                 paginationMeta: {
                     page: 1,
                     limit: tasks.length,
@@ -219,7 +164,7 @@ export class TaskController {
             const assignee = await this.taskService.assign(req.body, ctx);
             const safeAssignee = {
                 taskId: assignee.taskId,
-                userId: assignee.taskId,
+                userId: assignee.userId,
             };
             const envelope = created(safeAssignee);
             const envelopeSchema = createdEnvelopeSchema(safeAssigneeSchema);
@@ -235,19 +180,7 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.archivTask(ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTask(task);
             const envelope = ok(safeTask);
             const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
@@ -262,19 +195,7 @@ export class TaskController {
                 ActorId: req.user.id,
             };
             const task = await this.taskService.restoreTask(ctx);
-            const safeTask = {
-                id: task.id,
-                projectId: task.projectId,
-                columnId: task.columnId,
-                title: task.title,
-                priority: task.priority,
-                position: task.position,
-                createdBy: task.createdBy,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                description: task.description ?? '',
-                dueDate: task.dueDate ?? undefined,
-            };
+            const safeTask = toSafeTask(task);
             const envelope = ok(safeTask);
             const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);

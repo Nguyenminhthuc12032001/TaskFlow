@@ -1,6 +1,6 @@
 import { workspaceParamsSchema } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, reOrderBodySchema, safeTaskSchema, safeTasksSchema, updateBodySchema } from "../../../../api/src/modules/task/task.schemas";
+import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, reOrderBodySchema, safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, updateBodySchema } from "../../../../api/src/modules/task/task.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
@@ -35,7 +35,7 @@ export const taskApi = {
         const response = await http.get(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}/${validatedParams.taskId}`);
 
         const envelop = response.data;
-        const envelopSchema = okEnvelopeSchema(safeTaskSchema);
+        const envelopSchema = okEnvelopeSchema(safeTaskDetailSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;
@@ -45,7 +45,7 @@ export const taskApi = {
         const validatedParams = validate(workspaceParamsSchema)(ctx);
         const validatedData = validate(updateBodySchema)(data);
 
-        const response = await http.put(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}/${validatedParams.taskId}`, validatedData);
+        const response = await http.patch(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}/${validatedParams.taskId}`, validatedData);
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeTaskSchema);
@@ -96,10 +96,10 @@ export const taskApi = {
         const validatedParams = validate(workspaceParamsSchema)(ctx);
         const validatedData = validate(assignBodySchema)(data);
 
-        const response = await http.put(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}/${validatedParams.taskId}`, validatedData);
+        const response = await http.post(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}/${validatedParams.taskId}`, validatedData);
 
         const envelop = response.data;
-        const envelopSchema = okEnvelopeSchema(assignBodySchema);
+        const envelopSchema = createdEnvelopeSchema(safeAssigneeSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data; 

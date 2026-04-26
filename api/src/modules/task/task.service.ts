@@ -29,12 +29,12 @@ export class TaskService {
         throw new AppError('Duplicate task title is not allowed', 409);
       }
 
-      data.position = Math.max(...tasks.map((t) => t.position), -1) + 1;
+      const position = Math.max(...tasks.map((t) => t.position), -1) + 1;
 
       const createData: Prisma.TaskCreateInput = {
         title: data.title,
         priority: data.priority,
-        position: data.position,
+        position,
         description: data.description ?? null,
         dueDate: data.dueDate ?? null,
         project: {
@@ -136,7 +136,7 @@ export class TaskService {
   async update(data: UpdateBodyType, ctx: ResourceContext) {
     const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
-    if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? ''))) {
+    if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? '') && t.id !== ctx.TaskId)) {
       throw new AppError('Duplicate title is not allowed', 409);
     }
 
@@ -144,7 +144,6 @@ export class TaskService {
       ...(data.title !== undefined && { title: data.title }),
       ...(data.description !== undefined && { description: data.description }),
       ...(data.priority !== undefined && { priority: data.priority }),
-      ...(data.position !== undefined && { position: data.position }),
       ...(data.dueDate !== undefined && { dueDate: data.dueDate }),
     };
 

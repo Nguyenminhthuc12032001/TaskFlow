@@ -62,7 +62,7 @@ export class ProjectService {
     }
     async update(data, ctx) {
         const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
-        if (projects.some((p) => p.name === data.name && p.id !== ctx.projectId)) {
+        if (projects.some((p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId)) {
             throw new AppError('Duplicate name is not allowed', 409);
         }
         const updateData = {

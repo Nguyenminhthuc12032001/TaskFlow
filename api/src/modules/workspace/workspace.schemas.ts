@@ -1,5 +1,5 @@
 import z from '../../docs/zod.js';
-import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
+import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 
@@ -27,7 +27,7 @@ export type UpdateWorkspaceBody = z.infer<typeof updateBodySchema>;
 
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
-  email: emailSchema,
+  userId: z.uuid(),
   role: z.enum(WorkspaceRole),
 });
 export type InviteBody = z.infer<typeof inviteBodySchema>;
@@ -54,14 +54,22 @@ export const createResponseSchema = z.object({
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
 // Get workspace/list
+export const workspaceListItemResponseSchema = createResponseSchema.extend({
+  createdByName: z.string(),
+  role: z.enum(WorkspaceRole),
+});
+
 export const getByUserIdResponseSchema = z.object({
-  data: z.array(createResponseSchema),
+  data: z.array(workspaceListItemResponseSchema),
   paginationMeta: paginationMetaSchema,
 });
 export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
 // Get workspace/:workspaceId
-export const getByIdResponseSchema = createResponseSchema;
+export const getByIdResponseSchema = createResponseSchema.extend({
+  createdByName: z.string(),
+});
+export type SafeWorkspaceDetailResponse = z.infer<typeof getByIdResponseSchema>;
 
 // Put workspace/:workspaceId
 export const updateResponseSchema = createResponseSchema;
@@ -82,6 +90,12 @@ export const membersResponseSchema = z.object({
   paginationMeta: paginationMetaSchema,
 });
 export type SafeMembersResponse = z.infer<typeof membersResponseSchema>;
+
+// GET workspace/invitees/:workspaceId
+export const inviteCandidatesResponseSchema = z.object({
+  data: z.array(safeUserSchema),
+});
+export type InviteCandidatesResponse = z.infer<typeof inviteCandidatesResponseSchema>;
 
 // POST workspace/invite/:workspaceId
 export const inviteResponseSchema = z.object({

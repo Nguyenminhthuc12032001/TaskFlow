@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useFetcher } from "react-router-dom";
+import { CheckIcon, EditIcon, XIcon } from "../../../../components/ui/Icons";
 import type { ActionError } from "../../../../features/type";
 
-type UpdateProjectActionData =
-  | ActionError
-  | undefined;
+type UpdateProjectActionData = ActionError | undefined;
 
 function isActionError(data: UpdateProjectActionData): data is ActionError {
   return !!data && typeof data === "object" && (
@@ -75,10 +74,9 @@ export function ProjectIdentitySection({
   }, [fetcher.state, fetcherData]);
 
   return (
-    <div className="space-y-4">
-      <fetcher.Form method="post" className="space-y-4">
-
-        <div className="flex items-start gap-3">
+    <div className="space-y-3">
+      <fetcher.Form method="post" className="space-y-3">
+        <div className="flex flex-wrap items-start gap-3">
           <div className="min-w-0 flex-1">
             <input
               type="text"
@@ -89,7 +87,7 @@ export function ProjectIdentitySection({
               aria-invalid={!!nameError}
               aria-describedby={nameError ? "project-name-error" : undefined}
               className={[
-                "w-full min-w-0 rounded-2xl border px-4 py-2 text-3xl font-semibold tracking-tight outline-none transition sm:text-4xl",
+                "w-full min-w-0 rounded-xl border px-3 py-2 text-3xl font-semibold tracking-tight outline-none transition sm:text-4xl",
                 isReadOnly
                   ? "border-transparent bg-transparent text-slate-900"
                   : nameError
@@ -109,11 +107,11 @@ export function ProjectIdentitySection({
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
               aria-label="Edit project"
               title="Edit project"
             >
-              ✏️
+              <EditIcon className="h-5 w-5" />
             </button>
           )}
         </div>
@@ -130,7 +128,7 @@ export function ProjectIdentitySection({
               descriptionError ? "project-description-error" : undefined
             }
             className={[
-              "w-full rounded-2xl border px-4 py-2.5 text-[15px] leading-6 outline-none transition resize-none",
+              "w-full resize-none rounded-xl border px-3 py-2.5 text-[15px] leading-6 outline-none transition",
               isReadOnly
                 ? "border-transparent bg-transparent text-slate-600 shadow-none"
                 : descriptionError
@@ -155,25 +153,29 @@ export function ProjectIdentitySection({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white transition hover:bg-slate-800 disabled:opacity-60"
+              aria-label={isSubmitting ? "Saving project" : "Save project"}
+              title={isSubmitting ? "Saving..." : "Save"}
             >
-              {isSubmitting ? "Saving..." : "Save"}
+              <CheckIcon className="h-5 w-5" />
             </button>
 
             <button
               type="button"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+              aria-label="Cancel project edit"
+              title="Cancel"
             >
-              Cancel
+              <XIcon className="h-5 w-5" />
             </button>
           </div>
         )}
       </fetcher.Form>
 
       {(formError || errorMessage) && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {formError || errorMessage}
         </div>
       )}

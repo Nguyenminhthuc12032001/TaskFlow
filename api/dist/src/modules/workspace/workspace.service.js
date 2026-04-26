@@ -59,6 +59,9 @@ export class WorkspaceService {
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
         return { members, paginationMeta };
     }
+    async listInviteCandidates(workspaceId) {
+        return this.workspaceRepo.findInviteCandidates(workspaceId);
+    }
     async getMemberByUserId(workspaceId, actorId) {
         const member = await this.workspaceRepo.findMembership(workspaceId, actorId);
         if (!member) {
@@ -86,7 +89,7 @@ export class WorkspaceService {
         });
         return result;
     }
-    async inviteMember(workspaceId, email, role, actorId) {
+    async inviteMember(workspaceId, inviteeId, role, actorId) {
         const result = await this.prisma.$transaction(async (tx) => {
             const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
             if (!actor) {
@@ -95,7 +98,7 @@ export class WorkspaceService {
             if (!['admin', 'owner'].includes(actor.role)) {
                 throw new AppError('Forbidden', 403);
             }
-            const existInvitee = await this.authRepo.findUserByEmail(email, tx);
+            const existInvitee = await this.authRepo.findUserById(inviteeId, tx);
             if (!existInvitee) {
                 throw new AppError('Invitee with the provided ID does not exist', 404);
             }
@@ -158,7 +161,7 @@ export class WorkspaceService {
             }, 'Failed to send invite email');
             throw error;
         }
-        log.info({ email }, 'Invited member for workspace successfully');
+        log.info({ inviteeId }, 'Invited member for workspace successfully');
         return result.invite;
     }
     async acceptInvite(token, actorId) {

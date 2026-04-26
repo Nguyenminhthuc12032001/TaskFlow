@@ -86,5 +86,20 @@ export const feedbackMessage = {
         bulkDeleteFailed: "Failed to delete tasks",
         reorderSuccess: "Successfully reordered tasks",
         reorderFailed: "Failed to reorder tasks"
+    },
+
+    comment: {
+        createSuccess: "Successfully created comment",
+        createFailed: "Failed to create comment",
+        updateSuccess: "Successfully updated comment",
+        updateFailed: "Failed to update comment",
+        deleteSuccess: "Successfully deleted comment",
+        deleteFailed: "Failed to delete comment",
+        listByTaskSuccess: "Successfully listed comments",
+        listByTaskFailed: "Failed to list comments",
+        getByIdSuccess: "Successfully got comment",
+        getByIdFailed: "Failed to get comment",
+        replySuccess: "Successfully replied comment",
+        replyFailed: "Failed to reply comment"
     }
 }

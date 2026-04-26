@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useFetcher } from "react-router-dom";
+import { CheckIcon, EditIcon, XIcon } from "../../../components/ui/Icons";
 import type { ActionError } from "../../../features/type";
 
-type RenameWorkspaceActionData =
-  | ActionError 
-  | undefined;
+type RenameWorkspaceActionData = ActionError | undefined;
 
 function isActionError(data: RenameWorkspaceActionData): data is ActionError {
   return !!data && typeof data === "object" && (
@@ -42,7 +41,6 @@ export function WorkspaceNameSection({
     : undefined;
 
   const isSubmitting = fetcher.state === "submitting";
-
   const isReadOnly = !canRenameWorkspace || !isEditing;
 
   function handleCancel() {
@@ -80,7 +78,7 @@ export function WorkspaceNameSection({
             aria-invalid={!!nameError}
             aria-describedby={nameError ? "workspace-name-error" : undefined}
             className={[
-              "w-full min-w-0 rounded-2xl border px-4 py-2 text-3xl font-semibold tracking-tight outline-none transition sm:text-4xl",
+              "w-full min-w-0 rounded-xl border px-3 py-2 text-3xl font-semibold tracking-tight outline-none transition sm:text-4xl",
               isReadOnly
                 ? "border-transparent bg-transparent text-slate-900"
                 : nameError
@@ -103,11 +101,11 @@ export function WorkspaceNameSection({
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
             aria-label="Edit workspace name"
             title="Edit workspace name"
           >
-            ✏️
+            <EditIcon className="h-5 w-5" />
           </button>
         )}
 
@@ -116,25 +114,29 @@ export function WorkspaceNameSection({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="shrink-0 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white transition hover:bg-slate-800 disabled:opacity-60"
+              aria-label={isSubmitting ? "Saving workspace name" : "Save workspace name"}
+              title={isSubmitting ? "Saving..." : "Save"}
             >
-              {isSubmitting ? "Saving..." : "Save"}
+              <CheckIcon className="h-5 w-5" />
             </button>
 
             <button
               type="button"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="shrink-0 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+              aria-label="Cancel workspace name edit"
+              title="Cancel"
             >
-              Cancel
+              <XIcon className="h-5 w-5" />
             </button>
           </>
         )}
       </fetcher.Form>
 
       {(formError || errorMessage) && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {formError || errorMessage}
         </div>
       )}

@@ -31,8 +31,8 @@ export const safeCommentSchema = z
         .trim()
         .min(5, 'Comment must be at least 5 characters long')
         .max(100, 'Comment must be at most 100 characters long'),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
 })
     .strict();
 export const safeCommentsSchema = z.object({

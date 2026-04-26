@@ -106,6 +106,10 @@ export class WorkspaceService {
     return { members, paginationMeta };
   }
 
+  async listInviteCandidates(workspaceId: string) {
+    return this.workspaceRepo.findInviteCandidates(workspaceId);
+  }
+
   async getMemberByUserId(workspaceId: string, actorId: string) {
     const member = await this.workspaceRepo.findMembership(workspaceId, actorId);
     if (!member) {
@@ -162,7 +166,7 @@ export class WorkspaceService {
 
   async inviteMember(
     workspaceId: string,
-    email: string,
+    inviteeId: string,
     role: WorkspaceRole,
     actorId: string,
   ) {
@@ -176,7 +180,7 @@ export class WorkspaceService {
         throw new AppError('Forbidden', 403);
       }
 
-      const existInvitee = await this.authRepo.findUserByEmail(email, tx);
+      const existInvitee = await this.authRepo.findUserById(inviteeId, tx);
       if (!existInvitee) {
         throw new AppError('Invitee with the provided ID does not exist', 404);
       }
@@ -279,7 +283,7 @@ export class WorkspaceService {
       throw error;
     }
 
-    log.info({ email }, 'Invited member for workspace successfully');
+    log.info({ inviteeId }, 'Invited member for workspace successfully');
 
     return result.invite;
   }

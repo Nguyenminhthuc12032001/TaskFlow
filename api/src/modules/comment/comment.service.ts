@@ -99,7 +99,7 @@ export class CommentService {
 
     const countComments = await this.commentRepo.countCommentsByTask(ctx);
 
-    const paginationMeta: PaginationMetaType = buildPaginationMeta(countComments, safePage, safeLimit);
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countComments);
 
     const comments = await this.commentRepo.listByTask(ctx, { skip, take });
 

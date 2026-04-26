@@ -1,5 +1,5 @@
 import { registry } from '../../docs/openapi.js';
-import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, } from './workspace.schemas.js';
+import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, } from './workspace.schemas.js';
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200, } from '../auth/auth.openApi.js';
 import z from '../../docs/zod.js';
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
@@ -83,6 +83,19 @@ registry.registerPath({
         }),
     },
     responses: defaultResponse(membersResponseSchema, [201, 409]),
+});
+registry.registerPath({
+    method: 'get',
+    path: defaultPath + '/invitees/{workspaceId}',
+    tags: ['Workspace'],
+    summary: 'Get users eligible to be invited to workspace',
+    security: [{ bearerAuth: [] }],
+    request: {
+        params: z.object({
+            workspaceId: z.uuid(),
+        }),
+    },
+    responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
 });
 registry.registerPath({
     method: 'patch',

@@ -29,6 +29,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { ListByColumnLoader } from "../../../../../features/task/loader/listByColumn.loader";
 import { ListMemberLoader } from "../../../../../features/workspace/loader/listMember";
+import { useAuth } from "../../../../../features/auth/auth.store";
+import { EyeIcon, PlusIcon } from "../../../../../components/ui/Icons";
 
 type LoaderData = Awaited<ReturnType<typeof ListByColumnLoader>>;
 type TaskListData = Extract<LoaderData, { data: unknown[] }>;
@@ -120,7 +122,7 @@ function PriorityBadge({ priority }: { priority: TaskItem["priority"] }) {
 
     return (
         <span
-            className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium ${meta.className}`}
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium ${meta.className}`}
         >
             {meta.label}
         </span>
@@ -163,6 +165,7 @@ function SortableTaskCard({
 
     const membersFetcher = useFetcher<typeof ListMemberLoader>();
     const assignFetcher = useFetcher();
+    const auth = useAuth();
 
     const wasAssigningRef = useRef(false);
 
@@ -183,6 +186,17 @@ function SortableTaskCard({
         : null;
 
     const isAssigning = assignFetcher.state !== "idle";
+    const memberListData = isMemberListData(membersFetcher.data)
+        ? membersFetcher.data
+        : null;
+    const assignedUserIds = new Set(
+        task.assignees?.map((assignee) => assignee.userId) ?? []
+    );
+    const isAssignedToMe = !!auth.user && assignedUserIds.has(auth.user.id);
+    const assignableMembers =
+        memberListData?.data.filter(
+            (member) => !assignedUserIds.has(member.user.id)
+        ) ?? [];
 
     useEffect(() => {
         if (!isAssignOpen) return;
@@ -211,43 +225,47 @@ function SortableTaskCard({
             ref={setNodeRef}
             style={style}
             className={[
-                "group flex flex-col justify-between",
-                "rounded-4xl border border-zinc-200 bg-white p-5 shadow-sm",
-                "transition duration-200",
-                "hover:-translate-y-1 hover:border-zinc-300 hover:shadow-md",
-                isAssignOpen
-                    ? "min-h-120 overflow-visible"
-                    : "aspect-square overflow-hidden",
+                "group flex min-h-[220px] flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition",
+                "hover:border-zinc-300 hover:shadow-md",
+                isAssignOpen ? "overflow-visible" : "",
                 isDragging
-                    ? "scale-[1.02] opacity-80 shadow-[0_20px_50px_rgba(0,0,0,0.14)]"
+                    ? "scale-[1.01] opacity-80 shadow-md"
                     : "",
             ].join(" ")}
         >
-            <div>
+            <div className="min-w-0">
                 <div className="flex items-start justify-between gap-3">
-                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-medium text-zinc-500">
-                        #{task.position ?? "-"}
-                    </span>
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-500">
+                            #{task.position ?? "-"}
+                        </span>
+
+                        {isAssignedToMe && (
+                            <span className="max-w-32 truncate rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
+                                Assigned to you
+                            </span>
+                        )}
+                    </div>
 
                     <PriorityBadge priority={task.priority} />
                 </div>
 
-                <h3 className="mt-5 line-clamp-2 text-base font-semibold leading-6 text-zinc-950">
+                <h3 className="mt-4 line-clamp-1 break-words text-base font-semibold leading-6 text-zinc-950">
                     {task.title}
                 </h3>
 
                 {task.description ? (
-                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-500">
+                    <p className="mt-2 line-clamp-2 break-all text-sm leading-6 text-zinc-500">
                         {task.description}
                     </p>
                 ) : (
-                    <p className="mt-3 text-sm leading-6 text-zinc-400">
+                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">
                         No description added yet.
                     </p>
                 )}
 
                 {isAssignOpen && (
-                    <div className="mt-5 rounded-3xl border border-zinc-200 bg-zinc-50/80 p-3">
+                    <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50/80 p-3">
                         <div className="mb-3 flex items-start justify-between gap-3">
                             <div>
                                 <p className="text-xs font-semibold text-zinc-950">
@@ -264,7 +282,7 @@ function SortableTaskCard({
                                 onClick={onCloseAssign}
                                 disabled={isAssigning}
                                 className={[
-                                    "shrink-0 rounded-full border border-zinc-200 bg-white",
+                                    "shrink-0 rounded-lg border border-zinc-200 bg-white",
                                     "px-3 py-1.5 text-[11px] font-medium text-zinc-500",
                                     "transition hover:bg-zinc-100 hover:text-zinc-900",
                                     isAssigning
@@ -277,7 +295,7 @@ function SortableTaskCard({
                         </div>
 
                         {isLoadingMembers && (
-                            <div className="rounded-2xl border border-zinc-200 bg-white px-3 py-3">
+                            <div className="rounded-xl border border-zinc-200 bg-white px-3 py-3">
                                 <p className="text-xs text-zinc-500">
                                     Loading members...
                                 </p>
@@ -285,30 +303,42 @@ function SortableTaskCard({
                         )}
 
                         {membersError && (
-                            <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-3">
+                            <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-3">
                                 <p className="text-xs text-red-700">
                                     {membersError}
                                 </p>
                             </div>
                         )}
 
-                        {isMemberListData(membersFetcher.data) &&
-                            membersFetcher.data.data.length === 0 && (
-                                <div className="rounded-2xl border border-dashed border-zinc-200 bg-white px-3 py-4 text-center">
+                        {memberListData && memberListData.data.length === 0 && (
+                            <div className="rounded-xl border border-dashed border-zinc-200 bg-white px-3 py-4 text-center">
+                                <p className="text-xs font-medium text-zinc-700">
+                                    No members found
+                                </p>
+
+                                <p className="mt-1 text-[11px] leading-4 text-zinc-500">
+                                    Invite members to this workspace first.
+                                </p>
+                            </div>
+                        )}
+
+                        {memberListData &&
+                            memberListData.data.length > 0 &&
+                            assignableMembers.length === 0 && (
+                                <div className="rounded-xl border border-dashed border-zinc-200 bg-white px-3 py-4 text-center">
                                     <p className="text-xs font-medium text-zinc-700">
-                                        No members found
+                                        All members are assigned
                                     </p>
 
                                     <p className="mt-1 text-[11px] leading-4 text-zinc-500">
-                                        Invite members to this workspace first.
+                                        There are no available members left for this task.
                                     </p>
                                 </div>
                             )}
 
-                        {isMemberListData(membersFetcher.data) &&
-                            membersFetcher.data.data.length > 0 && (
+                        {assignableMembers.length > 0 && (
                                 <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
-                                    {membersFetcher.data.data.map(
+                                    {assignableMembers.map(
                                         (member: WorkspaceMemberItem) => {
                                             const avatarText = (
                                                 member.user.name ||
@@ -335,7 +365,7 @@ function SortableTaskCard({
                                                         disabled={isAssigning}
                                                         className={[
                                                             "flex w-full items-center justify-between gap-3",
-                                                            "rounded-2xl border border-zinc-200 bg-white px-3 py-2.5",
+                                                            "rounded-xl border border-zinc-200 bg-white px-3 py-2.5",
                                                             "text-left transition",
                                                             "hover:border-zinc-300 hover:bg-zinc-100",
                                                             isAssigning
@@ -379,7 +409,7 @@ function SortableTaskCard({
                             )}
 
                         {assignError && (
-                            <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2">
+                            <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2">
                                 <p className="text-xs text-red-700">
                                     {assignError}
                                 </p>
@@ -395,14 +425,14 @@ function SortableTaskCard({
                 )}
             </div>
 
-            <div className="mt-5 border-t border-zinc-100 pt-4">
+            <div className="mt-auto border-t border-zinc-100 pt-3">
                 <div className="flex items-center justify-between gap-3 text-xs text-zinc-400">
                     <button
                         type="button"
                         onClick={isAssignOpen ? onCloseAssign : onOpenAssign}
                         disabled={isAssigning}
                         className={[
-                            "inline-flex items-center justify-center rounded-full px-3.5 py-2",
+                            "inline-flex h-8 items-center justify-center rounded-lg px-3",
                             "text-xs font-medium transition",
                             isAssignOpen
                                 ? "border border-zinc-200 bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
@@ -415,13 +445,24 @@ function SortableTaskCard({
                         {isAssignOpen ? "Close assign" : "Assign"}
                     </button>
 
+                    <Link
+                        to={task.id}
+                        className="group/detail-eye relative inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+                        aria-label={`View detail for ${task.title}`}
+                    >
+                        <EyeIcon className="h-4 w-4" />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 rounded-md bg-zinc-950 px-2 py-1 text-[11px] font-medium text-white opacity-0 shadow-sm transition group-hover/detail-eye:opacity-100">
+                            detail
+                        </span>
+                    </Link>
+
                     <button
                         type="button"
                         {...attributes}
                         {...listeners}
                         disabled={disabled}
                         className={[
-                            "inline-flex h-9 w-9 items-center justify-center rounded-2xl",
+                            "inline-flex h-8 w-8 items-center justify-center rounded-lg",
                             "border border-zinc-200 bg-zinc-50 text-zinc-500",
                             "transition active:cursor-grabbing",
                             disabled
@@ -435,7 +476,7 @@ function SortableTaskCard({
                                 : "Drag to reorder"
                         }
                     >
-                        ⋮⋮
+                        ::
                     </button>
                 </div>
             </div>
@@ -577,13 +618,9 @@ export function ListTaskPage() {
 
     return (
         <section className="space-y-5">
-            <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div className="border-b border-zinc-100 pb-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h2 className="text-lg font-semibold tracking-tight text-zinc-950">
-                            Tasks
-                        </h2>
-
+                    <div> 
                         <p className="mt-1 text-sm text-zinc-500">
                             {taskCountText}
                         </p>
@@ -609,8 +646,7 @@ export function ListTaskPage() {
                                             handlePriorityFilter(option.value)
                                         }
                                         className={[
-                                            "inline-flex items-center justify-center rounded-full border px-4 py-2 text-xs font-medium transition",
-                                            "hover:-translate-y-0.5 hover:shadow-sm",
+                                            "inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-medium transition",
                                             isActive
                                                 ? activeClassName
                                                 : "border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50",
@@ -637,9 +673,10 @@ export function ListTaskPage() {
 
                     <Link
                         to="create"
-                        className="inline-flex items-center justify-center rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-800"
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
                     >
-                        + Create new task
+                        <PlusIcon className="h-4 w-4" />
+                        Task
                     </Link>
                 </div>
             </div>
@@ -682,9 +719,10 @@ export function ListTaskPage() {
 
                         <Link
                             to="create"
-                            className="mt-5 inline-flex rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-800"
+                            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
                         >
-                            + Create new task
+                            <PlusIcon className="h-4 w-4" />
+                            Task
                         </Link>
                     </div>
                 </div>

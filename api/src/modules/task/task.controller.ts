@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import {
   safeAssigneeSchema,
+  safeTaskDetailSchema,
   safeTaskSchema,
   safeTasksSchema,
   type AssignBodyType,
@@ -9,6 +10,7 @@ import {
   type CreateBodyType,
   type ReOrderBodyType,
   type SafeAssignee,
+  type SafeTaskDetail,
   type SafeTask,
   type SafeTasks,
   type UpdateBodyType,
@@ -24,6 +26,58 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { paginationQuerySchema, type PaginationQueryType } from '../../common/schemas/common.schemas.js';
 
+type TaskResponseSource = Omit<SafeTask, 'description' | 'dueDate' | 'assignees'> & {
+  description: string | null;
+  dueDate: Date | null;
+  assignees?: Array<{
+    taskId: string;
+    userId: string;
+  }>;
+};
+
+type TaskDetailResponseSource = Omit<TaskResponseSource, 'assignees'> & {
+  assignees: Array<{
+    taskId: string;
+    userId: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+};
+
+const toSafeTask = (task: TaskResponseSource): SafeTask => ({
+  id: task.id,
+  projectId: task.projectId,
+  columnId: task.columnId,
+  title: task.title,
+  priority: task.priority,
+  position: task.position,
+  createdBy: task.createdBy,
+  createdAt: task.createdAt,
+  updatedAt: task.updatedAt,
+  description: task.description ?? '',
+  dueDate: task.dueDate ?? undefined,
+  assignees: task.assignees?.map((assignee) => ({
+    taskId: assignee.taskId,
+    userId: assignee.userId,
+  })),
+});
+
+const toSafeTaskDetail = (task: TaskDetailResponseSource): SafeTaskDetail => ({
+  ...toSafeTask(task),
+  assignees: task.assignees.map((assignee) => ({
+    taskId: assignee.taskId,
+    userId: assignee.userId,
+    user: {
+      id: assignee.user.id,
+      name: assignee.user.name,
+      email: assignee.user.email,
+    },
+  })),
+});
+
 export class TaskController {
   constructor(readonly taskService: TaskService) { }
 
@@ -37,19 +91,7 @@ export class TaskController {
 
     const task = await this.taskService.create(req.body, ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTask(task);
 
     const envelope = created(safeTask);
     const envelopeSchema = createdEnvelopeSchema(safeTaskSchema);
@@ -69,22 +111,10 @@ export class TaskController {
 
     const task = await this.taskService.get(ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTaskDetail(task);
 
     const envelope = ok(safeTask);
-    const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
+    const envelopeSchema = okEnvelopeSchema(safeTaskDetailSchema);
     const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
     return res.status(200).json(validatedEnvelope);
@@ -104,19 +134,7 @@ export class TaskController {
 
     const safeTasks: SafeTasks = {
       data:
-        tasks.map((task) => ({
-          id: task.id,
-          projectId: task.projectId,
-          columnId: task.columnId,
-          title: task.title,
-          priority: task.priority,
-          position: task.position,
-          createdBy: task.createdBy,
-          createdAt: task.createdAt,
-          updatedAt: task.updatedAt,
-          description: task.description ?? '',
-          dueDate: task.dueDate ?? undefined,
-        })),
+        tasks.map(toSafeTask),
       paginationMeta
     };
 
@@ -138,19 +156,7 @@ export class TaskController {
 
     const task = await this.taskService.update(req.body, ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTask(task);
 
     const envelope = ok(safeTask);
     const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
@@ -172,19 +178,7 @@ export class TaskController {
     const { tasks, paginationMeta } = await this.taskService.reOrder(req.body, ctx, paginationQuery);
 
     const safeTasks: SafeTasks = {
-      data: tasks.map((task) => ({
-        id: task.id,
-        projectId: task.projectId,
-        columnId: task.columnId,
-        title: task.title,
-        priority: task.priority,
-        position: task.position,
-        createdBy: task.createdBy,
-        createdAt: task.createdAt,
-        updatedAt: task.updatedAt,
-        description: task.description ?? '',
-        dueDate: task.dueDate ?? undefined,
-      })),
+      data: tasks.map(toSafeTask),
       paginationMeta
     };
 
@@ -206,19 +200,7 @@ export class TaskController {
 
     const task = await this.taskService.remove(ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTask(task);
 
     const envelope = ok(safeTask);
     const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
@@ -241,19 +223,7 @@ export class TaskController {
     const tasks = await this.taskService.bulkRemove(req.body, ctx);
 
     const safeTasks: SafeTasks = {
-      data: tasks.map((task) => ({
-        id: task.id,
-        projectId: task.projectId,
-        columnId: task.columnId,
-        title: task.title,
-        priority: task.priority,
-        position: task.position,
-        createdBy: task.createdBy,
-        createdAt: task.createdAt,
-        updatedAt: task.updatedAt,
-        description: task.description ?? '',
-        dueDate: task.dueDate ?? undefined,
-      })),
+      data: tasks.map(toSafeTask),
       paginationMeta: {
           page: 1,
           limit: tasks.length,
@@ -284,7 +254,7 @@ export class TaskController {
 
     const safeAssignee: SafeAssignee = {
       taskId: assignee.taskId,
-      userId: assignee.taskId,
+      userId: assignee.userId,
     };
 
     const envelope = created(safeAssignee);
@@ -305,19 +275,7 @@ export class TaskController {
 
     const task = await this.taskService.archivTask(ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTask(task);
 
     const envelope = ok(safeTask);
     const envelopeSchema = okEnvelopeSchema(safeTaskSchema);
@@ -337,19 +295,7 @@ export class TaskController {
 
     const task = await this.taskService.restoreTask(ctx);
 
-    const safeTask: SafeTask = {
-      id: task.id,
-      projectId: task.projectId,
-      columnId: task.columnId,
-      title: task.title,
-      priority: task.priority,
-      position: task.position,
-      createdBy: task.createdBy,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      description: task.description ?? '',
-      dueDate: task.dueDate ?? undefined,
-    };
+    const safeTask = toSafeTask(task);
 
     const envelope = ok(safeTask);
     const envelopeSchema = okEnvelopeSchema(safeTaskSchema);

@@ -47,6 +47,13 @@ export class TaskRepo {
 
   async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.findUnique({
+      include: {
+        assignees: {
+          include: {
+            user: true,
+          },
+        },
+      },
       where: {
         id: ctx.TaskId,
         column: {
@@ -69,6 +76,9 @@ export class TaskRepo {
 
   async listByColumn(ctx: ResourceContext, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
     return await db.task.findMany({
+      include: {
+        assignees: true,
+      },
       where: {
         column: {
           id: ctx.columnId,
@@ -95,6 +105,9 @@ export class TaskRepo {
 
   async allTasksByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
     return await db.task.findMany({
+      include: {
+        assignees: true,
+      },
       where: {
         column: {
           id: ctx.columnId,

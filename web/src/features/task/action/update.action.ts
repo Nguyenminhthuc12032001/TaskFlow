@@ -1,7 +1,7 @@
 import { taskApi } from "../task.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
-import { redirect, type ActionFunctionArgs } from "react-router-dom";
+import { type ActionFunctionArgs } from "react-router-dom";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
@@ -20,7 +20,7 @@ export async function UpdateTaskAction({ params, request }: ActionFunctionArgs) 
         title: formData.get('title'),
         description: formData.get('description'),
         priority: formData.get('priority'),
-        dueDate: formData.get('dueDate'),
+        dueDate: formData.get('dueDate') || undefined,
     };
 
     try {
@@ -33,8 +33,6 @@ export async function UpdateTaskAction({ params, request }: ActionFunctionArgs) 
         });
 
         await promise;
-
-        return redirect(`/workspaces/${params.workspaceId}/projects/${params.projectId}/columns/${params.columnId}/tasks/${params.taskId}`);
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

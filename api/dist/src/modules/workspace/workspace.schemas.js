@@ -1,5 +1,5 @@
 import z from '../../docs/zod.js';
-import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
+import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // ========= REQUEST ==========
@@ -21,7 +21,7 @@ export const updateBodySchema = z.object({
 });
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
-    email: emailSchema,
+    userId: z.uuid(),
     role: z.enum(WorkspaceRole),
 });
 // POST workspace/accept_invite
@@ -40,12 +40,18 @@ export const createResponseSchema = z.object({
     updatedAt: z.coerce.date(),
 });
 // Get workspace/list
+export const workspaceListItemResponseSchema = createResponseSchema.extend({
+    createdByName: z.string(),
+    role: z.enum(WorkspaceRole),
+});
 export const getByUserIdResponseSchema = z.object({
-    data: z.array(createResponseSchema),
+    data: z.array(workspaceListItemResponseSchema),
     paginationMeta: paginationMetaSchema,
 });
 // Get workspace/:workspaceId
-export const getByIdResponseSchema = createResponseSchema;
+export const getByIdResponseSchema = createResponseSchema.extend({
+    createdByName: z.string(),
+});
 // Put workspace/:workspaceId
 export const updateResponseSchema = createResponseSchema;
 // DELETE workspace/:workspaceId
@@ -59,6 +65,10 @@ export const safeMemberResponseSchema = z.object({
 export const membersResponseSchema = z.object({
     data: z.array(safeMemberResponseSchema),
     paginationMeta: paginationMetaSchema,
+});
+// GET workspace/invitees/:workspaceId
+export const inviteCandidatesResponseSchema = z.object({
+    data: z.array(safeUserSchema),
 });
 // POST workspace/invite/:workspaceId
 export const inviteResponseSchema = z.object({

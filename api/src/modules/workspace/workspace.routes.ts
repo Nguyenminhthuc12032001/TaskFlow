@@ -72,6 +72,15 @@ router.get(
   workspaceController.getMemberByUserId,
 );
 
+router.get(
+  '/invitees/:workspaceId',
+  authMiddleware,
+  validateParams(workspaceParamsSchema),
+  validateBody(emptyBodySchema),
+  requireWorkspaceRole('admin'),
+  workspaceController.getInviteCandidates,
+);
+
 router.patch(
   '/:workspaceId',
   authMiddleware,

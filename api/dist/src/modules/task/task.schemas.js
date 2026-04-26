@@ -1,6 +1,7 @@
 import z from '../../docs/zod.js';
 import { TaskPriority } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { safeUserSchema } from '../auth/auth.schemas.js';
 // REQUEST
 export const createBodySchema = z.object({
     title: z
@@ -16,11 +17,6 @@ export const createBodySchema = z.object({
         .optional(),
     priority: z.enum(TaskPriority).optional(),
     dueDate: z.coerce.date().optional(),
-    position: z
-        .number()
-        .int('Position must be an integer')
-        .min(0, 'Position must be a positive number')
-        .optional(),
 });
 export const assignBodySchema = z.object({
     userId: z.uuid(),
@@ -40,11 +36,6 @@ export const updateBodySchema = z.object({
         .optional(),
     priority: z.enum(TaskPriority).optional(),
     dueDate: z.coerce.date().optional(),
-    position: z
-        .number()
-        .int('Position must be an integer')
-        .min(0, 'Position must be a positive number')
-        .optional(),
 });
 export const reOrderBodySchema = z
     .array(z
@@ -114,14 +105,21 @@ export const safeTaskSchema = z.object({
         .max(100, 'Description must be at most 100 characters long')
         .optional(),
     priority: z.enum(TaskPriority),
-    dueDate: z.date().optional(),
+    dueDate: z.coerce.date().optional(),
     position: z
         .number()
         .int('Position must be an integer')
-        .min(0, 'Position must be a positive number'),
+        .min(0, 'Position must be a positive number')
+        .optional(),
     createdBy: z.uuid(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+    assignees: z
+        .array(z.object({
+        taskId: z.uuid(),
+        userId: z.uuid(),
+    }))
+        .optional(),
 });
 export const safeTasksSchema = z.object({
     data: z.array(safeTaskSchema),
@@ -130,4 +128,12 @@ export const safeTasksSchema = z.object({
 export const safeAssigneeSchema = z.object({
     taskId: z.uuid(),
     userId: z.uuid(),
+});
+export const safeTaskDetailAssigneeSchema = z.object({
+    taskId: z.uuid(),
+    userId: z.uuid(),
+    user: safeUserSchema,
+});
+export const safeTaskDetailSchema = safeTaskSchema.extend({
+    assignees: z.array(safeTaskDetailAssigneeSchema),
 });

@@ -7,6 +7,7 @@ import {
   deleteResponseSchema,
   getByIdResponseSchema,
   getByUserIdResponseSchema,
+  inviteCandidatesResponseSchema,
   inviteBodySchema,
   inviteResponseSchema,
   membersResponseSchema,
@@ -118,6 +119,20 @@ registry.registerPath({
     }),
   },
   responses: defaultResponse(membersResponseSchema, [201, 409]),
+})
+
+registry.registerPath({
+  method: 'get',
+  path: defaultPath + '/invitees/{workspaceId}',
+  tags: ['Workspace'],
+  summary: 'Get users eligible to be invited to workspace',
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: z.object({
+      workspaceId: z.uuid(),
+    }),
+  },
+  responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
 })
 
 registry.registerPath({

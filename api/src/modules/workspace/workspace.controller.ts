@@ -6,6 +6,7 @@ import {
   deleteResponseSchema,
   getByIdResponseSchema,
   getByUserIdResponseSchema,
+  inviteCandidatesResponseSchema,
   inviteResponseSchema,
   membersResponseSchema,
   removeMemberResponseSchema,
@@ -15,8 +16,10 @@ import {
   type AcceptResponse,
   type CreateWorkspaceBody,
   type InviteBody,
+  type InviteCandidatesResponse,
   type InviteResponse,
   type RemoveMemberResponse,
+  type SafeWorkspaceDetailResponse,
   type SafeMemberResponse,
   type SafeMembersResponse,
   type SafeWorkspaceResponse,
@@ -56,10 +59,11 @@ export class WorkspaceController {
   getById = async (req: Request<WorkspaceParamsType>, res: Response) => {
     const workspace = await this.workspaceService.getById(req.params.workspaceId);
 
-    const workspaceResponse: SafeWorkspaceResponse = {
+    const workspaceResponse: SafeWorkspaceDetailResponse = {
       id: workspace.id,
       name: workspace.name,
       createdBy: workspace.createdBy,
+      createdByName: workspace.creator.name,
       createdAt: workspace.createdAt,
       updatedAt: workspace.updatedAt,
     };
@@ -82,8 +86,10 @@ export class WorkspaceController {
           id: w.id,
           name: w.name,
           createdBy: w.createdBy,
+          createdByName: w.creator.name,
           createdAt: w.createdAt,
           updatedAt: w.updatedAt,
+          role: w.members[0].role,
         })),
       paginationMeta
     };
@@ -141,6 +147,24 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   }
 
+  getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response) => {
+    const users = await this.workspaceService.listInviteCandidates(req.params.workspaceId);
+
+    const inviteCandidatesResponse: InviteCandidatesResponse = {
+      data: users.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      })),
+    };
+
+    const envelope = ok(inviteCandidatesResponse);
+    const envelopeSchema = okEnvelopeSchema(inviteCandidatesResponseSchema);
+    const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+
+    return res.status(200).json(validatedEnvelope);
+  }
+
   update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response) => {
     const updateData: UpdateWorkspaceBody = { name: req.body.name };
     const result = await this.workspaceService.update(
@@ -185,7 +209,7 @@ export class WorkspaceController {
   invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response) => {
     const result = await this.workspaceService.inviteMember(
       req.params.workspaceId,
-      req.body.email,
+      req.body.userId,
       req.body.role,
       req.user!.id,
     );

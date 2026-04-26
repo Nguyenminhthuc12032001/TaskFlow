@@ -1,6 +1,7 @@
 import z from '../../docs/zod.js';
 import { TaskPriority } from '../../../prisma/generated/enums.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { safeUserSchema } from '../auth/auth.schemas.js';
 
 // REQUEST
 export const createBodySchema = z.object({
@@ -17,11 +18,6 @@ export const createBodySchema = z.object({
     .optional(),
   priority: z.enum(TaskPriority).optional(),
   dueDate: z.coerce.date().optional(),
-  position: z
-    .number()
-    .int('Position must be an integer')
-    .min(0, 'Position must be a positive number')
-    .optional(),
 });
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
@@ -45,11 +41,6 @@ export const updateBodySchema = z.object({
     .optional(),
   priority: z.enum(TaskPriority).optional(),
   dueDate: z.coerce.date().optional(),
-  position: z
-    .number()
-    .int('Position must be an integer')
-    .min(0, 'Position must be a positive number')
-    .optional(),
 });
 export type UpdateBodyType = z.infer<typeof updateBodySchema>;
 
@@ -141,6 +132,14 @@ export const safeTaskSchema = z.object({
   createdBy: z.uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  assignees: z
+    .array(
+      z.object({
+        taskId: z.uuid(),
+        userId: z.uuid(),
+      }),
+    )
+    .optional(),
 });
 export type SafeTask = z.infer<typeof safeTaskSchema>;
 
@@ -155,3 +154,15 @@ export const safeAssigneeSchema = z.object({
   userId: z.uuid(),
 });
 export type SafeAssignee = z.infer<typeof safeAssigneeSchema>;
+
+export const safeTaskDetailAssigneeSchema = z.object({
+  taskId: z.uuid(),
+  userId: z.uuid(),
+  user: safeUserSchema,
+});
+export type SafeTaskDetailAssignee = z.infer<typeof safeTaskDetailAssigneeSchema>;
+
+export const safeTaskDetailSchema = safeTaskSchema.extend({
+  assignees: z.array(safeTaskDetailAssigneeSchema),
+});
+export type SafeTaskDetail = z.infer<typeof safeTaskDetailSchema>;

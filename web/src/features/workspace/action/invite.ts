@@ -12,7 +12,7 @@ export async function InviteAction({ request, params }: ActionFunctionArgs) {
     const workspaceId = params.workspaceId
 
     const data: unknown = {
-        email: form.get('email'),
+        userId: form.get('userId'),
         role: form.get('role'),
     }
 

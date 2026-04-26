@@ -10,7 +10,7 @@ import {
 import type { ActionError } from "../../type";
 import { ZodError } from "zod";
 import z from "zod";
-import type { SafeMemberResponse, SafeWorkspaceResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
+import type { SafeMemberResponse, SafeWorkspaceDetailResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
 
 export async function GetByIdLoader({ params }: LoaderFunctionArgs) { 
     const workspaceId = params.workspaceId;
@@ -34,7 +34,7 @@ export async function GetByIdLoader({ params }: LoaderFunctionArgs) {
         const [workspace, myMembership] = await Promise.all([promise, promiseMyMembership]);
 
         return {
-            workspace: workspace as SafeWorkspaceResponse,
+            workspace: workspace as SafeWorkspaceDetailResponse,
             myMembership: myMembership as SafeMemberResponse,
         };
     } catch (error) {

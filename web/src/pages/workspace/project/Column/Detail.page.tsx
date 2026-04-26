@@ -1,14 +1,21 @@
 import {
-  Link,
   NavLink,
   Outlet,
   useLoaderData,
   useNavigate,
+  useParams,
+  useRouteLoaderData,
 } from "react-router-dom";
+import { EyeIcon } from "../../../../components/ui/Icons";
 import type { GetColumnByIdLoader } from "../../../../features/column/loader/getById.loader";
+import type { GetByIdLoader } from "../../../../features/workspace/loader/getById";
+import { ColumnNameSection } from "./Name.section";
 
 export function DetailColumnPage() {
   const data = useLoaderData<typeof GetColumnByIdLoader>();
+  const workspaceData =
+    useRouteLoaderData<typeof GetByIdLoader>("workspace-detail");
+  const { workspaceId, projectId } = useParams();
   const navigate = useNavigate();
 
   if (!data) {
@@ -85,59 +92,57 @@ export function DetailColumnPage() {
     done: "Done",
     custom: "Custom",
   }[data.type];
+  const role =
+    workspaceData &&
+    !("errorMessage" in workspaceData) &&
+    !("formErrors" in workspaceData) &&
+    !("fieldErrors" in workspaceData)
+      ? workspaceData.myMembership.role
+      : undefined;
+  const canEditColumn = role === "owner" || role === "admin";
+  const renameAction =
+    workspaceId && projectId
+      ? `/board/workspaces/${workspaceId}/projects/${projectId}/columns/${data.id}/rename`
+      : "rename";
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-8">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-600 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950"
-        >
-          ← Back
-        </button>
-
-        <Link
-          to="edit"
-          className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
-        >
-          Edit column
-        </Link>
-      </div>
-
-      <div className="overflow-hidden rounded-4xl border border-zinc-200/80 bg-white shadow-sm">
-        <div className="border-b border-zinc-100 bg-linear-to-br from-zinc-50 via-white to-zinc-100/60 px-8 py-8">
+    <div className="flex flex-col gap-5">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+        <div className="border-b border-zinc-100 px-6 py-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3 py-1 text-xs font-medium text-zinc-500 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Active column
+                Active
               </div>
 
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-zinc-950">
-                {data.name}
-              </h1>
+              <div className="mt-4">
+                <ColumnNameSection
+                  columnId={data.id}
+                  initialName={data.name}
+                  canRenameColumn={canEditColumn}
+                  action={renameAction}
+                  variant="hero"
+                />
+              </div>
 
-              <p className="mt-3 text-sm leading-6 text-zinc-500">
-                A focused workspace lane for managing tasks, reviewing flow,
-                and keeping project execution clean.
-              </p>
+              <p className="mt-2 text-sm text-zinc-500">Column details and tasks.</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm">
+              <span className="rounded-full bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-700">
                 {typeLabel}
               </span>
 
-              <span className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm">
-                Position #{data.position}
+              <span className="rounded-full bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-700">
+                #{data.position}
               </span>
             </div>
           </div>
         </div>
 
         <div className="grid gap-0 divide-y divide-zinc-100 border-b border-zinc-100 md:grid-cols-3 md:divide-x md:divide-y-0">
-          <div className="p-6">
+          <div className="p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Created at
             </p>
@@ -146,7 +151,7 @@ export function DetailColumnPage() {
             </p>
           </div>
 
-          <div className="p-6">
+          <div className="p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Column ID
             </p>
@@ -155,7 +160,7 @@ export function DetailColumnPage() {
             </p>
           </div>
 
-          <div className="p-6">
+          <div className="p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
               Project ID
             </p>
@@ -165,39 +170,37 @@ export function DetailColumnPage() {
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="p-5">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-zinc-950">
-                Column activity
+                Tasks
               </h2>
-              <p className="mt-1 text-sm text-zinc-500">
-                Open tasks for this column without leaving the detail page.
-              </p>
             </div>
 
-            <div className="flex rounded-full border border-zinc-200 bg-zinc-50 p-1">
+            <div className="flex">
               <NavLink
                 to="tasks"
                 className={({ isActive }) =>
                   [
-                    "rounded-full px-4 py-2 text-sm font-medium transition",
+                    "inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium transition",
                     isActive
-                      ? "bg-white text-zinc-950 shadow-sm"
-                      : "text-zinc-500 hover:text-zinc-950",
+                      ? "bg-zinc-950 text-white shadow-sm"
+                      : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950",
                   ].join(" ")
                 }
               >
-                View tasks
+                <EyeIcon className="h-4 w-4" />
+                Tasks
               </NavLink>
             </div>
           </div>
 
-          <div className="min-h-56 rounded-4xl border border-zinc-200 bg-zinc-50/60 p-4">
+          <div className="min-h-56">
             <Outlet context={{ column: data }} />
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

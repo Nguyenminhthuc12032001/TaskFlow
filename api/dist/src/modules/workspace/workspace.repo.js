@@ -44,10 +44,53 @@ export class WorkspaceRepo {
             }
         });
     }
+    async findInviteCandidates(workspaceId, db = this.prisma) {
+        const pendingInvites = await db.invite.findMany({
+            where: {
+                workspaceId,
+                expiresAt: {
+                    gt: new Date(),
+                },
+                usedAt: null,
+            },
+            select: {
+                email: true,
+            },
+        });
+        const pendingInviteEmails = pendingInvites.map((invite) => invite.email);
+        return db.user.findMany({
+            where: {
+                memberships: {
+                    none: {
+                        workspaceId,
+                    },
+                },
+                ...(pendingInviteEmails.length > 0
+                    ? { email: { notIn: pendingInviteEmails } }
+                    : {}),
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+            },
+            orderBy: [
+                { name: 'asc' },
+                { email: 'asc' },
+            ],
+        });
+    }
     async findById(workspaceId, db = this.prisma) {
         return db.workspace.findUnique({
             where: {
                 id: workspaceId,
+            },
+            include: {
+                creator: {
+                    select: {
+                        name: true,
+                    },
+                },
             },
         });
     }
@@ -56,6 +99,20 @@ export class WorkspaceRepo {
             where: {
                 members: {
                     some: { userId },
+                },
+            },
+            include: {
+                creator: {
+                    select: {
+                        name: true,
+                    },
+                },
+                members: {
+                    where: { userId },
+                    select: {
+                        role: true,
+                        joinedAt: true,
+                    },
                 },
             },
             skip,
