@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router-dom";
 import { GetByIdLoader } from "../../../features/workspace/loader/getById";
 import type {
   SafeMemberResponse,
@@ -6,6 +6,7 @@ import type {
 } from "../../../../../api/src/modules/workspace/workspace.schemas";
 import { WorkspaceNameSection } from "./Name.section";
 import { PlusIcon } from "../../../components/ui/Icons";
+import { StickySectionTabs } from "../../../components/ui/StickySectionTabs";
 
 const tabs = [
   { to: "", label: "Overview", end: true },
@@ -181,30 +182,13 @@ export function WorkspaceDetailPage() {
           </dl>
         </header>
 
-        <div className="sticky top-4 z-10 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-          <nav
-            className="flex min-w-max items-center gap-1"
-            aria-label="Workspace sections"
-          >
-            {tabs.map((tab) => (
-              <NavLink
-                key={tab.to + tab.label}
-                to={tab.to}
-                end={tab.end}
-                className={({ isActive }) =>
-                  [
-                    "rounded-xl px-4 py-2.5 text-sm font-semibold transition",
-                    isActive
-                      ? "bg-slate-900 text-white"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-                  ].join(" ")
-                }
-              >
-                {tab.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+        <StickySectionTabs
+          tabs={tabs}
+          ariaLabel="Workspace sections"
+          scopeLabel="Workspace"
+          topClassName="top-2"
+          zClassName="z-30"
+        />
 
         <Outlet />
       </div>

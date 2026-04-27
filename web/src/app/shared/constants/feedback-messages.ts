@@ -101,5 +101,26 @@ export const feedbackMessage = {
         getByIdFailed: "Failed to get comment",
         replySuccess: "Successfully replied comment",
         replyFailed: "Failed to reply comment"
+    },
+
+    lead: {
+        createSuccess: "Successfully created lead",
+        createFailed: "Failed to create lead",
+        updateSuccess: "Successfully updated lead",
+        updateFailed: "Failed to update lead",
+        deleteSuccess: "Successfully deleted lead",
+        deleteFailed: "Failed to delete lead",
+        listByWorkspaceSuccess: "Successfully listed leads",
+        listByWorkspaceFailed: "Failed to list leads",
+        getByIdSuccess: "Successfully got lead",
+        getByIdFailed: "Failed to get lead",
+        linkTaskSuccess: "Successfully linked task to lead",
+        linkTaskFailed: "Failed to link task to lead",
+        unlinkTaskSuccess: "Successfully unlinked task from lead",
+        unlinkTaskFailed: "Failed to unlink task from lead",
+        updateStageSuccess: "Successfully updated lead stage",
+        updateStageFailed: "Failed to update lead stage",
+        createFollowUpTaskSuccess: "Successfully created follow-up task",
+        createFollowUpTaskFailed: "Failed to create follow-up task"
     }
 }

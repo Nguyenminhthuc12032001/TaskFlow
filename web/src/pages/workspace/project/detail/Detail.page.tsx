@@ -1,6 +1,7 @@
-import { NavLink, Outlet, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Outlet, useLoaderData, useRouteLoaderData } from "react-router-dom";
 import type { ProjectByIdLoader } from "../../../../features/project/loader/getById.loader";
 import type { GetByIdLoader } from "../../../../features/workspace/loader/getById";
+import { StickySectionTabs } from "../../../../components/ui/StickySectionTabs";
 import { ProjectIdentitySection } from "./ProjectIdentity.section";
 
 const tabs = [
@@ -108,27 +109,13 @@ export function ProjectPage() {
         </dl>
       </header>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
-        <nav className="flex min-w-max items-center gap-1">
-          {tabs.map((tab) => (
-            <NavLink
-              key={tab.to + tab.label}
-              to={tab.to}
-              end={tab.end}
-              className={({ isActive }) =>
-                [
-                  "rounded-xl px-4 py-2.5 text-sm font-semibold transition",
-                  isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-                ].join(" ")
-              }
-            >
-              {tab.label}
-            </NavLink>
-          ))}
-        </nav>
-      </div>
+      <StickySectionTabs
+        tabs={tabs}
+        ariaLabel="Project sections"
+        scopeLabel="Project"
+        topClassName="top-[4.75rem]"
+        zClassName="z-20"
+      />
 
       <Outlet />
     </div>
