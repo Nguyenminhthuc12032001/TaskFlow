@@ -44,7 +44,7 @@ export class WorkspaceRepo {
             }
         });
     }
-    async findInviteCandidates(workspaceId, db = this.prisma) {
+    async findInviteCandidates(workspaceId, { take, skip }, db = this.prisma) {
         const pendingInvites = await db.invite.findMany({
             where: {
                 workspaceId,
@@ -74,10 +74,39 @@ export class WorkspaceRepo {
                 name: true,
                 email: true,
             },
+            skip,
+            take,
             orderBy: [
                 { name: 'asc' },
                 { email: 'asc' },
             ],
+        });
+    }
+    async countInviteCandidates(workspaceId, db = this.prisma) {
+        const pendingInvites = await db.invite.findMany({
+            where: {
+                workspaceId,
+                expiresAt: {
+                    gt: new Date(),
+                },
+                usedAt: null,
+            },
+            select: {
+                email: true,
+            },
+        });
+        const pendingInviteEmails = pendingInvites.map((invite) => invite.email);
+        return db.user.count({
+            where: {
+                memberships: {
+                    none: {
+                        workspaceId,
+                    },
+                },
+                ...(pendingInviteEmails.length > 0
+                    ? { email: { notIn: pendingInviteEmails } }
+                    : {}),
+            },
         });
     }
     async findById(workspaceId, db = this.prisma) {

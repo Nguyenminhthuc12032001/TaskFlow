@@ -27,7 +27,7 @@ export class LeadService {
         };
         return await this.prisma.$transaction(async (tx) => {
             const lead = await this.leadRepo.create(dataCreate, tx);
-            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_LEAD, 'lead', ctx.ActorId, ctx.LeadId, { lead }, tx);
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_LEAD, 'lead', ctx.ActorId, lead.id, { lead }, tx);
             return lead;
         });
     }
@@ -43,6 +43,13 @@ export class LeadService {
         const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
         const leads = await this.leadRepo.listByWorkspace(ctx, { skip, take });
+        return { leads, paginationMeta };
+    }
+    async listByActorWorkspaces(actorId, paginationQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
+        const leads = await this.leadRepo.listByActorWorkspaces(actorId, { skip, take });
         return { leads, paginationMeta };
     }
     async update(data, ctx) {
@@ -129,7 +136,7 @@ export class LeadService {
                 task: { connect: { id: task.id } },
             };
             const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
-            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_FOLLOWUP_TASK, 'task_leadTaskLink', ctx.ActorId, `leadId: ${leadTaskLink.leadId}, taskId: ${leadTaskLink.taskId}`, { leadTaskLink }, tx);
+            await this.activityService.logActivity(ctx.workspaceId, ActivityAction.CREATE_FOLLOWUP_TASK, 'task', ctx.ActorId, task.id, { task, leadTaskLink }, tx);
             return leadTaskLink;
         });
     }

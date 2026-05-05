@@ -16,11 +16,15 @@ export async function CreateFollowUpTaskAction({ params, request }: ActionFuncti
         leadId: params.leadId
     };
 
+    const description = formData.get('description')?.toString().trim();
+    const dueDate = formData.get('dueDate')?.toString();
+    const priority = formData.get('priority')?.toString();
+
     const data: unknown = {
         title: formData.get('title'),
-        description: formData.get('description'),
-        priority: formData.get('priority'),
-        dueDate: formData.get('dueDate')
+        ...(description && { description }),
+        ...(priority && { priority }),
+        ...(dueDate && { dueDate })
     };
 
     try {

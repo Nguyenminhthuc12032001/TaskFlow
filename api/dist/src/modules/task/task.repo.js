@@ -84,11 +84,11 @@ export class TaskRepo {
                     },
                 },
             },
-            skip,
-            take,
             orderBy: {
                 position: 'asc'
-            }
+            },
+            skip,
+            take,
         });
     }
     async allTasksByColumn(ctx, db = this.prisma) {

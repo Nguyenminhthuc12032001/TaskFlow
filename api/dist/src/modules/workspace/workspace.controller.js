@@ -91,13 +91,15 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelope);
         };
         this.getInviteCandidates = async (req, res) => {
-            const users = await this.workspaceService.listInviteCandidates(req.params.workspaceId);
+            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, paginationQuery);
             const inviteCandidatesResponse = {
                 data: users.map((user) => ({
                     id: user.id,
                     name: user.name,
                     email: user.email,
                 })),
+                paginationMeta,
             };
             const envelope = ok(inviteCandidatesResponse);
             const envelopeSchema = okEnvelopeSchema(inviteCandidatesResponseSchema);

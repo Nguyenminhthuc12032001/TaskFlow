@@ -85,7 +85,7 @@ export class ProjectService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 
-    const projects = await this.projectRepo.listByWorkspace(ctx, { take, skip });
+    const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, { take, skip });
     
     return { projects, paginationMeta };
   }

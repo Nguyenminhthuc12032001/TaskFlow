@@ -61,11 +61,28 @@ import { UpdateTaskAction } from "../features/task/action/update.action";
 import { TaskDetailPage } from "../pages/workspace/project/Column/task/Detail.page";
 import { CommentPage } from "../pages/workspace/project/Column/task/comment/Comment.page";
 import { ListCommentPage } from "../pages/workspace/project/Column/task/comment/List.page";
-import { ListByTaskLoader } from "../features/comment/loader/listByTask.loader"; 
-import { CreateCommentAction } from "../features/comment/action/create.action"; 
-import { GetCommentByIdLoader } from "../features/comment/loader/getById.loader"; 
+import { ListByTaskLoader } from "../features/comment/loader/listByTask.loader";
+import { CreateCommentAction } from "../features/comment/action/create.action";
+import { GetCommentByIdLoader } from "../features/comment/loader/getById.loader";
 import { ReplyCommentAction } from "../features/comment/action/reply.action";
 import { UpdateCommentAction } from "../features/comment/action/update.action";
+import { ListLeadByWorkspaceLoader } from "../features/lead/loader/listByWorkspace.loader";
+import { ListLeadByUserWorkspacesLoader } from "../features/lead/loader/listByUserWorkspaces.loader";
+import { CreateLeadAction } from "../features/lead/action/create.action";
+import { GetLeadByIdLoader } from "../features/lead/loader/getById.loader";
+import { UpdateLeadAction } from "../features/lead/action/update.action";
+import { UpdateLeadStageAction } from "../features/lead/action/updateStage.action";
+import { LinkTaskAction } from "../features/lead/action/linkTask.action";
+import { UnLinkTaskAction } from "../features/lead/action/unLinkTask.action";
+import { CreateFollowUpTaskAction } from "../features/lead/action/createFollowUpTask.action";
+import { ListLeadPage } from "../pages/leads/List.page";
+import { CreateLeadPage } from "../pages/leads/Create.page";
+import { DetailLeadPage } from "../pages/leads/Detail.page";
+import { UpdateLeadSection } from "../pages/leads/section/Update.section";
+import { UpdateLeadStageSection } from "../pages/leads/section/UpdateLeadStage.section";
+import { LinkTaskPage } from "../pages/leads/LinkTask.page";
+import { UnlinkTaskSection } from "../pages/leads/section/UnLinkTask.section";
+import { CreateFollowUpTaskPage } from "../pages/leads/CreateFollowUpTask.page";
 
 export const router = createBrowserRouter([
   {
@@ -101,8 +118,48 @@ export const router = createBrowserRouter([
             action: UpdateWorkspaceAction,
             loader: GetByIdLoader,
             children: [
-              // This place is for projects
               //{ index: true, element: <Navigate to="/board" replace /> },
+              {
+                path: "leads", element: <LeadsPage />,
+                children: [
+                  {
+                    index: true, element: <ListLeadPage />,
+                    loader: ListLeadByWorkspaceLoader
+                  },
+                  {
+                    path: "create", element: <CreateLeadPage />,
+                    action: CreateLeadAction
+                  }, {
+                    path: ":leadId", element: <DetailLeadPage />,
+                    loader: GetLeadByIdLoader,
+                    children: [
+                      {
+                        path: "update", element: <UpdateLeadSection />,
+                        action: UpdateLeadAction
+                      },
+                      {
+                        path: "updateStage", element: <UpdateLeadStageSection />,
+                        action: UpdateLeadStageAction
+                      },
+                      {
+                        path: "linkTask", element: <LinkTaskPage />
+                      },
+                      {
+                        path: ":taskId/linkTask",
+                        action: LinkTaskAction
+                      },
+                      {
+                        path: ":taskId/unlinkTask", element: <UnlinkTaskSection />,
+                        action: UnLinkTaskAction
+                      }, 
+                      {
+                        path: "follow-up/:projectId/:columnId", element: <CreateFollowUpTaskPage />,
+                        action: CreateFollowUpTaskAction
+                      }
+                    ]
+                  }
+                ]
+              },
               {
                 path: "members", element: <ListMemberPage />,
                 loader: ListMemberLoader
@@ -200,7 +257,7 @@ export const router = createBrowserRouter([
                                               }
                                             ]
                                           },
-                                        ] 
+                                        ]
                                       }
                                     ]
                                   }
@@ -230,7 +287,15 @@ export const router = createBrowserRouter([
         path: "accept-invite", element: <AcceptInvitePage />,
         action: AcceptInviteAction
       },
-      { path: "leads", element: <LeadsPage /> },
+      {
+        path: "leads", element: <LeadsPage />,
+        children: [
+          {
+            index: true, element: <ListLeadPage />,
+            loader: ListLeadByUserWorkspacesLoader
+          }
+        ]
+      },
       { path: "members", element: <MembersPage /> },
       { path: "workspace/create", element: <Navigate to="/board" replace /> },
     ],

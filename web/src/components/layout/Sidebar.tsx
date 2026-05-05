@@ -151,7 +151,7 @@ export function Sidebar() {
     const auth = useAuth();
 
     return (
-        <aside className="hidden h-screen w-72 shrink-0 border-r border-zinc-200 bg-white lg:flex lg:flex-col">
+        <aside className="hidden h-full w-72 shrink-0 border-r border-zinc-200 bg-white lg:flex lg:flex-col">
             <div className="flex h-16 items-center gap-3 border-b border-zinc-200 px-5">
                 <Link
                     to="/board/workspaces"

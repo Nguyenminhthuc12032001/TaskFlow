@@ -13,9 +13,23 @@ export const workspaceParamsSchema = z.object({
 });
 export type WorkspaceParamsType = z.infer<typeof workspaceParamsSchema>;
 
+export const searchQuerySchema = z.preprocess((value) => {
+  if (typeof value !== 'string') return undefined;
+
+  const trimmed = value.trim();
+  
+  return trimmed.length > 0 ? trimmed : undefined;
+}, z.string("Search query must be greater than 0 characters long")
+  .min(1, "Search query must be at least 1 character long")
+  .max(100, "Search query must be at most 100 characters long")
+  .optional()
+);
+export type SearchQueryType = z.infer<typeof searchQuerySchema>;
+
 export const paginationQuerySchema = z.object({
-    page: z.coerce.number().int().min(1, 'Page must be a positive integer').default(1),
-    limit: z.coerce.number().int().min(1, 'Limit must be a positive integer').default(10)
+  page: z.coerce.number().int().min(1, 'Page must be a positive integer').default(1),
+  limit: z.coerce.number().int().min(1, 'Limit must be a positive integer').default(10),
+  search: searchQuerySchema
 });
 export type PaginationQueryType = z.infer<typeof paginationQuerySchema>;
 

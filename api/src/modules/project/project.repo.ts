@@ -5,11 +5,17 @@ import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 export class ProjectRepo {
   constructor(private readonly prisma: DbClient) { }
 
-  async create(data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma) {
+  async create(
+    data: Prisma.ProjectCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.project.create({ data });
   }
 
-  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async get(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.project.findFirst({
       where: {
         id: ctx.projectId,
@@ -27,6 +33,7 @@ export class ProjectRepo {
 
   async listByWorkspace(
     ctx: ResourceContext,
+    search: string | undefined,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
   ) {
@@ -40,6 +47,12 @@ export class ProjectRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
       skip,
       take,
@@ -111,7 +124,10 @@ export class ProjectRepo {
     });
   }
 
-  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async remove(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.project.delete({
       where: {
         id: ctx.projectId,
@@ -130,7 +146,10 @@ export class ProjectRepo {
     });
   }
 
-  async countProjectsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async countProjectsByWorkspace(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.project.count({
       where: {
         workspaceId: ctx.workspaceId,

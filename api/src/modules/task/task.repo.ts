@@ -5,7 +5,10 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class TaskRepo {
   constructor(readonly prisma: DbClient) { }
 
-  async create(data: Prisma.TaskCreateInput, db: DbOrTxClient = this.prisma) {
+  async create(
+    data: Prisma.TaskCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.create({ data });
   }
 
@@ -41,11 +44,17 @@ export class TaskRepo {
     });
   }
 
-  async assign(data: Prisma.TaskAssigneeCreateInput, db: DbOrTxClient = this.prisma) {
+  async assign(
+    data: Prisma.TaskAssigneeCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.taskAssignee.create({ data });
   }
 
-  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async get(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.findUnique({
       include: {
         assignees: {
@@ -74,7 +83,12 @@ export class TaskRepo {
     });
   }
 
-  async listByColumn(ctx: ResourceContext, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
+  async listByColumn(
+    ctx: ResourceContext,
+    search: string | undefined,
+    { take, skip }: { take: number; skip: number },
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.findMany({
       include: {
         assignees: true,
@@ -94,16 +108,25 @@ export class TaskRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
+      },
+      orderBy: {
+        position: 'asc'
       },
       skip,
       take,
-      orderBy: {
-        position: 'asc'
-      }
     });
   }
 
-  async allTasksByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async allTasksByColumn(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.findMany({
       include: {
         assignees: true,
@@ -130,7 +153,10 @@ export class TaskRepo {
     });
   }
 
-  async countTasksByColumn(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async countTasksByColumn(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.count({
       where: {
         column: {
@@ -181,7 +207,10 @@ export class TaskRepo {
     });
   }
 
-  async archivTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async archivTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -209,7 +238,10 @@ export class TaskRepo {
     });
   }
 
-  async restoreTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async restoreTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -237,7 +269,10 @@ export class TaskRepo {
     });
   }
 
-  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async remove(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.task.delete({
       where: {
         id: ctx.TaskId,

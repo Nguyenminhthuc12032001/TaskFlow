@@ -3,11 +3,11 @@ import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
-import { z, ZodError } from "zod/v4";
-import type { ActionFunctionArgs } from "react-router-dom";
+import { z, ZodError } from "zod";
+import { redirect, type ActionFunctionArgs } from "react-router-dom";
 
 export async function CreateLeadAction({ params, request }: ActionFunctionArgs) {
-    const paramsDara: unknown = {
+    const paramsData: unknown = {
         workspaceId: params.workspaceId
     };
 
@@ -19,21 +19,21 @@ export async function CreateLeadAction({ params, request }: ActionFunctionArgs) 
         ...(formData.get('email') && { email: formData.get('email') }),
         ...(formData.get('phone') && { phone: formData.get('phone') }),
         ...(formData.get('source') && { source: formData.get('source') }),
-        ...(formData.get('stage') && { status: formData.get('stage') }),
+        ...(formData.get('stage') && { stage: formData.get('stage') }),
     };
 
     try {
-        const promist = leadApi.create(paramsDara, data);
+        const promise = leadApi.create(paramsData, data);
 
-        notify.promise(promist, {
+        notify.promise(promise, {
             loading: "Creating lead... ",
             success: feedbackMessage.lead.createSuccess,
             error: feedbackMessage.lead.createFailed
         });
 
-        const response = await promist;
+        await promise;
 
-        return response;
+        return redirect(`/board/workspaces/${params.workspaceId}/leads`);
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {
@@ -43,7 +43,7 @@ export async function CreateLeadAction({ params, request }: ActionFunctionArgs) 
                 } satisfies ActionError
             }
 
-            if (error.status === 403 || error.status === 404 || error.status === 409) {
+            if (error.status === 401 || error.status === 403 || error.status === 404 || error.status === 409) {
                 return {
                     errorMessage: error.message
                 } as ActionError

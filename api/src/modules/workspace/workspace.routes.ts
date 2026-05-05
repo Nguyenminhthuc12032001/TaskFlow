@@ -42,7 +42,8 @@ router.get('',
   authMiddleware,
   validateBody(emptyBodySchema),
   validateQuery(paginationQuerySchema),
-  workspaceController.getByUserId);
+  workspaceController.getByUserId
+);
 
 router.get(
   '/:workspaceId',
@@ -77,6 +78,7 @@ router.get(
   authMiddleware,
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
+  validateQuery(paginationQuerySchema),
   requireWorkspaceRole('admin'),
   workspaceController.getInviteCandidates,
 );

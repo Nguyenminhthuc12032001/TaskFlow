@@ -38,6 +38,14 @@ router.post(
 );
 
 router.get(
+  '',
+  authMiddleware,
+  validateBody(emptyBodySchema),
+  validateQuery(paginationQuerySchema),
+  leadController.listByActorWorkspaces,
+);
+
+router.get(
   '/:workspaceId/:leadId',
   authMiddleware,
   requireWorkspaceRole('member'),
@@ -83,7 +91,7 @@ router.patch(
   leadController.linkTask,
 );
 
-router.patch(
+router.delete(
   '/:workspaceId/:leadId/:taskId/unlinkTask',
   authMiddleware,
   requireWorkspaceRole('member'),

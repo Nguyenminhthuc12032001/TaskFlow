@@ -36,10 +36,25 @@ export class WorkspaceRepo {
     });
   }
 
-  async findMembers(workspaceId: string, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
+  async findMembers(
+    workspaceId: string,
+    search: string | undefined,
+    { take, skip }: { take: number; skip: number },
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspaceMember.findMany({
       where: {
         workspaceId,
+        ...(search
+          ? {
+            user: {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            }
+          }
+          : {})
       },
       include: {
         user: {
@@ -54,7 +69,12 @@ export class WorkspaceRepo {
     });
   }
 
-  async findInviteCandidates(workspaceId: string, db: DbOrTxClient = this.prisma) {
+  async findInviteCandidates(
+    workspaceId: string,
+    search: string | undefined,
+    { take, skip }: { take: number; skip: number },
+    db: DbOrTxClient = this.prisma,
+  ) {
     const pendingInvites = await db.invite.findMany({
       where: {
         workspaceId,
@@ -80,12 +100,22 @@ export class WorkspaceRepo {
         ...(pendingInviteEmails.length > 0
           ? { email: { notIn: pendingInviteEmails } }
           : {}),
+        ...(search
+          ? {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            }
+          }
+          : {})
       },
       select: {
         id: true,
         name: true,
         email: true,
       },
+      skip,
+      take,
       orderBy: [
         { name: 'asc' },
         { email: 'asc' },
@@ -93,7 +123,43 @@ export class WorkspaceRepo {
     });
   }
 
-  async findById(workspaceId: string, db: DbOrTxClient = this.prisma) {
+  async countInviteCandidates(
+    workspaceId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
+    const pendingInvites = await db.invite.findMany({
+      where: {
+        workspaceId,
+        expiresAt: {
+          gt: new Date(),
+        },
+        usedAt: null,
+      },
+      select: {
+        email: true,
+      },
+    });
+
+    const pendingInviteEmails = pendingInvites.map((invite) => invite.email);
+
+    return db.user.count({
+      where: {
+        memberships: {
+          none: {
+            workspaceId,
+          },
+        },
+        ...(pendingInviteEmails.length > 0
+          ? { email: { notIn: pendingInviteEmails } }
+          : {}),
+      },
+    });
+  }
+
+  async findById(
+    workspaceId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspace.findUnique({
       where: {
         id: workspaceId,
@@ -108,9 +174,21 @@ export class WorkspaceRepo {
     });
   }
 
-  async findByUserId(userId: string, { take, skip }: { take: number; skip: number }, db: DbOrTxClient = this.prisma) {
+  async findByUserId(
+    userId: string,
+    search: string | undefined,
+    { take, skip }: { take: number; skip: number },
+    db: DbOrTxClient = this.prisma) {
     return db.workspace.findMany({
       where: {
+        ...(search
+          ? {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            }
+          }
+          : {}),
         members: {
           some: { userId },
         },
@@ -131,13 +209,15 @@ export class WorkspaceRepo {
       },
       skip,
       take,
-       orderBy: {
+      orderBy: {
         createdAt: 'desc'
-       }
+      }
     });
   }
 
-  async findAllByUserId(userId: string, db: DbOrTxClient = this.prisma) {
+  async findAllByUserId(
+    userId: string,
+    db: DbOrTxClient = this.prisma) {
     return db.workspace.findMany({
       where: {
         members: {
@@ -163,7 +243,10 @@ export class WorkspaceRepo {
     });
   }
 
-  async delete(workspaceId: string, db: DbOrTxClient = this.prisma) {
+  async delete(
+    workspaceId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspace.delete({
       where: { id: workspaceId },
     });
@@ -195,7 +278,10 @@ export class WorkspaceRepo {
     });
   }
 
-  async findInviteByJti(jti: string, db: DbOrTxClient = this.prisma) {
+  async findInviteByJti(
+    jti: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.invite.findFirst({
       where: {
         jti,
@@ -207,7 +293,10 @@ export class WorkspaceRepo {
     });
   }
 
-  async markInviteUsed(jti: string, db: DbOrTxClient = this.prisma) {
+  async markInviteUsed(
+    jti: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.invite.updateMany({
       where: {
         jti,
@@ -237,7 +326,10 @@ export class WorkspaceRepo {
     });
   }
 
-  async countWorkspaceMembers(workspaceId: string, db: DbOrTxClient = this.prisma) {
+  async countWorkspaceMembers(
+    workspaceId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspaceMember.count({
       where: {
         workspaceId,
@@ -245,7 +337,10 @@ export class WorkspaceRepo {
     });
   }
 
-  async countWorkspacesByUserId(userId: string, db: DbOrTxClient = this.prisma) {
+  async countWorkspacesByUserId(
+    userId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspace.count({
       where: {
         members: {

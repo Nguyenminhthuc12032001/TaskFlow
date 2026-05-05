@@ -1,7 +1,8 @@
-import { LeadStage, TaskPriority } from '../../../prisma/generated/client.js';
+import { LeadStage, TaskPriority } from '../../../prisma/generated/enums.js';
 import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { safeTaskSchema } from '../task/task.schemas.js';
 import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
 // REQUEST
 export const createBodySchema = z.object({
@@ -109,8 +110,47 @@ export const safeLeadSchema = z.object({
         .min(5, 'Note must be at least 5 characters long')
         .max(200, 'Note must be at most 100 characters long'),
     createdBy: z.uuid(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+});
+export const safeLeadWorkspaceSchema = z.object({
+    id: z.uuid(),
+    name: z.string(),
+});
+export const safeLeadWithWorkspaceSchema = safeLeadSchema.extend({
+    workspace: safeLeadWorkspaceSchema,
+});
+export const safeLeadDetailSchema = z.object({
+    id: z.uuid(),
+    workspaceId: z.uuid(),
+    name: z
+        .string()
+        .trim()
+        .min(5, 'Name must be at least 5 characters long')
+        .max(100, 'Name must be at most 100 characters long'),
+    email: emailSchema.optional(),
+    phone: z
+        .string()
+        .refine(isValidPhoneNumber, {
+        message: 'Is valid phone number',
+    })
+        .optional(),
+    source: z
+        .string()
+        .trim()
+        .min(10, 'Source must be at least 10 characters long')
+        .max(100, 'Source must be at most 100 characters long')
+        .optional(),
+    stage: z.enum(LeadStage),
+    note: z
+        .string()
+        .trim()
+        .min(5, 'Note must be at least 5 characters long')
+        .max(200, 'Note must be at most 100 characters long'),
+    createdBy: z.uuid(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
+    taskLinks: z.array(safeTaskSchema),
 });
 export const safeLeadTaskLinkSchema = z.object({
     leadId: z.uuid(),
@@ -119,4 +159,8 @@ export const safeLeadTaskLinkSchema = z.object({
 export const safeLeadsSchema = z.object({
     data: z.array(safeLeadSchema),
     paginationMeta: paginationMetaSchema
+});
+export const safeLeadsWithWorkspaceSchema = z.object({
+    data: z.array(safeLeadWithWorkspaceSchema),
+    paginationMeta: paginationMetaSchema,
 });

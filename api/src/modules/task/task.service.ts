@@ -128,7 +128,7 @@ export class TaskService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 
-    const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+    const tasks = await this.taskRepo.listByColumn(ctx, paginationQuery.search, { take, skip });
 
     return { tasks, paginationMeta };
   }
@@ -201,7 +201,7 @@ export class TaskService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 
-    const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+    const tasks = await this.taskRepo.listByColumn(ctx, undefined, { take, skip });
 
     return { tasks, paginationMeta };
   }

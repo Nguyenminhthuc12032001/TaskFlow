@@ -7,7 +7,7 @@ import { normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/li
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
-export async function UpdateAction({ params, request }: ActionFunctionArgs) {
+export async function UpdateLeadAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
 
     const paramsData: unknown = {

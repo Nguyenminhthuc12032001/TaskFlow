@@ -131,6 +131,7 @@ registry.registerPath({
     params: z.object({
       workspaceId: z.uuid(),
     }),
+    query: paginationQuerySchema,
   },
   responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
 })

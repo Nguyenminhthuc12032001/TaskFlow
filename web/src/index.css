@@ -1,1 +1,68 @@
 @import "tailwindcss";
+@import "react-phone-number-input/style.css";
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+.taskflow-phone-input {
+    --PhoneInput-color--focus: #94a3b8;
+    --PhoneInputCountryFlag-height: 1rem;
+    display: flex;
+    height: 2.75rem;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #0f172a;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.taskflow-phone-input:focus-within {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 4px #f1f5f9;
+}
+
+.taskflow-phone-input--error {
+    border-color: #fca5a5;
+}
+
+.taskflow-phone-input--error:focus-within {
+    border-color: #f87171;
+    box-shadow: 0 0 0 4px #fee2e2;
+}
+
+.taskflow-phone-input--disabled {
+    cursor: not-allowed;
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.taskflow-phone-input .PhoneInputCountry {
+    align-self: stretch;
+    margin-right: 0;
+    padding: 0 0.75rem;
+    border-right: 1px solid #e2e8f0;
+}
+
+.taskflow-phone-input .PhoneInputCountrySelect {
+    cursor: pointer;
+}
+
+.taskflow-phone-input .PhoneInputInput {
+    height: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 0 0.75rem;
+    color: #0f172a;
+    font-size: 0.875rem;
+    outline: 0;
+}
+
+.taskflow-phone-input .PhoneInputInput::placeholder {
+    color: #94a3b8;
+}

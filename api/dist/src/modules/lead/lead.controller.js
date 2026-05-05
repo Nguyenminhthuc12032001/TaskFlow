@@ -1,5 +1,5 @@
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
-import { safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
+import { safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 export class LeadController {
@@ -29,6 +29,34 @@ export class LeadController {
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(201).json(validatedEnvelope);
         };
+        this.listByActorWorkspaces = async (req, res) => {
+            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user.id, paginationQuery);
+            const safeLeads = {
+                data: leads.map((lead) => ({
+                    id: lead.id,
+                    workspaceId: lead.workspaceId,
+                    name: lead.name,
+                    stage: lead.stage,
+                    note: lead.note,
+                    createdBy: lead.createdBy,
+                    createdAt: lead.createdAt,
+                    updatedAt: lead.updatedAt,
+                    ...(lead.email != null && { email: lead.email }),
+                    ...(lead.phone != null && { phone: lead.phone }),
+                    ...(lead.source != null && { source: lead.source }),
+                    workspace: {
+                        id: lead.workspace.id,
+                        name: lead.workspace.name,
+                    },
+                })),
+                paginationMeta,
+            };
+            const envelope = ok(safeLeads);
+            const envelopeSchema = okEnvelopeSchema(safeLeadsWithWorkspaceSchema);
+            const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
+            return res.status(200).json(validatedEnvelope);
+        };
         this.get = async (req, res) => {
             const ctx = {
                 workspaceId: req.params.workspaceId,
@@ -48,9 +76,21 @@ export class LeadController {
                 ...(lead.email != null && { email: lead.email }),
                 ...(lead.phone != null && { phone: lead.phone }),
                 ...(lead.source != null && { source: lead.source }),
+                taskLinks: lead.taskLinks.map((taskLink) => ({
+                    id: taskLink.task.id,
+                    projectId: taskLink.task.projectId,
+                    columnId: taskLink.task.columnId,
+                    title: taskLink.task.title,
+                    priority: taskLink.task.priority,
+                    createdBy: taskLink.task.createdBy,
+                    createdAt: taskLink.task.createdAt,
+                    updatedAt: taskLink.task.updatedAt,
+                    ...(taskLink.task.description != null && { description: taskLink.task.description }),
+                    ...(taskLink.task.dueDate != null && { dueDate: taskLink.task.dueDate }),
+                }))
             };
             const envelope = ok(safeLead);
-            const envelopeSchema = okEnvelopeSchema(safeLeadSchema);
+            const envelopeSchema = okEnvelopeSchema(safeLeadDetailSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(200).json(validatedEnvelope);
         };

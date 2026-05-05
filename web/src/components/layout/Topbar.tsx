@@ -3,7 +3,7 @@ import { PlusIcon } from "../ui/Icons";
 import { UserMenu } from "./UserMenu";
 
 function getPageTitle(pathname: string) {
-  if (pathname.startsWith("/leads")) return "Leads";
+  if (pathname.startsWith("/leads") || pathname.includes("/leads")) return "Leads";
   if (pathname.startsWith("/members")) return "Members";
   if (pathname.includes("/projects")) return "Projects";
   if (pathname.includes("/tasks")) return "Tasks";

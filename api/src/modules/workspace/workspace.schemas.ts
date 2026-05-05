@@ -94,6 +94,7 @@ export type SafeMembersResponse = z.infer<typeof membersResponseSchema>;
 // GET workspace/invitees/:workspaceId
 export const inviteCandidatesResponseSchema = z.object({
   data: z.array(safeUserSchema),
+  paginationMeta: paginationMetaSchema,
 });
 export type InviteCandidatesResponse = z.infer<typeof inviteCandidatesResponseSchema>;
 

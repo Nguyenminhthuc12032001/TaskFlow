@@ -6,7 +6,7 @@ import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../ap
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
-export async function UpdateStageAction({ params, request }: ActionFunctionArgs) {
+export async function UpdateLeadStageAction({ params, request }: ActionFunctionArgs) {
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
         leadId: params.leadId

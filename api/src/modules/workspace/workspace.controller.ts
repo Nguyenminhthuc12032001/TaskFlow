@@ -148,7 +148,9 @@ export class WorkspaceController {
   }
 
   getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response) => {
-    const users = await this.workspaceService.listInviteCandidates(req.params.workspaceId);
+    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+
+    const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, paginationQuery);
 
     const inviteCandidatesResponse: InviteCandidatesResponse = {
       data: users.map((user) => ({
@@ -156,6 +158,7 @@ export class WorkspaceController {
         name: user.name,
         email: user.email,
       })),
+      paginationMeta,
     };
 
     const envelope = ok(inviteCandidatesResponse);

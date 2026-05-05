@@ -6,13 +6,16 @@ import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../ap
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
 
-export async function ListLeadByWorkspaceLoader({ params }: LoaderFunctionArgs) {
-    const paramsData: unknown = {
-        workspaceId: params.workspaceId
+export async function ListLeadByWorkspaceLoader({ params, request }: LoaderFunctionArgs) {
+    const url = new URL(request.url);
+
+    const query = {
+        page: url.searchParams.get("page") ?? undefined,
+        limit: url.searchParams.get("limit") ?? undefined,
     };
 
     try {
-        const promise = leadApi.listByWorkspace(paramsData);
+        const promise = leadApi.listByWorkspace(params.workspaceId, query);
 
         notify.promise(promise, {
             loading: "Loading leads... ",

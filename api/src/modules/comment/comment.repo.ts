@@ -38,7 +38,12 @@ export class CommentRepo {
     });
   }
 
-  async listByTask(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
+  async listByTask(
+    ctx: ResourceContext,
+    search: string | undefined,
+    { skip, take }: { skip: number; take: number },
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.comment.findMany({
       where: {
         task: {
@@ -58,6 +63,12 @@ export class CommentRepo {
             },
           },
         },
+        ...(search ? {
+          content: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
       skip,
       take,
@@ -67,7 +78,10 @@ export class CommentRepo {
     });
   }
 
-  async allCommentsByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async allCommentsByTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.comment.findMany({
       where: {
         task: {
@@ -94,7 +108,10 @@ export class CommentRepo {
     });
   }
 
-  async countCommentsByTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async countCommentsByTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.comment.count({
       where: {
         task: {
@@ -148,7 +165,10 @@ export class CommentRepo {
     });
   }
 
-  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async remove(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.comment.delete({
       where: {
         id: ctx.CommentId,
@@ -173,7 +193,10 @@ export class CommentRepo {
     });
   }
 
-  async getMember(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async getMember(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {

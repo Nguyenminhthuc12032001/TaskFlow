@@ -59,8 +59,12 @@ export class WorkspaceService {
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
         return { members, paginationMeta };
     }
-    async listInviteCandidates(workspaceId) {
-        return this.workspaceRepo.findInviteCandidates(workspaceId);
+    async listInviteCandidates(workspaceId, paginationQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+        const users = await this.workspaceRepo.findInviteCandidates(workspaceId, { take, skip });
+        const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId);
+        const paginationMeta = buildPaginationMeta(safePage, safeLimit, countInviteCandidates);
+        return { users, paginationMeta };
     }
     async getMemberByUserId(workspaceId, actorId) {
         const member = await this.workspaceRepo.findMembership(workspaceId, actorId);

@@ -69,6 +69,7 @@ export const membersResponseSchema = z.object({
 // GET workspace/invitees/:workspaceId
 export const inviteCandidatesResponseSchema = z.object({
     data: z.array(safeUserSchema),
+    paginationMeta: paginationMetaSchema,
 });
 // POST workspace/invite/:workspaceId
 export const inviteResponseSchema = z.object({

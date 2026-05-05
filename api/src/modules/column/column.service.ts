@@ -66,7 +66,7 @@ export class ColumnService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 
-    const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+    const columns = await this.columnRepo.listByProject(ctx, paginationQuery.search, { skip, take });
 
     return { columns, paginationMeta };
   }
@@ -174,7 +174,7 @@ export class ColumnService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 
-    const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+    const columns = await this.columnRepo.listByProject(ctx, undefined, { skip, take });
 
     return { columns, paginationMeta };
   }

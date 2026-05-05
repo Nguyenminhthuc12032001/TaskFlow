@@ -1,12 +1,12 @@
-import { workspaceParamsSchema } from "../../../../api/src/common/schemas/common.schemas";
+import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { createBodySchema, createFollowUpTaskBodySchema, safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema } from "../../../../api/src/modules/lead/lead.schemas";
+import { createBodySchema, createFollowUpTaskBodySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema } from "../../../../api/src/modules/lead/lead.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
 export const leadApi = {
-    create: async (workspaceId: unknown, data: unknown) => {
-        const validatedIds = validate(workspaceParamsSchema)({ workspaceId: workspaceId });
+    create: async (ctx: unknown, data: unknown) => {
+        const validatedIds = validate(workspaceParamsSchema)(ctx);
 
         const validatedData = validate(createBodySchema)(data);
 
@@ -19,13 +19,26 @@ export const leadApi = {
         return validatedEnvelop.data;
     },
 
-    listByWorkspace: async (workspaceId: unknown) => {
-        const validatedIds = validate(workspaceParamsSchema)({ workspaceId: workspaceId });
+    listByWorkspace: async (workspaceId: unknown, query: unknown) => {
+        const validatedIds: WorkspaceParamsType = validate(workspaceParamsSchema)({ workspaceId: workspaceId });
+        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
 
-        const response = await http.get(`/leads/${validatedIds.workspaceId}`);
+        const response = await http.get(`/leads/${validatedIds.workspaceId}`, { params: validatedQuery });
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeLeadsSchema);
+        const validatedEnvelop = validate(envelopSchema)(envelop);
+
+        return validatedEnvelop.data;
+    },
+
+    listByUserWorkspaces: async (query: unknown) => {
+        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+
+        const response = await http.get("/leads", { params: validatedQuery });
+
+        const envelop = response.data;
+        const envelopSchema = okEnvelopeSchema(safeLeadsWithWorkspaceSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;
@@ -37,7 +50,7 @@ export const leadApi = {
         const response = await http.get(`/leads/${validatedIds.workspaceId}/${validatedIds.leadId}`);
 
         const envelop = response.data;
-        const envelopSchema = okEnvelopeSchema(safeLeadSchema);
+        const envelopSchema = okEnvelopeSchema(safeLeadDetailSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;
@@ -86,7 +99,7 @@ export const leadApi = {
     linkTask: async (ctx: unknown) => {
         const validatedIds = validate(workspaceParamsSchema)(ctx);
 
-        const response = await http.post(`/leads/${validatedIds.workspaceId}/${validatedIds.leadId}/${validatedIds.taskId}/linkTask`);
+        const response = await http.patch(`/leads/${validatedIds.workspaceId}/${validatedIds.leadId}/${validatedIds.taskId}/linkTask`);
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeLeadTaskLinkSchema);

@@ -11,6 +11,7 @@ import { StickySectionTabs } from "../../../components/ui/StickySectionTabs";
 const tabs = [
   { to: "", label: "Overview", end: true },
   { to: "projects", label: "Projects" },
+  { to: "leads", label: "Leads" },
   { to: "members", label: "Members" },
   { to: "activity", label: "Activity" },
   { to: "settings", label: "Settings" },

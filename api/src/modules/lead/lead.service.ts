@@ -50,7 +50,7 @@ export class LeadService {
         ActivityAction.CREATE_LEAD,
         'lead',
         ctx.ActorId,
-        ctx.LeadId,
+        lead.id,
         { lead },
         tx,
       );
@@ -76,7 +76,19 @@ export class LeadService {
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
 
-    const leads = await this.leadRepo.listByWorkspace(ctx, { skip, take });
+    const leads = await this.leadRepo.listByWorkspace(ctx, paginationQuery.search, { skip, take });
+
+    return { leads, paginationMeta };
+  }
+
+  async listByActorWorkspaces(actorId: string, paginationQuery: PaginationQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+
+    const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId);
+
+    const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
+
+    const leads = await this.leadRepo.listByActorWorkspaces(actorId, paginationQuery.search, { skip, take });
 
     return { leads, paginationMeta };
   }
@@ -229,10 +241,10 @@ export class LeadService {
       await this.activityService.logActivity(
         ctx.workspaceId,
         ActivityAction.CREATE_FOLLOWUP_TASK,
-        'task_leadTaskLink',
+        'task',
         ctx.ActorId,
-        `leadId: ${leadTaskLink.leadId}, taskId: ${leadTaskLink.taskId}`,
-        { leadTaskLink },
+        task.id,
+        { task, leadTaskLink },
         tx,
       );
 

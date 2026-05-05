@@ -11,6 +11,7 @@ export class ColumnRepo {
 
   async listByProject(
     ctx: ResourceContext,
+    search: string | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
   ) {
@@ -27,6 +28,12 @@ export class ColumnRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
       skip,
       take,
@@ -81,7 +88,10 @@ export class ColumnRepo {
     });
   }
 
-  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async get(
+    ctx: ResourceContext, 
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.column.findFirst({
       where: {
         id: ctx.columnId,

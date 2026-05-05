@@ -25,10 +25,21 @@ export class LeadRepo {
           },
         },
       },
+      include: {
+        taskLinks: {
+          include: {
+            task: true,
+          },
+        }
+      }
     });
   }
 
-  async listByWorkspace(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
+  async listByWorkspace(
+    ctx: ResourceContext, 
+    search: string | undefined,
+    { skip, take }: { skip: number; take: number }, 
+    db: DbOrTxClient = this.prisma) {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -51,7 +62,42 @@ export class LeadRepo {
     });
   }
 
-  async allLeadsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async listByActorWorkspaces(
+    actorId: string,
+    search: string | undefined,
+    { skip, take }: { skip: number; take: number },
+    db: DbOrTxClient = this.prisma,
+  ) {
+    return await db.lead.findMany({
+      where: {
+        workspace: { 
+          members: {
+            some: {
+              userId: actorId,
+              role: {
+                in: ['member', 'admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+      include: {
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy: {
+        createdAt: 'desc'
+      }
+     });
+  }
+
+  async allLeadsByWorkspace(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -66,6 +112,8 @@ export class LeadRepo {
           },
         },
       },
+      skip,
+      take,
       orderBy: {
         createdAt: 'desc'
       }
@@ -80,6 +128,23 @@ export class LeadRepo {
           members: {
             some: {
               userId: ctx.ActorId,
+              role: {
+                in: ['member', 'admin', 'owner'],
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async countLeadsByActorWorkspaces(actorId: string, db: DbOrTxClient = this.prisma) {
+    return await db.lead.count({
+      where: {
+        workspace: {
+          members: {
+            some: {
+              userId: actorId,
               role: {
                 in: ['member', 'admin', 'owner'],
               },

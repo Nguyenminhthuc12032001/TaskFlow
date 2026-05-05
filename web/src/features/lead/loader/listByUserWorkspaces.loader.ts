@@ -1,24 +1,26 @@
 import type { LoaderFunctionArgs } from "react-router-dom";
-import { leadApi } from "../lead.api";
-import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
+import { notify } from "../../../app/shared/lib/notify";
 import type { ActionError } from "../../type";
+import { leadApi } from "../lead.api";
 import { z, ZodError } from "zod";
 
-export async function GetLeadByIdLoader({ params }: LoaderFunctionArgs) {
-    const paramsData: unknown = {
-        workspaceId: params.workspaceId,
-        leadId: params.leadId
-    }
+export async function ListLeadByUserWorkspacesLoader({ request }: LoaderFunctionArgs) {
+    const url = new URL(request.url);
+
+    const query = {
+        page: url.searchParams.get("page") ?? undefined,
+        limit: url.searchParams.get("limit") ?? undefined,
+    };
 
     try {
-        const promise = leadApi.getById(paramsData);
+        const promise = leadApi.listByUserWorkspaces(query);
 
         notify.promise(promise, {
-            loading: "Loading lead... ",
-            success: feedbackMessage.lead.getByIdSuccess,
-            error: feedbackMessage.lead.getByIdFailed
+            loading: "Loading leads... ",
+            success: feedbackMessage.lead.listByWorkspaceSuccess,
+            error: feedbackMessage.lead.listByWorkspaceFailed
         });
 
         return await promise;
@@ -45,6 +47,5 @@ export async function GetLeadByIdLoader({ params }: LoaderFunctionArgs) {
         }
 
         throw error;
-
     }
 }
