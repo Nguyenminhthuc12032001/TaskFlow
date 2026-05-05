@@ -19,7 +19,7 @@ export class TaskService {
     readonly prisma: DbClient,
     readonly activityService: ActivityService,
     readonly taskRepo: TaskRepo,
-  ) {}
+  ) { }
 
   async create(data: CreateBodyType, ctx: ResourceContext) {
     const result = await this.prisma.$transaction(async (tx) => {
@@ -124,7 +124,7 @@ export class TaskService {
   async listByColumn(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
     const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+    const countTasks = await this.taskRepo.countTasksByColumn(ctx, paginationQuery.search);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 
@@ -197,7 +197,7 @@ export class TaskService {
 
     const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+    const countTasks = await this.taskRepo.countTasksByColumn(ctx, undefined);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 

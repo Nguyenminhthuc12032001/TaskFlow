@@ -69,6 +69,7 @@ export class ColumnRepo {
 
   async countColumnsByProject(
     ctx: ResourceContext,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.column.count({
@@ -84,6 +85,12 @@ export class ColumnRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }

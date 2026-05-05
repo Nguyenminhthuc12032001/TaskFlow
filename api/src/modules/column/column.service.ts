@@ -62,7 +62,7 @@ export class ColumnService {
   async listByProjectId(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
     const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+    const countColumns = await this.columnRepo.countColumnsByProject(ctx, paginationQuery.search);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 
@@ -170,7 +170,7 @@ export class ColumnService {
 
     const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+    const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 

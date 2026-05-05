@@ -110,6 +110,7 @@ export class CommentRepo {
 
   async countCommentsByTask(
     ctx: ResourceContext,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.comment.count({
@@ -131,6 +132,12 @@ export class CommentRepo {
             },
           },
         },
+        ...(search ? {
+          content: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }

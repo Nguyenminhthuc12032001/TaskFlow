@@ -1,11 +1,13 @@
 import { Prisma } from '../../../prisma/generated/client.js';
-import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class WorkspaceRepo {
   constructor(readonly prisma: DbClient) { }
 
-  async create(workspaceData: Prisma.WorkspaceCreateInput, db: DbOrTxClient = this.prisma) {
+  async create(
+    workspaceData: Prisma.WorkspaceCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspace.create({
       data: workspaceData,
     });
@@ -20,7 +22,11 @@ export class WorkspaceRepo {
     });
   }
 
-  async findMembership(workspaceId: string, userId: string, db: DbOrTxClient = this.prisma) {
+  async findMembership(
+    workspaceId: string,
+    userId: string,
+    db: DbOrTxClient = this.prisma
+  ) {
     return db.workspaceMember.findUnique({
       where: {
         workspaceId_userId: {
@@ -102,7 +108,7 @@ export class WorkspaceRepo {
           : {}),
         ...(search
           ? {
-            name: {
+            email: {
               contains: search,
               mode: 'insensitive',
             }
@@ -125,6 +131,7 @@ export class WorkspaceRepo {
 
   async countInviteCandidates(
     workspaceId: string,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     const pendingInvites = await db.invite.findMany({
@@ -134,6 +141,13 @@ export class WorkspaceRepo {
           gt: new Date(),
         },
         usedAt: null,
+        ...(search
+          ? {
+            email: {
+              contains: search,
+              mode: 'insensitive',
+            }
+          } : {})
       },
       select: {
         email: true,
@@ -152,6 +166,12 @@ export class WorkspaceRepo {
         ...(pendingInviteEmails.length > 0
           ? { email: { notIn: pendingInviteEmails } }
           : {}),
+        ...(search ? {
+          email: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }
@@ -181,6 +201,9 @@ export class WorkspaceRepo {
     db: DbOrTxClient = this.prisma) {
     return db.workspace.findMany({
       where: {
+        members: {
+          some: { userId },
+        },
         ...(search
           ? {
             name: {
@@ -189,9 +212,6 @@ export class WorkspaceRepo {
             }
           }
           : {}),
-        members: {
-          some: { userId },
-        },
       },
       include: {
         creator: {
@@ -328,17 +348,27 @@ export class WorkspaceRepo {
 
   async countWorkspaceMembers(
     workspaceId: string,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return db.workspaceMember.count({
       where: {
         workspaceId,
+        ...(search ? {
+          user: {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            }
+          }
+        } : {})
       },
     });
   }
 
   async countWorkspacesByUserId(
     userId: string,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return db.workspace.count({
@@ -346,6 +376,14 @@ export class WorkspaceRepo {
         members: {
           some: { userId },
         },
+        ...(search
+          ? {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            }
+          }
+          : {}),
       },
     });
   }

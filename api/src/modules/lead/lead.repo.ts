@@ -5,7 +5,10 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class LeadRepo {
   constructor(readonly prisma: DbClient) { }
 
-  async create(data: Prisma.LeadCreateInput, db: DbOrTxClient = this.prisma) {
+  async create(
+    data: Prisma.LeadCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.create({ data });
   }
 
@@ -36,9 +39,9 @@ export class LeadRepo {
   }
 
   async listByWorkspace(
-    ctx: ResourceContext, 
+    ctx: ResourceContext,
     search: string | undefined,
-    { skip, take }: { skip: number; take: number }, 
+    { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma) {
     return await db.lead.findMany({
       where: {
@@ -53,6 +56,12 @@ export class LeadRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
       skip,
       take,
@@ -70,7 +79,7 @@ export class LeadRepo {
   ) {
     return await db.lead.findMany({
       where: {
-        workspace: { 
+        workspace: {
           members: {
             some: {
               userId: actorId,
@@ -80,6 +89,12 @@ export class LeadRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
       include: {
         workspace: {
@@ -94,10 +109,14 @@ export class LeadRepo {
       orderBy: {
         createdAt: 'desc'
       }
-     });
+    });
   }
 
-  async allLeadsByWorkspace(ctx: ResourceContext, { skip, take }: { skip: number; take: number }, db: DbOrTxClient = this.prisma) {
+  async allLeadsByWorkspace(
+    ctx: ResourceContext,
+    { skip, take }: { skip: number; take: number },
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -120,7 +139,11 @@ export class LeadRepo {
     });
   }
 
-  async countLeadsByWorkspace(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async countLeadsByWorkspace(
+    ctx: ResourceContext,
+    search: string | undefined,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.count({
       where: {
         workspace: {
@@ -134,11 +157,21 @@ export class LeadRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }
 
-  async countLeadsByActorWorkspaces(actorId: string, db: DbOrTxClient = this.prisma) {
+  async countLeadsByActorWorkspaces(
+    actorId: string,
+    search: string | undefined,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.count({
       where: {
         workspace: {
@@ -151,6 +184,12 @@ export class LeadRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }
@@ -194,11 +233,17 @@ export class LeadRepo {
     });
   }
 
-  async linkTask(data: Prisma.LeadTaskLinkCreateInput, db: DbOrTxClient = this.prisma) {
+  async linkTask(
+    data: Prisma.LeadTaskLinkCreateInput,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.leadTaskLink.create({ data });
   }
 
-  async unlinkTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async unlinkTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.leadTaskLink.delete({
       where: {
         leadId_taskId: {
@@ -239,7 +284,10 @@ export class LeadRepo {
     });
   }
 
-  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async remove(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.delete({
       where: {
         id: ctx.LeadId,
@@ -273,7 +321,10 @@ export class LeadRepo {
     });
   }
 
-  async removeLeadTaskLink(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async removeLeadTaskLink(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.leadTaskLink.deleteMany({
       where: {
         leadId: ctx.LeadId,
@@ -311,7 +362,11 @@ export class LeadRepo {
     });
   }
 
-  async existEmail(email: string, ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async existEmail(
+    email: string,
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.findFirst({
       where: {
         email,
@@ -345,7 +400,11 @@ export class LeadRepo {
     });
   }
 
-  async existPhone(phone: string, ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async existPhone(
+    phone: string,
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.lead.findFirst({
       where: {
         phone,
@@ -379,7 +438,10 @@ export class LeadRepo {
     });
   }
 
-  async existLinkTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async existLinkTask(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma
+  ) {
     return await db.leadTaskLink.findUnique({
       where: {
         leadId_taskId: { leadId: ctx.LeadId!, taskId: ctx.TaskId! },

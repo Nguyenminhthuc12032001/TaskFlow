@@ -87,7 +87,7 @@ export class WorkspaceService {
 
     const workspaces = await this.workspaceRepo.findByUserId(actorId, paginationQuery.search, { take, skip });
 
-    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId);
+    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId, paginationQuery.search);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspacesByUser);
 
@@ -99,7 +99,7 @@ export class WorkspaceService {
 
     const members = await this.workspaceRepo.findMembers(workspaceId, paginationQuery.search, { take, skip });
 
-    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId);
+    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId, paginationQuery.search);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
 
@@ -111,7 +111,7 @@ export class WorkspaceService {
 
     const users = await this.workspaceRepo.findInviteCandidates(workspaceId, paginationQuery.search, { take, skip });
 
-    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId);
+    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId, paginationQuery.search);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countInviteCandidates);
 

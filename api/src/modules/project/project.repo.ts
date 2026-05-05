@@ -148,6 +148,7 @@ export class ProjectRepo {
 
   async countProjectsByWorkspace(
     ctx: ResourceContext,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.project.count({
@@ -160,6 +161,12 @@ export class ProjectRepo {
             },
           },
         },
+        ...(search ? {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }

@@ -81,7 +81,7 @@ export class ProjectService {
   async listByWorkspace(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
     const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx);
+    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 

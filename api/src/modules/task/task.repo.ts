@@ -109,7 +109,7 @@ export class TaskRepo {
           },
         },
         ...(search ? {
-          name: {
+          title: {
             contains: search,
             mode: 'insensitive',
           }
@@ -155,6 +155,7 @@ export class TaskRepo {
 
   async countTasksByColumn(
     ctx: ResourceContext,
+    search: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.task.count({
@@ -173,6 +174,12 @@ export class TaskRepo {
             },
           },
         },
+        ...(search ? {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          }
+        } : {})
       },
     });
   }
