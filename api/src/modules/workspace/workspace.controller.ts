@@ -25,6 +25,12 @@ import {
   type SafeWorkspaceResponse,
   type SafeWorkspacesResponse,
   type UpdateWorkspaceBody,
+  type ListWorkspaceQuery,
+  listWorkspaceQuerySchema,
+  type ListMemberByWorkspaceQuery,
+  listMemberByWorkspaceQuerySchema,
+  type ListInviteeCandidatesQuery,
+  listInviteeCandidatesQuerySchema,
 } from './workspace.schemas.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import {
@@ -33,7 +39,7 @@ import {
   ok,
   okEnvelopeSchema,
 } from '../../common/utils/response/format.js';
-import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
+import type { WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 
 export class WorkspaceController {
   constructor(private workspaceService: WorkspaceService) { }
@@ -76,9 +82,9 @@ export class WorkspaceController {
   };
 
   getByUserId = async (req: Request, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listWorkspaceQuery: ListWorkspaceQuery = listWorkspaceQuerySchema.parse(req.query);
 
-    const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user!.id, paginationQuery);
+    const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user!.id, listWorkspaceQuery);
 
     const workspacesResponse: SafeWorkspacesResponse = {
       data:
@@ -102,9 +108,9 @@ export class WorkspaceController {
   };
 
   getMembersById = async (req: Request<WorkspaceParamsType>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery = listMemberByWorkspaceQuerySchema.parse(req.query);
 
-    const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, paginationQuery);
+    const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, listMemberByWorkspaceQuery);
 
     const membersResponse: SafeMembersResponse = {
       data:
@@ -148,9 +154,9 @@ export class WorkspaceController {
   }
 
   getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listInviteeCandidatesQuery: ListInviteeCandidatesQuery = listInviteeCandidatesQuerySchema.parse(req.query);
 
-    const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, paginationQuery);
+    const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, listInviteeCandidatesQuery);
 
     const inviteCandidatesResponse: InviteCandidatesResponse = {
       data: users.map((user) => ({

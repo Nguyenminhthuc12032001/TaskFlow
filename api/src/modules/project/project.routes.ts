@@ -6,7 +6,7 @@ import { ProjectService } from './project.service.js';
 import { ProjectRepo } from './project.repo.js';
 import { prisma } from '../../db/prisma.js';
 import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
-import { createBodySchema, updateBodySchema } from './project.schemas.js';
+import { createBodySchema, listProjectsQuerySchema, updateBodySchema } from './project.schemas.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
@@ -36,7 +36,7 @@ router.get(
   requireWorkspaceRole(),
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listProjectsQuerySchema),
   projectController.listByWorkspace,
 );
 

@@ -61,9 +61,9 @@ export class CommentService {
     }
     async listByTask(ctx, paginationQuery) {
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countComments = await this.commentRepo.countCommentsByTask(ctx);
+        const countComments = await this.commentRepo.countCommentsByTask(ctx, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countComments);
-        const comments = await this.commentRepo.listByTask(ctx, { skip, take });
+        const comments = await this.commentRepo.listByTask(ctx, paginationQuery.search, { skip, take });
         return { comments, paginationMeta };
     }
     async update(data, ctx) {

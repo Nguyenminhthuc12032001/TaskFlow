@@ -1,4 +1,5 @@
 import type { Prisma } from '../../../prisma/generated/client.js';
+import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
@@ -34,6 +35,7 @@ export class ProjectRepo {
   async listByWorkspace(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
   ) {
@@ -48,10 +50,26 @@ export class ProjectRepo {
           },
         },
         ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            },
+            {
+              description: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            }
+          ]
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+          },
         } : {})
       },
       skip,
@@ -149,6 +167,7 @@ export class ProjectRepo {
   async countProjectsByWorkspace(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.project.count({
@@ -162,10 +181,26 @@ export class ProjectRepo {
           },
         },
         ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            },
+            {
+              description: {
+                contains: search,
+                mode: 'insensitive',
+              }
+            }
+          ]
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+          },
         } : {})
       },
     });

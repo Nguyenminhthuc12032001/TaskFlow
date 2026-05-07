@@ -45,24 +45,24 @@ export class WorkspaceService {
         }
         return workspace;
     }
-    async getByUserId(actorId, paginationQuery) {
-        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const workspaces = await this.workspaceRepo.findByUserId(actorId, { take, skip });
-        const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId);
+    async getByUserId(actorId, listWorkspaceQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(listWorkspaceQuery.page, listWorkspaceQuery.limit);
+        const workspaces = await this.workspaceRepo.findByUserId(actorId, listWorkspaceQuery.search, { take, skip });
+        const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId, listWorkspaceQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspacesByUser);
         return { workspaces, paginationMeta };
     }
-    async listMembers(workspaceId, paginationQuery) {
-        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const members = await this.workspaceRepo.findMembers(workspaceId, { take, skip });
-        const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId);
+    async listMembers(workspaceId, listMemberByWorkspaceQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(listMemberByWorkspaceQuery.page, listMemberByWorkspaceQuery.limit);
+        const members = await this.workspaceRepo.findMembers(workspaceId, listMemberByWorkspaceQuery.search, { take, skip });
+        const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId, listMemberByWorkspaceQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
         return { members, paginationMeta };
     }
-    async listInviteCandidates(workspaceId, paginationQuery) {
-        const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const users = await this.workspaceRepo.findInviteCandidates(workspaceId, { take, skip });
-        const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId);
+    async listInviteCandidates(workspaceId, listInviteeCandidatesQuery) {
+        const { safePage, safeLimit, take, skip } = buildPagination(listInviteeCandidatesQuery.page, listInviteeCandidatesQuery.limit);
+        const users = await this.workspaceRepo.findInviteCandidates(workspaceId, listInviteeCandidatesQuery.search, { take, skip });
+        const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId, listInviteeCandidatesQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countInviteCandidates);
         return { users, paginationMeta };
     }

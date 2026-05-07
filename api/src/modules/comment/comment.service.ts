@@ -2,11 +2,12 @@ import { ActivityAction, Prisma } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
 import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
 import type { CommentRepo } from './comment.repo.js';
-import type { CreateBodyType, UpdateBodyType } from './comment.schemas.js';
+import type { CreateBodyType, ListCommentsQueryType, UpdateBodyType } from './comment.schemas.js';
 
 export class CommentService {
   constructor(
@@ -94,14 +95,19 @@ export class CommentService {
     return comment;
   }
 
-  async listByTask(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
-    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+  async listByTask(ctx: ResourceContext, listCommentsQuery: ListCommentsQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(listCommentsQuery.page, listCommentsQuery.limit);
 
-    const countComments = await this.commentRepo.countCommentsByTask(ctx, paginationQuery.search);
+    const dateRange = buildDateRange({
+      startDate: listCommentsQuery.startDate,
+      endDate: listCommentsQuery.endDate
+    });
+
+    const countComments = await this.commentRepo.countCommentsByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countComments);
 
-    const comments = await this.commentRepo.listByTask(ctx, paginationQuery.search, { skip, take });
+    const comments = await this.commentRepo.listByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId, { skip, take });
 
     return { comments, paginationMeta };
   }

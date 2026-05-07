@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import {
+  listCommentsQuerySchema,
   safeCommentSchema,
   safeCommentsSchema,
   type CreateBodyType,
+  type ListCommentsQueryType,
   type SafeCommentsType,
   type SafeCommentType,
   type UpdateBodyType,
@@ -78,7 +80,7 @@ export class CommentController {
   };
 
   listByTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listCommentsQuery: ListCommentsQueryType = listCommentsQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -88,7 +90,7 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const { comments, paginationMeta } = await this.commentService.listByTask(ctx, paginationQuery);
+    const { comments, paginationMeta } = await this.commentService.listByTask(ctx, listCommentsQuery);
 
     const safeComments: SafeCommentsType = {
       data:

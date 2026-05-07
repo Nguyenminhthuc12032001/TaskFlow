@@ -2,6 +2,7 @@ import z from '../../docs/zod.js';
 import { registry } from '../../docs/openapi.js';
 import {
   createBodySchema,
+  listColumnQuerySchema,
   reOrderBodySchema,
   safeColumnSchema,
   safeColumnsSchema,
@@ -41,7 +42,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: paginationQuerySchema
+    query: listColumnQuerySchema
   },
   responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });

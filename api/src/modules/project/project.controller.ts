@@ -1,10 +1,12 @@
 import type { Request, Response } from 'express';
 import type { ProjectService } from './project.service.js';
 import {
+  listProjectsQuerySchema,
   listProjectsResponseSchema,
   safeProjectResponseSchema,
   type CreateBodyType,
   type ListProjectResponseType,
+  type ListProjectsQueryType,
   type SafeProjectResponseType,
   type UpdateBodyType,
 } from './project.schemas.js';
@@ -71,13 +73,13 @@ export class ProjectController {
   };
 
   listByWorkspace = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listProjectsQuery: ListProjectsQueryType = listProjectsQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       ActorId: req.user!.id,
     };
 
-    const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, paginationQuery);
+    const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, listProjectsQuery);
 
     const safeProjectResponse: ListProjectResponseType = {
       data:

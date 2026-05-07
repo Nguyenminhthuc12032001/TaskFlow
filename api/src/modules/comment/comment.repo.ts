@@ -1,4 +1,5 @@
 import type { Prisma } from '../../../prisma/generated/client.js';
+import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
@@ -41,6 +42,8 @@ export class CommentRepo {
   async listByTask(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    parentId: string | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma
   ) {
@@ -67,6 +70,15 @@ export class CommentRepo {
           content: {
             contains: search,
             mode: 'insensitive',
+          }
+        } : {}),
+        ...(parentId ? {
+          parentId
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
           }
         } : {})
       },
@@ -111,6 +123,8 @@ export class CommentRepo {
   async countCommentsByTask(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    parentId: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.comment.count({
@@ -136,6 +150,13 @@ export class CommentRepo {
           content: {
             contains: search,
             mode: 'insensitive',
+          }
+        } : {}),
+        ...(parentId ? { parentId } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
           }
         } : {})
       },

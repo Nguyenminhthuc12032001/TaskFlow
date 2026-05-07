@@ -14,6 +14,8 @@ import {
   type SafeTask,
   type SafeTasks,
   type UpdateBodyType,
+  type ListTaskByColumnQueryType,
+  listTaskByColumnQuerySchema,
 } from './task.schemas.js';
 import type { TaskService } from './task.service.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
@@ -121,7 +123,7 @@ export class TaskController {
   };
 
   listByColumn = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listTaskByColumnQuery: ListTaskByColumnQueryType = listTaskByColumnQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -130,7 +132,7 @@ export class TaskController {
       ActorId: req.user!.id,
     };
 
-    const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, paginationQuery);
+    const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, listTaskByColumnQuery);
 
     const safeTasks: SafeTasks = {
       data:

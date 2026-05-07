@@ -4,6 +4,7 @@ import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
 import {
   createBodySchema,
+  listCommentsQuerySchema,
   safeCommentSchema,
   safeCommentsSchema,
   updateBodySchema,
@@ -60,7 +61,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: paginationQuerySchema
+    query: listCommentsQuerySchema
   },
   responses: defaultResponse(safeCommentsSchema, [201, 409]),
 });

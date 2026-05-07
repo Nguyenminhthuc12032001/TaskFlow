@@ -11,6 +11,7 @@ import {
   assignBodySchema,
   bulkRemoveBodySchema,
   createBodySchema,
+  listTaskByColumnQuerySchema,
   reOrderBodySchema,
   updateBodySchema,
 } from './task.schemas.js';
@@ -55,7 +56,7 @@ router.get(
   requireWorkspaceRole(),
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listTaskByColumnQuerySchema),
   taskController.listByColumn,
 );
 

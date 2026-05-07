@@ -6,6 +6,7 @@ import {
   assignBodySchema,
   bulkRemoveBodySchema,
   createBodySchema,
+  listTaskByColumnQuerySchema,
   reOrderBodySchema,
   safeAssigneeSchema,
   safeTaskSchema,
@@ -75,7 +76,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: paginationQuerySchema
+    query: listTaskByColumnQuerySchema
   },
   responses: defaultResponse(safeTasksSchema, [201, 409]),
 });

@@ -75,9 +75,9 @@ export class TaskService {
     }
     async listByColumn(ctx, paginationQuery) {
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
-        const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+        const tasks = await this.taskRepo.listByColumn(ctx, paginationQuery.search, { take, skip });
         return { tasks, paginationMeta };
     }
     async update(data, ctx) {
@@ -109,9 +109,9 @@ export class TaskService {
             await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_TASK, 'tasks', ctx.ActorId, undefined, { result }, tx);
         });
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countTasks = await this.taskRepo.countTasksByColumn(ctx);
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx, undefined);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
-        const tasks = await this.taskRepo.listByColumn(ctx, { take, skip });
+        const tasks = await this.taskRepo.listByColumn(ctx, undefined, { take, skip });
         return { tasks, paginationMeta };
     }
     async archivTask(ctx) {

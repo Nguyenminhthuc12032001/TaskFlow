@@ -12,7 +12,7 @@ import {
 } from '../../common/utils/jwt.js';
 import { type DbClient } from '../../db/prisma.js';
 import { WorkspaceRepo } from './workspace.repo.js';
-import type { CreateWorkspaceBody, UpdateWorkspaceBody } from './workspace.schemas.js';
+import type { CreateWorkspaceBody, ListInviteeCandidatesQuery, ListMemberByWorkspaceQuery, ListWorkspaceQuery, UpdateWorkspaceBody } from './workspace.schemas.js';
 import { AuthRepo } from '../auth/auth.repo.js';
 import { env } from '../../config/env.js';
 import ms from 'ms';
@@ -21,8 +21,10 @@ import { hashValue, verifyHash } from '../../common/utils/crypto.js';
 import type { IEmailService } from '../mail/mail.interface.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { ProjectRepo } from '../project/project.repo.js';
-import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type { DataRangeQueryType, PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
+
 
 export class WorkspaceService {
   constructor(
@@ -32,7 +34,7 @@ export class WorkspaceService {
     readonly projectRepo: ProjectRepo,
     readonly activityService: ActivityService,
     readonly prisma: DbClient,
-  ) {}
+  ) { }
 
   async create(workspaceData: CreateWorkspaceBody, actorId: string) {
 
@@ -81,37 +83,52 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async getByUserId(actorId: string, paginationQuery: PaginationQueryType) {
+  async getByUserId(actorId: string, listWorkspaceQuery: ListWorkspaceQuery) {
 
-    const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+    const { safePage, safeLimit, take, skip } = buildPagination(listWorkspaceQuery.page, listWorkspaceQuery.limit);
 
-    const workspaces = await this.workspaceRepo.findByUserId(actorId, paginationQuery.search, { take, skip });
+    const dateRange = buildDateRange({
+      startDate: listWorkspaceQuery.startDate,
+      endDate: listWorkspaceQuery.endDate
+    });
 
-    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId, paginationQuery.search);
+    const workspaces = await this.workspaceRepo.findByUserId(actorId, listWorkspaceQuery.search, dateRange, listWorkspaceQuery.actorRole, { take, skip });
+
+    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId, listWorkspaceQuery.search, dateRange, listWorkspaceQuery.actorRole);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspacesByUser);
 
     return { workspaces, paginationMeta };
   }
 
-  async listMembers(workspaceId: string, paginationQuery: PaginationQueryType) {
-    const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+  async listMembers(workspaceId: string, listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery) {
+    const { safePage, safeLimit, take, skip } = buildPagination(listMemberByWorkspaceQuery.page, listMemberByWorkspaceQuery.limit);
 
-    const members = await this.workspaceRepo.findMembers(workspaceId, paginationQuery.search, { take, skip });
+    const dateRange = buildDateRange({
+      startDate: listMemberByWorkspaceQuery.startDate,
+      endDate: listMemberByWorkspaceQuery.endDate
+    });
 
-    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId, paginationQuery.search);
+    const members = await this.workspaceRepo.findMembers(workspaceId, listMemberByWorkspaceQuery.search, dateRange, listMemberByWorkspaceQuery.role, { take, skip });
+
+    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId, listMemberByWorkspaceQuery.search, dateRange, listMemberByWorkspaceQuery.role);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
 
     return { members, paginationMeta };
   }
 
-  async listInviteCandidates(workspaceId: string, paginationQuery: PaginationQueryType) {
-    const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+  async listInviteCandidates(workspaceId: string, listInviteeCandidatesQuery: ListInviteeCandidatesQuery) {
+    const { safePage, safeLimit, take, skip } = buildPagination(listInviteeCandidatesQuery.page, listInviteeCandidatesQuery.limit);
 
-    const users = await this.workspaceRepo.findInviteCandidates(workspaceId, paginationQuery.search, { take, skip });
+    const dateRange = buildDateRange({
+      startDate: listInviteeCandidatesQuery.startDate,
+      endDate: listInviteeCandidatesQuery.endDate
+    });
 
-    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId, paginationQuery.search);
+    const users = await this.workspaceRepo.findInviteCandidates(workspaceId, listInviteeCandidatesQuery.search, dateRange, { take, skip });
+
+    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId, listInviteeCandidatesQuery.search, dateRange);
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countInviteCandidates);
 

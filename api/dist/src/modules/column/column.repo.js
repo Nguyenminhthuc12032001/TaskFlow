@@ -5,7 +5,7 @@ export class ColumnRepo {
     async create(data, db = this.prisma) {
         return await db.column.create({ data });
     }
-    async listByProject(ctx, { skip, take }, db = this.prisma) {
+    async listByProject(ctx, search, { skip, take }, db = this.prisma) {
         return await db.column.findMany({
             where: {
                 project: {
@@ -19,6 +19,12 @@ export class ColumnRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             skip,
             take,
@@ -47,7 +53,7 @@ export class ColumnRepo {
             }
         });
     }
-    async countColumnsByProject(ctx, db = this.prisma) {
+    async countColumnsByProject(ctx, search, db = this.prisma) {
         return await db.column.count({
             where: {
                 project: {
@@ -61,6 +67,12 @@ export class ColumnRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }

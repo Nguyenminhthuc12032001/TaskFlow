@@ -14,11 +14,14 @@ import {
   acceptBodySchema,
   createBodySchema,
   inviteBodySchema,
+  listInviteeCandidatesQuerySchema,
+  listMemberByWorkspaceQuerySchema,
+  listWorkspaceQuerySchema,
   removeMemberBodySchema,
   updateBodySchema,
 } from './workspace.schemas.js';
 import { ProjectRepo } from '../project/project.repo.js';
-import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
+import { emptyBodySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 
 const router = Router();
 
@@ -41,7 +44,7 @@ router.post('',
 router.get('',
   authMiddleware,
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listWorkspaceQuerySchema),
   workspaceController.getByUserId
 );
 
@@ -59,7 +62,7 @@ router.get(
   authMiddleware,
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listMemberByWorkspaceQuerySchema),
   requireWorkspaceRole(),
   workspaceController.getMembersById,
 );
@@ -78,7 +81,7 @@ router.get(
   authMiddleware,
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listInviteeCandidatesQuerySchema),
   requireWorkspaceRole('admin'),
   workspaceController.getInviteCandidates,
 );

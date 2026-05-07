@@ -32,7 +32,7 @@ export class CommentRepo {
             },
         });
     }
-    async listByTask(ctx, { skip, take }, db = this.prisma) {
+    async listByTask(ctx, search, { skip, take }, db = this.prisma) {
         return await db.comment.findMany({
             where: {
                 task: {
@@ -52,6 +52,12 @@ export class CommentRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    content: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             skip,
             take,
@@ -86,7 +92,7 @@ export class CommentRepo {
             }
         });
     }
-    async countCommentsByTask(ctx, db = this.prisma) {
+    async countCommentsByTask(ctx, search, db = this.prisma) {
         return await db.comment.count({
             where: {
                 task: {
@@ -106,6 +112,12 @@ export class CommentRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    content: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }

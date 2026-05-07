@@ -63,7 +63,7 @@ export class TaskRepo {
             },
         });
     }
-    async listByColumn(ctx, { take, skip }, db = this.prisma) {
+    async listByColumn(ctx, search, { take, skip }, db = this.prisma) {
         return await db.task.findMany({
             include: {
                 assignees: true,
@@ -83,6 +83,12 @@ export class TaskRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    title: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             orderBy: {
                 position: 'asc'
@@ -117,7 +123,7 @@ export class TaskRepo {
             }
         });
     }
-    async countTasksByColumn(ctx, db = this.prisma) {
+    async countTasksByColumn(ctx, search, db = this.prisma) {
         return await db.task.count({
             where: {
                 column: {
@@ -134,6 +140,12 @@ export class TaskRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    title: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }

@@ -30,7 +30,7 @@ export class LeadRepo {
             }
         });
     }
-    async listByWorkspace(ctx, { skip, take }, db = this.prisma) {
+    async listByWorkspace(ctx, search, { skip, take }, db = this.prisma) {
         return await db.lead.findMany({
             where: {
                 workspace: {
@@ -44,6 +44,12 @@ export class LeadRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             skip,
             take,
@@ -52,7 +58,7 @@ export class LeadRepo {
             }
         });
     }
-    async listByActorWorkspaces(actorId, { skip, take }, db = this.prisma) {
+    async listByActorWorkspaces(actorId, search, { skip, take }, db = this.prisma) {
         return await db.lead.findMany({
             where: {
                 workspace: {
@@ -65,6 +71,12 @@ export class LeadRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             include: {
                 workspace: {
@@ -103,7 +115,7 @@ export class LeadRepo {
             }
         });
     }
-    async countLeadsByWorkspace(ctx, db = this.prisma) {
+    async countLeadsByWorkspace(ctx, search, db = this.prisma) {
         return await db.lead.count({
             where: {
                 workspace: {
@@ -117,10 +129,16 @@ export class LeadRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }
-    async countLeadsByActorWorkspaces(actorId, db = this.prisma) {
+    async countLeadsByActorWorkspaces(actorId, search, db = this.prisma) {
         return await db.lead.count({
             where: {
                 workspace: {
@@ -133,6 +151,12 @@ export class LeadRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }

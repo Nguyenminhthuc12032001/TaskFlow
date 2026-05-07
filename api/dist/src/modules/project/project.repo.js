@@ -20,7 +20,7 @@ export class ProjectRepo {
             },
         });
     }
-    async listByWorkspace(ctx, { take, skip }, db = this.prisma) {
+    async listByWorkspace(ctx, search, { take, skip }, db = this.prisma) {
         return await db.project.findMany({
             where: {
                 workspaceId: ctx.workspaceId,
@@ -31,6 +31,12 @@ export class ProjectRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
             skip,
             take,
@@ -109,7 +115,7 @@ export class ProjectRepo {
             },
         });
     }
-    async countProjectsByWorkspace(ctx, db = this.prisma) {
+    async countProjectsByWorkspace(ctx, search, db = this.prisma) {
         return await db.project.count({
             where: {
                 workspaceId: ctx.workspaceId,
@@ -120,6 +126,12 @@ export class ProjectRepo {
                         },
                     },
                 },
+                ...(search ? {
+                    name: {
+                        contains: search,
+                        mode: 'insensitive',
+                    }
+                } : {})
             },
         });
     }

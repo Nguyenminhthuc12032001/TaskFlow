@@ -17,7 +17,7 @@ export const searchQuerySchema = z.preprocess((value) => {
   if (typeof value !== 'string') return undefined;
 
   const trimmed = value.trim();
-  
+
   return trimmed.length > 0 ? trimmed : undefined;
 }, z.string("Search query must be greater than 0 characters long")
   .min(1, "Search query must be at least 1 character long")
@@ -26,10 +26,29 @@ export const searchQuerySchema = z.preprocess((value) => {
 );
 export type SearchQueryType = z.infer<typeof searchQuerySchema>;
 
+const optionalDateQuerySchema = z.preprocess((value) => {
+  if (typeof value === 'string' && value.trim().length === 0) return undefined;
+
+  return value;
+}, z.coerce.date().optional());
+
+export const dataRangeQuerySchema = z.object({
+  startDate: optionalDateQuerySchema,
+  endDate: optionalDateQuerySchema
+}).superRefine((data, ctx) => {
+  if (data.startDate && data.endDate && data.startDate > data.endDate) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Start date must be before end date',
+      path: ['startDate'],
+    });
+  }
+});
+export type DataRangeQueryType = z.infer<typeof dataRangeQuerySchema>;
+
 export const paginationQuerySchema = z.object({
   page: z.coerce.number().int().min(1, 'Page must be a positive integer').default(1),
-  limit: z.coerce.number().int().min(1, 'Limit must be a positive integer').default(10),
-  search: searchQuerySchema
+  limit: z.coerce.number().int().min(1, 'Limit must be a positive integer').default(10), 
 });
 export type PaginationQueryType = z.infer<typeof paginationQuerySchema>;
 

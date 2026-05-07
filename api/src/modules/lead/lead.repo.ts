@@ -1,4 +1,5 @@
-import type { Prisma } from '../../../prisma/generated/client.js';
+import type { LeadStage, Prisma } from '../../../prisma/generated/client.js';
+import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
@@ -41,6 +42,8 @@ export class LeadRepo {
   async listByWorkspace(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    stage: LeadStage | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma) {
     return await db.lead.findMany({
@@ -74,6 +77,9 @@ export class LeadRepo {
   async listByActorWorkspaces(
     actorId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    stage: LeadStage | undefined,
+    workspaceId: string | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
   ) {
@@ -94,7 +100,15 @@ export class LeadRepo {
             contains: search,
             mode: 'insensitive',
           }
-        } : {})
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+          }
+        } : {}),
+        ...(stage ? { stage } : {}),
+        ...(workspaceId ? { workspaceId } : {})
       },
       include: {
         workspace: {
@@ -142,6 +156,8 @@ export class LeadRepo {
   async countLeadsByWorkspace(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    stage: LeadStage | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.lead.count({
@@ -170,6 +186,9 @@ export class LeadRepo {
   async countLeadsByActorWorkspaces(
     actorId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    stage: LeadStage | undefined,
+    workspaceId: string | undefined,
     db: DbOrTxClient = this.prisma
   ) {
     return await db.lead.count({
@@ -189,7 +208,15 @@ export class LeadRepo {
             contains: search,
             mode: 'insensitive',
           }
-        } : {})
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+          }
+        } : {}),
+        ...(stage ? { stage } : {}),
+        ...(workspaceId ? { workspaceId } : {})
       },
     });
   }

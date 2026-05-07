@@ -40,16 +40,16 @@ export class LeadService {
     }
     async listByWorkspace(ctx, paginationQuery) {
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx);
+        const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
-        const leads = await this.leadRepo.listByWorkspace(ctx, { skip, take });
+        const leads = await this.leadRepo.listByWorkspace(ctx, paginationQuery.search, { skip, take });
         return { leads, paginationMeta };
     }
     async listByActorWorkspaces(actorId, paginationQuery) {
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId);
+        const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
-        const leads = await this.leadRepo.listByActorWorkspaces(actorId, { skip, take });
+        const leads = await this.leadRepo.listByActorWorkspaces(actorId, paginationQuery.search, { skip, take });
         return { leads, paginationMeta };
     }
     async update(data, ctx) {

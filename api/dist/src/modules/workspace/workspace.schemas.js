@@ -1,8 +1,22 @@
 import z from '../../docs/zod.js';
 import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
-import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
 // ========= REQUEST ==========
+export const listWorkspaceQuerySchema = paginationQuerySchema.extend({
+    search: searchQuerySchema,
+    ...dataRangeQuerySchema.shape,
+    actorRole: z.enum(WorkspaceRole).optional(),
+});
+export const listMemberByWorkspaceQuerySchema = paginationQuerySchema.extend({
+    search: searchQuerySchema,
+    ...dataRangeQuerySchema.shape,
+    role: z.enum(WorkspaceRole).optional(),
+});
+export const listInviteeCandidatesQuerySchema = paginationQuerySchema.extend({
+    search: searchQuerySchema,
+    ...dataRangeQuerySchema.shape,
+});
 // POST workspace/create
 export const createBodySchema = z.object({
     name: z

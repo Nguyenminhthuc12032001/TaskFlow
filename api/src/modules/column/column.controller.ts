@@ -2,9 +2,11 @@ import type { Request, Response } from 'express';
 import { paginationMetaSchema, paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import {
+  listColumnQuerySchema,
   safeColumnSchema,
   safeColumnsSchema,
   type CreateBodyType,
+  type ListColumnQueryType,
   type ReOrderBodyType,
   type SafeColumnsType,
   type SafeColumnType,
@@ -48,14 +50,14 @@ export class ColumnController {
   };
 
   listByProject = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listColumnQuery: ListColumnQueryType = listColumnQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
       ActorId: req.user!.id,
     };
 
-    const { columns, paginationMeta } = await this.columnService.listByProjectId(ctx, paginationQuery);
+    const { columns, paginationMeta } = await this.columnService.listByProjectId(ctx, listColumnQuery);
 
     const safeColumns: SafeColumnsType = {
       data: columns.map((c) => ({

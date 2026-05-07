@@ -2,11 +2,12 @@ import { ActivityAction, type Prisma } from '../../../prisma/generated/client.js
 import { AppError } from '../../common/errors/AppError.js';
 import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { ColumnRepo } from './column.repo.js';
-import type { CreateBodyType, ReOrderBodyType, UpdateBodyType } from './column.schemas.js';
+import type { CreateBodyType, ListColumnQueryType, ReOrderBodyType, UpdateBodyType } from './column.schemas.js';
 
 export class ColumnService {
   constructor(
@@ -59,14 +60,19 @@ export class ColumnService {
     });
   }
 
-  async listByProjectId(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
-    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+  async listByProjectId(ctx: ResourceContext, listColumnQuery: ListColumnQueryType) {
+    const { safePage, safeLimit, skip, take } = buildPagination(listColumnQuery.page, listColumnQuery.limit);
+    
+    const dateRange = buildDateRange({
+      startDate: listColumnQuery.startDate,
+      endDate: listColumnQuery.endDate
+    });  
 
-    const countColumns = await this.columnRepo.countColumnsByProject(ctx, paginationQuery.search);
+    const countColumns = await this.columnRepo.countColumnsByProject(ctx, listColumnQuery.search, dateRange, listColumnQuery.type);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 
-    const columns = await this.columnRepo.listByProject(ctx, paginationQuery.search, { skip, take });
+    const columns = await this.columnRepo.listByProject(ctx, listColumnQuery.search, dateRange, listColumnQuery.type, { skip, take });
 
     return { columns, paginationMeta };
   }
@@ -170,15 +176,15 @@ export class ColumnService {
 
     const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined);
+    const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined, { startDate: undefined, endDate: undefined }, undefined);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
 
-    const columns = await this.columnRepo.listByProject(ctx, undefined, { skip, take });
+    const columns = await this.columnRepo.listByProject(ctx, undefined, { startDate: undefined, endDate: undefined }, undefined, { skip, take });
 
     return { columns, paginationMeta };
   }
-
+ 
   async remove(ctx: ResourceContext) {
     return this.prisma.$transaction(async (tx) => {
       const column = await this.columnRepo.remove(ctx, tx);

@@ -3,9 +3,24 @@ import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { safeTaskSchema } from '../task/task.schemas.js';
-import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
 
 // REQUEST
+
+export const listLeadByActorQuerySchema = paginationQuerySchema.extend({
+  search: searchQuerySchema,
+  ...dataRangeQuerySchema.shape,
+  stage: z.enum(LeadStage).optional(),
+  workspaceId: z.uuid().optional(),
+});
+export type ListLeadByActorQueryType = z.infer<typeof listLeadByActorQuerySchema>;
+
+export const listLeadsQuerySchema = paginationQuerySchema.extend({
+  search: searchQuerySchema,
+  ...dataRangeQuerySchema.shape,
+  stage: z.enum(LeadStage).optional(),
+});
+export type ListLeadsQueryType = z.infer<typeof listLeadsQuerySchema>;
 
 export const createBodySchema = z.object({
   name: z

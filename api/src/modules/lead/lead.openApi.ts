@@ -5,6 +5,8 @@ import { defaultResponse } from '../workspace/workspace.openApi.js';
 import {
   createBodySchema,
   createFollowUpTaskBodySchema,
+  listLeadByActorQuerySchema,
+  listLeadsQuerySchema,
   safeLeadDetailSchema,
   safeLeadSchema,
   safeLeadsSchema,
@@ -31,7 +33,7 @@ registry.registerPath({
   summary: 'List leads across actor workspaces',
   security: [{ bearerAuth: [] }],
   request: {
-    query: paginationQuerySchema,
+    query: listLeadByActorQuerySchema,
   },
   responses: defaultResponse(safeLeadsWithWorkspaceSchema, [201, 409]),
 });
@@ -72,7 +74,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: paginationQuerySchema
+    query: listLeadsQuerySchema
   },
   responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });

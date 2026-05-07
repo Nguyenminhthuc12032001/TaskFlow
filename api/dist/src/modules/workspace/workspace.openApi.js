@@ -1,8 +1,7 @@
 import { registry } from '../../docs/openapi.js';
-import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, } from './workspace.schemas.js';
+import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, listWorkspaceQuerySchema, listMemberByWorkspaceQuerySchema, } from './workspace.schemas.js';
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200, } from '../auth/auth.openApi.js';
 import z from '../../docs/zod.js';
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 export const defaultResponse = (schema, exclude = []) => {
     const responses = {
         200: ok200(schema),
@@ -40,7 +39,7 @@ registry.registerPath({
     summary: 'Get list workspace by user ID',
     security: [{ bearerAuth: [] }],
     request: {
-        query: paginationQuerySchema,
+        query: listWorkspaceQuerySchema,
     },
     responses: defaultResponse(getByUserIdResponseSchema, [201, 404, 409]),
 });
@@ -67,7 +66,7 @@ registry.registerPath({
         params: z.object({
             workspaceId: z.uuid(),
         }),
-        query: paginationQuerySchema
+        query: listMemberByWorkspaceQuerySchema
     },
     responses: defaultResponse(membersResponseSchema, [201, 409]),
 });
@@ -94,7 +93,7 @@ registry.registerPath({
         params: z.object({
             workspaceId: z.uuid(),
         }),
-        query: paginationQuerySchema,
+        query: listMemberByWorkspaceQuerySchema,
     },
     responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
 });

@@ -1,4 +1,5 @@
-import type { Prisma } from '../../../prisma/generated/client.js';
+import type { ColumnType, Prisma } from '../../../prisma/generated/client.js';
+import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
@@ -12,6 +13,8 @@ export class ColumnRepo {
   async listByProject(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    type: ColumnType | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
   ) {
@@ -32,6 +35,13 @@ export class ColumnRepo {
           name: {
             contains: search,
             mode: 'insensitive',
+          }
+        } : {}),
+        ...(type ? { type } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
           }
         } : {})
       },
@@ -70,6 +80,8 @@ export class ColumnRepo {
   async countColumnsByProject(
     ctx: ResourceContext,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    type: ColumnType | undefined,
     db: DbOrTxClient = this.prisma,
   ) {
     return await db.column.count({
@@ -90,7 +102,14 @@ export class ColumnRepo {
             contains: search,
             mode: 'insensitive',
           }
-        } : {})
+        } : {}),
+        ...(type ? { type } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+          }
+        } : {}) 
       },
     });
   }

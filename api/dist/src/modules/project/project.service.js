@@ -52,9 +52,9 @@ export class ProjectService {
     }
     async listByWorkspace(ctx, paginationQuery) {
         const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx);
+        const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
-        const projects = await this.projectRepo.listByWorkspace(ctx, { take, skip });
+        const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, { take, skip });
         return { projects, paginationMeta };
     }
     async listByUser(actorId) {

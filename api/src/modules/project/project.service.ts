@@ -1,14 +1,14 @@
 import { ActivityAction, ColumnType, type Prisma } from '../../../prisma/generated/client.js';
 import type { ProjectUpdateInput } from '../../../prisma/generated/models.js';
-import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import { AppError } from '../../common/errors/AppError.js'; 
 import type { ResourceContext } from '../../common/types/common.types.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 
 import { ProjectRepo } from './project.repo.js';
-import type { CreateBodyType, UpdateBodyType } from './project.schemas.js';
+import type { CreateBodyType, ListProjectsQueryType, UpdateBodyType } from './project.schemas.js';
 
 export class ProjectService {
   constructor(
@@ -78,14 +78,19 @@ export class ProjectService {
     return result;
   }
 
-  async listByWorkspace(ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+  async listByWorkspace(ctx: ResourceContext, paginationQuery: ListProjectsQueryType) {
     const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
-    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search);
+    const dateRange = buildDateRange({
+      startDate: paginationQuery.startDate,
+      endDate: paginationQuery.endDate
+    });
+
+    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search, dateRange);
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 
-    const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, { take, skip });
+    const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, dateRange, { take, skip });
     
     return { projects, paginationMeta };
   }

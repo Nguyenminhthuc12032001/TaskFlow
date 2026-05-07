@@ -1,7 +1,13 @@
-import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 
 // REQUEST
+
+export const listProjectsQuerySchema = paginationQuerySchema.extend({
+  search: searchQuerySchema,
+  ...dataRangeQuerySchema.shape
+});
+export type ListProjectsQueryType = z.infer<typeof listProjectsQuerySchema>;
 
 export const createBodySchema = z.object({
   name: z

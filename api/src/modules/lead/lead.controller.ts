@@ -3,11 +3,15 @@ import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsTy
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { LeadService } from './lead.service.js';
 import {
+  listLeadByActorQuerySchema,
+  listLeadsQuerySchema,
   safeLeadDetailSchema,
   safeLeadSchema,
   safeLeadsSchema,
   safeLeadsWithWorkspaceSchema,
   safeLeadTaskLinkSchema,
+  type ListLeadByActorQueryType,
+  type ListLeadsQueryType,
   type SafeLeadDetailType,
   type SafeLeadsType,
   type SafeLeadsWithWorkspaceType,
@@ -55,9 +59,9 @@ export class LeadController {
   };
 
   listByActorWorkspaces = async (req: Request, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listLeadByActorQuery: ListLeadByActorQueryType = listLeadByActorQuerySchema.parse(req.query);
 
-    const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user!.id, paginationQuery);
+    const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user!.id, listLeadByActorQuery);
 
     const safeLeads: SafeLeadsWithWorkspaceType = {
       data: leads.map((lead) => ({
@@ -130,14 +134,14 @@ export class LeadController {
   };
 
   listByWorkspace = async (req: Request<WorkspaceParamsType>, res: Response) => {
-    const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
+    const listLeadsQuery: ListLeadsQueryType = listLeadsQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       ActorId: req.user!.id,
     };
 
-    const { leads, paginationMeta } = await this.leadService.listByWorkspace(ctx, paginationQuery);
+    const { leads, paginationMeta } = await this.leadService.listByWorkspace(ctx, listLeadsQuery);
 
     const safeLeads: SafeLeadsType = {
       data: leads.map((lead) => ({

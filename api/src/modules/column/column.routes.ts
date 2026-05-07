@@ -6,7 +6,7 @@ import { ColumnRepo } from './column.repo.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
 import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
-import { createBodySchema, reOrderBodySchema, updateBodySchema } from './column.schemas.js';
+import { createBodySchema, listColumnQuerySchema, reOrderBodySchema, updateBodySchema } from './column.schemas.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
@@ -32,7 +32,7 @@ router.get(
   requireWorkspaceRole(),
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listColumnQuerySchema),
   columnController.listByProject,
 );
 

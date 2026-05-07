@@ -1,6 +1,7 @@
 import { registry } from '../../docs/openapi.js';
 import {
   createBodySchema,
+  listProjectsQuerySchema,
   listProjectsResponseSchema,
   safeProjectResponseSchema,
   updateBodySchema,
@@ -53,7 +54,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: paginationQuerySchema
+    query: listProjectsQuerySchema
   },
   responses: defaultResponse(listProjectsResponseSchema, [201, 409]),
 });

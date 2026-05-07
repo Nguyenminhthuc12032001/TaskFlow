@@ -1,7 +1,6 @@
-import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, safeMemberResponseSchema, updateResponseSchema, } from './workspace.schemas.js';
+import { acceptResponseSchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, safeMemberResponseSchema, updateResponseSchema, listWorkspaceQuerySchema, listMemberByWorkspaceQuerySchema, listInviteeCandidatesQuerySchema, } from './workspace.schemas.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 export class WorkspaceController {
     constructor(workspaceService) {
         this.workspaceService = workspaceService;
@@ -35,8 +34,8 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelope);
         };
         this.getByUserId = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
-            const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user.id, paginationQuery);
+            const listWorkspaceQuery = listWorkspaceQuerySchema.parse(req.query);
+            const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user.id, listWorkspaceQuery);
             const workspacesResponse = {
                 data: workspaces.map((w) => ({
                     id: w.id,
@@ -55,8 +54,8 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelope);
         };
         this.getMembersById = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
-            const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, paginationQuery);
+            const listMemberByWorkspaceQuery = listMemberByWorkspaceQuerySchema.parse(req.query);
+            const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, listMemberByWorkspaceQuery);
             const membersResponse = {
                 data: members.map((m) => ({
                     user: {
@@ -91,8 +90,8 @@ export class WorkspaceController {
             return res.status(200).json(validatedEnvelope);
         };
         this.getInviteCandidates = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
-            const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, paginationQuery);
+            const listInviteeCandidatesQuery = listInviteeCandidatesQuerySchema.parse(req.query);
+            const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, listInviteeCandidatesQuery);
             const inviteCandidatesResponse = {
                 data: users.map((user) => ({
                     id: user.id,

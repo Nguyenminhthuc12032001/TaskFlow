@@ -34,9 +34,9 @@ export class ColumnService {
     }
     async listByProjectId(ctx, paginationQuery) {
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx, paginationQuery.search);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
-        const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+        const columns = await this.columnRepo.listByProject(ctx, paginationQuery.search, { skip, take });
         return { columns, paginationMeta };
     }
     async get(ctx) {
@@ -94,9 +94,9 @@ export class ColumnService {
             }, tx);
         });
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countColumns = await this.columnRepo.countColumnsByProject(ctx);
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
-        const columns = await this.columnRepo.listByProject(ctx, { skip, take });
+        const columns = await this.columnRepo.listByProject(ctx, undefined, { skip, take });
         return { columns, paginationMeta };
     }
     async remove(ctx) {

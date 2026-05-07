@@ -1,5 +1,15 @@
-import { Prisma } from '../../../prisma/generated/client.js';
+import { Prisma, type WorkspaceRole } from '../../../prisma/generated/client.js';
+import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
+
+function buildDateRangeFilter(dateRange: DataRangeQueryType) {
+  if (!dateRange?.startDate && !dateRange?.endDate) return undefined;
+
+  return {
+    ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+    ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+  };
+}
 
 export class WorkspaceRepo {
   constructor(readonly prisma: DbClient) { }
@@ -45,22 +55,38 @@ export class WorkspaceRepo {
   async findMembers(
     workspaceId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    role: WorkspaceRole | undefined,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma
   ) {
+    const joinedAtFilter = buildDateRangeFilter(dateRange);
+
     return db.workspaceMember.findMany({
       where: {
         workspaceId,
         ...(search
           ? {
             user: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              }
+              OR: [
+                {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
             }
           }
-          : {})
+          : {}),
+        ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
+        ...(role ? { role } : {}),
       },
       include: {
         user: {
@@ -78,9 +104,12 @@ export class WorkspaceRepo {
   async findInviteCandidates(
     workspaceId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
   ) {
+    const createdAtFilter = buildDateRangeFilter(dateRange);
+
     const pendingInvites = await db.invite.findMany({
       where: {
         workspaceId,
@@ -108,12 +137,23 @@ export class WorkspaceRepo {
           : {}),
         ...(search
           ? {
-            email: {
-              contains: search,
-              mode: 'insensitive',
-            }
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                email: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+            ],
           }
-          : {})
+          : {}),
+        ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
       select: {
         id: true,
@@ -132,8 +172,11 @@ export class WorkspaceRepo {
   async countInviteCandidates(
     workspaceId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
     db: DbOrTxClient = this.prisma
   ) {
+    const createdAtFilter = buildDateRangeFilter(dateRange);
+
     const pendingInvites = await db.invite.findMany({
       where: {
         workspaceId,
@@ -141,13 +184,6 @@ export class WorkspaceRepo {
           gt: new Date(),
         },
         usedAt: null,
-        ...(search
-          ? {
-            email: {
-              contains: search,
-              mode: 'insensitive',
-            }
-          } : {})
       },
       select: {
         email: true,
@@ -167,11 +203,22 @@ export class WorkspaceRepo {
           ? { email: { notIn: pendingInviteEmails } }
           : {}),
         ...(search ? {
-          email: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {})
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        } : {}),
+        ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
     });
   }
@@ -197,21 +244,41 @@ export class WorkspaceRepo {
   async findByUserId(
     userId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    actorRole: WorkspaceRole | undefined,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma) {
+    const createdAtFilter = buildDateRangeFilter(dateRange);
+
     return db.workspace.findMany({
       where: {
         members: {
-          some: { userId },
+          some: {
+            userId,
+            ...(actorRole ? { role: actorRole } : {}),
+          },
         },
         ...(search
           ? {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            }
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                creator: {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            ],
           }
           : {}),
+        ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
       include: {
         creator: {
@@ -349,19 +416,35 @@ export class WorkspaceRepo {
   async countWorkspaceMembers(
     workspaceId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    role: WorkspaceRole | undefined,
     db: DbOrTxClient = this.prisma
   ) {
+    const joinedAtFilter = buildDateRangeFilter(dateRange);
+
     return db.workspaceMember.count({
       where: {
         workspaceId,
         ...(search ? {
           user: {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            }
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                email: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+            ],
           }
-        } : {})
+        } : {}),
+        ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
+        ...(role ? { role } : {}),
       },
     });
   }
@@ -369,21 +452,41 @@ export class WorkspaceRepo {
   async countWorkspacesByUserId(
     userId: string,
     search: string | undefined,
+    dateRange: DataRangeQueryType,
+    actorRole: WorkspaceRole | undefined,
     db: DbOrTxClient = this.prisma
   ) {
+    const createdAtFilter = buildDateRangeFilter(dateRange);
+
     return db.workspace.count({
       where: {
         members: {
-          some: { userId },
+          some: {
+            userId,
+            ...(actorRole ? { role: actorRole } : {}),
+          },
         },
         ...(search
           ? {
-            name: {
-              contains: search,
-              mode: 'insensitive',
-            }
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                creator: {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              },
+            ],
           }
           : {}),
+        ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
     });
   }

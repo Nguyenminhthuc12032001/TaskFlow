@@ -6,6 +6,8 @@ import { validateBody, validateParams, validateQuery } from '../../common/middle
 import {
   createBodySchema,
   createFollowUpTaskBodySchema,
+  listLeadByActorQuerySchema,
+  listLeadsQuerySchema,
   updateBodySchema,
   updateStageBodySchema,
 } from './lead.schemas.js';
@@ -41,7 +43,7 @@ router.get(
   '',
   authMiddleware,
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listLeadByActorQuerySchema),
   leadController.listByActorWorkspaces,
 );
 
@@ -60,7 +62,7 @@ router.get(
   requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
   validateBody(emptyBodySchema),
-  validateQuery(paginationQuerySchema),
+  validateQuery(listLeadsQuerySchema),
   leadController.listByWorkspace,
 );
 

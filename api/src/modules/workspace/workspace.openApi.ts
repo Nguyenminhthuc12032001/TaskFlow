@@ -14,6 +14,9 @@ import {
   removeMemberResponseSchema,
   updateBodySchema,
   updateResponseSchema,
+  listWorkspaceQuerySchema,
+  listMemberByWorkspaceQuerySchema,
+  listInviteeCandidatesQuerySchema,
 } from './workspace.schemas.js';
 import {
   created201,
@@ -26,7 +29,6 @@ import {
   ok200,
 } from '../auth/auth.openApi.js';
 import z, { type ZodType } from '../../docs/zod.js';
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 
 export const defaultResponse = (
   schema: ZodType,
@@ -73,7 +75,7 @@ registry.registerPath({
   summary: 'Get list workspace by user ID',
   security: [{ bearerAuth: [] }],
   request: {
-    query: paginationQuerySchema,
+    query: listWorkspaceQuerySchema,
   },
   responses: defaultResponse(getByUserIdResponseSchema, [201, 404, 409]),
 });
@@ -102,7 +104,7 @@ registry.registerPath({
     params: z.object({
       workspaceId: z.uuid(),
     }),
-    query: paginationQuerySchema
+    query: listMemberByWorkspaceQuerySchema
   },
   responses: defaultResponse(membersResponseSchema, [201, 409]),
 });
@@ -131,7 +133,7 @@ registry.registerPath({
     params: z.object({
       workspaceId: z.uuid(),
     }),
-    query: paginationQuerySchema,
+    query: listInviteeCandidatesQuerySchema,
   },
   responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
 })
