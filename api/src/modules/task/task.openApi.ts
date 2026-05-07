@@ -9,6 +9,7 @@ import {
   listTaskByColumnQuerySchema,
   reOrderBodySchema,
   safeAssigneeSchema,
+  safeTaskDetailSchema,
   safeTaskSchema,
   safeTasksSchema,
   updateBodySchema,
@@ -53,7 +54,7 @@ registry.registerPath({
     },
     params: withTaskId,
   },
-  responses: defaultResponse(safeAssigneeSchema, [201]),
+  responses: defaultResponse(safeAssigneeSchema, [200]),
 });
 
 registry.registerPath({
@@ -65,7 +66,7 @@ registry.registerPath({
   request: {
     params: withTaskId,
   },
-  responses: defaultResponse(safeTaskSchema, [201, 409]),
+  responses: defaultResponse(safeTaskDetailSchema, [201, 409]),
 });
 
 registry.registerPath({

@@ -141,17 +141,6 @@ export const safeLeadSchema = z.object({
 });
 export type SafeLeadType = z.infer<typeof safeLeadSchema>;
 
-export const safeLeadWorkspaceSchema = z.object({
-  id: z.uuid(),
-  name: z.string(),
-});
-export type SafeLeadWorkspaceType = z.infer<typeof safeLeadWorkspaceSchema>;
-
-export const safeLeadWithWorkspaceSchema = safeLeadSchema.extend({
-  workspace: safeLeadWorkspaceSchema,
-});
-export type SafeLeadWithWorkspaceType = z.infer<typeof safeLeadWithWorkspaceSchema>;
-
 export const safeLeadDetailSchema = z.object({
   id: z.uuid(),
   workspaceId: z.uuid(),
@@ -197,9 +186,3 @@ export const safeLeadsSchema = z.object({
   paginationMeta: paginationMetaSchema
 });
 export type SafeLeadsType = z.infer<typeof safeLeadsSchema>;
-
-export const safeLeadsWithWorkspaceSchema = z.object({
-  data: z.array(safeLeadWithWorkspaceSchema),
-  paginationMeta: paginationMetaSchema,
-});
-export type SafeLeadsWithWorkspaceType = z.infer<typeof safeLeadsWithWorkspaceSchema>;

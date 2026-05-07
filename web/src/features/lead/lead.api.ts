@@ -1,6 +1,19 @@
-import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
+import { workspaceParamsSchema, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { createBodySchema, createFollowUpTaskBodySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema } from "../../../../api/src/modules/lead/lead.schemas";
+import {
+    createBodySchema,
+    createFollowUpTaskBodySchema,
+    listLeadByActorQuerySchema,
+    listLeadsQuerySchema,
+    safeLeadDetailSchema,
+    safeLeadSchema,
+    safeLeadTaskLinkSchema,
+    safeLeadsSchema,
+    updateBodySchema,
+    updateStageBodySchema,
+    type ListLeadByActorQueryType,
+    type ListLeadsQueryType,
+} from "../../../../api/src/modules/lead/lead.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
@@ -21,7 +34,7 @@ export const leadApi = {
 
     listByWorkspace: async (workspaceId: unknown, query: unknown) => {
         const validatedIds: WorkspaceParamsType = validate(workspaceParamsSchema)({ workspaceId: workspaceId });
-        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+        const validatedQuery: ListLeadsQueryType = validate(listLeadsQuerySchema)(query);
 
         const response = await http.get(`/leads/${validatedIds.workspaceId}`, { params: validatedQuery });
 
@@ -33,12 +46,12 @@ export const leadApi = {
     },
 
     listByUserWorkspaces: async (query: unknown) => {
-        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+        const validatedQuery: ListLeadByActorQueryType = validate(listLeadByActorQuerySchema)(query);
 
         const response = await http.get("/leads", { params: validatedQuery });
 
         const envelop = response.data;
-        const envelopSchema = okEnvelopeSchema(safeLeadsWithWorkspaceSchema);
+        const envelopSchema = okEnvelopeSchema(safeLeadsSchema);
         const validatedEnvelop = validate(envelopSchema)(envelop);
 
         return validatedEnvelop.data;

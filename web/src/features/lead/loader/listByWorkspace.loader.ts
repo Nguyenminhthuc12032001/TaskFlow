@@ -5,14 +5,18 @@ import { leadApi } from "../lead.api";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ListLeadByWorkspaceLoader({ params, request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get("page") ?? undefined,
-        limit: url.searchParams.get("limit") ?? undefined,
-    };
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "stage",
+    ]);
 
     try {
         const promise = leadApi.listByWorkspace(params.workspaceId, query);

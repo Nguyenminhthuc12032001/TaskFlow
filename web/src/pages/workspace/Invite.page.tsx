@@ -1,7 +1,17 @@
-import { Form, Link, useActionData, useLoaderData, useNavigation } from "react-router-dom";
+import type { FormEvent } from "react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useSearchParams,
+} from "react-router-dom";
 import type { ActionError } from "../../features/type";
 import { InviteCandidatesLoader } from "../../features/workspace/loader/inviteCandidates";
 import { WorkspaceRole } from "../../../../api/prisma/generated/enums";
+import { getQueryLink } from "../../app/shared/lib/query";
+import { XIcon } from "../../components/ui/Icons";
 
 const roleOptions = [
   {
@@ -21,20 +31,78 @@ const roleOptions = [
   },
 ];
 
+const defaultPageSizeOptions = [6, 10, 20, 50, 100];
+
+function getPageSizeOptions(currentLimit: number) {
+  return Array.from(new Set([...defaultPageSizeOptions, currentLimit])).sort((a, b) => a - b);
+}
+
 export function InvitePage() {
   const data = useLoaderData<typeof InviteCandidatesLoader>();
   const actionError: ActionError | undefined = useActionData();
   const navigation = useNavigation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const isSubmitting = navigation.state === "submitting";
   const isLoadError = "errorMessage" in data;
   const users = isLoadError ? [] : data.data;
+  const pagination = isLoadError ? null : data.paginationMeta;
+  const query = searchParams.get("search")?.trim() ?? "";
+  const startDate = searchParams.get("startDate") ?? "";
+  const endDate = searchParams.get("endDate") ?? "";
+  const pageSizeOptions = pagination ? getPageSizeOptions(pagination.limit) : defaultPageSizeOptions;
+  const hasFilters = Boolean(query || startDate || endDate);
+  const filterKey = [query, startDate, endDate, pagination?.limit ?? ""].join("|");
 
   const userIdError = actionError?.fieldErrors?.userId?.[0];
   const roleError = actionError?.fieldErrors?.role?.[0];
   const formError = actionError?.formErrors?.[0];
   const errorMessage = actionError?.errorMessage;
   const hasInviteCandidates = users.length > 0;
+  const availableCount = pagination?.totalItems ?? users.length;
+
+  function handleFilterSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!pagination) return;
+
+    const formData = new FormData(event.currentTarget);
+    const nextSearch = formData.get("search")?.toString().trim() ?? "";
+    const nextStartDate = formData.get("startDate")?.toString() ?? "";
+    const nextEndDate = formData.get("endDate")?.toString() ?? "";
+    const nextLimit = formData.get("limit")?.toString() ?? String(pagination.limit);
+    const params = new URLSearchParams(searchParams);
+
+    [
+      ["search", nextSearch],
+      ["startDate", nextStartDate],
+      ["endDate", nextEndDate],
+      ["limit", nextLimit],
+    ].forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+
+    params.set("page", "1");
+    setSearchParams(params);
+  }
+
+  function handleClearFilters() {
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("search");
+    params.delete("startDate");
+    params.delete("endDate");
+    params.set("page", "1");
+    setSearchParams(params);
+  }
+
+  function getPageLink(page: number) {
+    return getQueryLink(searchParams, { page, limit: pagination?.limit ?? 10 });
+  }
 
   return (
     <section className="min-h-full bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -58,10 +126,94 @@ export function InvitePage() {
                 Available
               </p>
               <p className="mt-1 text-2xl font-semibold text-slate-900">
-                {users.length}
+                {availableCount}
               </p>
             </div>
           </div>
+
+          {!isLoadError ? (
+            <div className="border-b border-slate-100 px-6 py-5 sm:px-8">
+              <form
+                key={filterKey}
+                onSubmit={handleFilterSubmit}
+                className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(180px,1fr)_150px_150px_110px_auto]"
+              >
+                <label className="min-w-0">
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Search
+                  </span>
+                  <input
+                    name="search"
+                    defaultValue={query}
+                    placeholder="Name or email"
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </label>
+
+                <label>
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    From
+                  </span>
+                  <input
+                    type="date"
+                    name="startDate"
+                    defaultValue={startDate}
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </label>
+
+                <label>
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    To
+                  </span>
+                  <input
+                    type="date"
+                    name="endDate"
+                    defaultValue={endDate}
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  />
+                </label>
+
+                <label>
+                  <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Per page
+                  </span>
+                  <select
+                    name="limit"
+                    defaultValue={String(pagination?.limit ?? 10)}
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  >
+                    {pageSizeOptions.map((limit) => (
+                      <option key={limit} value={limit}>
+                        {limit}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="flex items-end gap-2">
+                  <button
+                    type="submit"
+                    className="inline-flex h-11 flex-1 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white transition hover:bg-slate-800 lg:flex-none"
+                  >
+                    Apply
+                  </button>
+
+                  {hasFilters ? (
+                    <button
+                      type="button"
+                      onClick={handleClearFilters}
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                      aria-label="Clear filters"
+                      title="Clear filters"
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </button>
+                  ) : null}
+                </div>
+              </form>
+            </div>
+          ) : null}
 
           <div className="px-6 py-6 sm:px-8">
             {isLoadError ? (
@@ -113,18 +265,20 @@ export function InvitePage() {
                         </option>
                       ))
                     ) : (
-                      <option value="">No eligible users</option>
+                      <option value="">
+                        {hasFilters ? "No eligible users match filters" : "No eligible users"}
+                      </option>
                     )}
                   </select>
 
                   {userIdError && (
-                      <p
-                        id="invitee-error"
-                        className="mt-2 text-sm text-red-600"
-                        role="alert"
-                      >
-                        {userIdError}
-                      </p>
+                    <p
+                      id="invitee-error"
+                      className="mt-2 text-sm text-red-600"
+                      role="alert"
+                    >
+                      {userIdError}
+                    </p>
                   )}
                 </div>
 
@@ -178,6 +332,46 @@ export function InvitePage() {
                     )}
                   </div>
                 </div>
+
+                {pagination && pagination.totalPages > 1 ? (
+                  <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-sm text-slate-600">
+                      Page <span className="font-semibold text-slate-900">{pagination.page}</span>
+                      {" / "}
+                      <span className="font-semibold text-slate-900">{pagination.totalPages}</span>
+                      {" - "}
+                      Total <span className="font-semibold text-slate-900">{pagination.totalItems}</span> users
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      {pagination.hasPrevPage ? (
+                        <Link
+                          to={getPageLink(pagination.page - 1)}
+                          className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        >
+                          Previous
+                        </Link>
+                      ) : (
+                        <span className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-400 opacity-50">
+                          Previous
+                        </span>
+                      )}
+
+                      {pagination.hasNextPage ? (
+                        <Link
+                          to={getPageLink(pagination.page + 1)}
+                          className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        >
+                          Next
+                        </Link>
+                      ) : (
+                        <span className="inline-flex h-10 cursor-not-allowed items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-400 opacity-50">
+                          Next
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-end">
                   <Link

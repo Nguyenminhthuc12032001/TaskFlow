@@ -7,8 +7,7 @@ import {
   updateBodySchema,
 } from './project.schemas.js';
 import z from '../../docs/zod.js';
-import { defaultResponse } from '../workspace/workspace.openApi.js';
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
+import { defaultResponse } from '../workspace/workspace.openApi.js'; 
 
 const defaultPath = '/api/projects/{workspaceId}';
 

@@ -9,6 +9,7 @@ import {
 import type { ListLeadByWorkspaceLoader } from "../../features/lead/loader/listByWorkspace.loader";
 import type { ListLeadByUserWorkspacesLoader } from "../../features/lead/loader/listByUserWorkspaces.loader";
 import { EyeIcon, PlusIcon, XIcon } from "../../components/ui/Icons";
+import { getQueryLink } from "../../app/shared/lib/query";
 
 type WorkspaceLoaderData = Awaited<ReturnType<typeof ListLeadByWorkspaceLoader>>;
 type UserWorkspacesLoaderData = Awaited<ReturnType<typeof ListLeadByUserWorkspacesLoader>>;
@@ -125,10 +126,6 @@ function getSourceText(source: LeadItem["source"]) {
     return source?.trim() || "No source";
 }
 
-function getWorkspaceName(lead: LeadItem) {
-    return "workspace" in lead ? lead.workspace.name : null;
-}
-
 function leadMatchesQuery(lead: LeadItem, query: string) {
     if (!query) return true;
 
@@ -137,7 +134,6 @@ function leadMatchesQuery(lead: LeadItem, query: string) {
         lead.email,
         lead.phone,
         lead.source,
-        getWorkspaceName(lead),
         lead.note,
         lead.stage,
     ]
@@ -268,7 +264,7 @@ export function ListLeadPage() {
 
     const leads = data.data;
     const pagination = data.paginationMeta;
-    const query = searchParams.get("q")?.trim() ?? "";
+    const query = (searchParams.get("search") ?? searchParams.get("q"))?.trim() ?? "";
     const stageFromUrl = searchParams.get("stage");
     const activeStage = isLeadStage(stageFromUrl) ? stageFromUrl : null;
     const hasFilters = Boolean(query) || Boolean(activeStage);
@@ -290,6 +286,7 @@ export function ListLeadPage() {
 
     function updateParams(next: Record<string, string | null>) {
         const params = new URLSearchParams(searchParams);
+        params.delete("q");
 
         Object.entries(next).forEach(([key, value]) => {
             if (value) {
@@ -309,7 +306,7 @@ export function ListLeadPage() {
         const formData = new FormData(event.currentTarget);
         const nextQuery = formData.get("q")?.toString().trim() ?? "";
 
-        updateParams({ q: nextQuery || null });
+        updateParams({ search: nextQuery || null, q: null });
     }
 
     function handleStageFilter(stage: StageFilter) {
@@ -319,17 +316,14 @@ export function ListLeadPage() {
     function handleClearFilters() {
         const params = new URLSearchParams(searchParams);
         params.delete("q");
+        params.delete("search");
         params.delete("stage");
         params.set("page", "1");
         setSearchParams(params);
     }
 
     function getPageLink(page: number) {
-        const params = new URLSearchParams(searchParams);
-        params.set("page", String(page));
-        params.set("limit", String(pagination.limit));
-
-        return `?${params.toString()}`;
+        return getQueryLink(searchParams, { page, limit: pagination.limit });
     }
 
     function getLeadDetailLink(lead: LeadItem) {
@@ -410,7 +404,7 @@ export function ListLeadPage() {
                         </label>
                         <input
                             id="lead-search"
-                            name="q"
+                            name="search"
                             defaultValue={query}
                             placeholder="Search by name, contact, source, note..."
                             className="h-10 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
@@ -489,11 +483,6 @@ export function ListLeadPage() {
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase text-slate-400">
                                     Source
                                 </th>
-                                {isGlobalList ? (
-                                    <th className="px-4 py-3 text-[11px] font-semibold uppercase text-slate-400">
-                                        Workspace
-                                    </th>
-                                ) : null}
                                 <th className="px-4 py-3 text-[11px] font-semibold uppercase text-slate-400">
                                     Stage
                                 </th>
@@ -511,7 +500,7 @@ export function ListLeadPage() {
                         <tbody className="divide-y divide-slate-100 bg-white">
                             {visibleLeads.length === 0 ? (
                                 <tr>
-                                    <td colSpan={isGlobalList ? 7 : 6} className="px-4 py-12 text-center">
+                                    <td colSpan={6} className="px-4 py-12 text-center">
                                         <div className="mx-auto max-w-sm">
                                             <h3 className="text-base font-semibold text-slate-900">
                                                 No leads match these filters
@@ -550,13 +539,6 @@ export function ListLeadPage() {
                                                 {getSourceText(lead.source)}
                                             </p>
                                         </td>
-                                        {isGlobalList ? (
-                                            <td className="max-w-[190px] px-4 py-4">
-                                                <p className="truncate text-sm font-medium text-slate-700">
-                                                    {getWorkspaceName(lead)}
-                                                </p>
-                                            </td>
-                                        ) : null}
                                         <td className="px-4 py-4">
                                             <StageBadge stage={lead.stage} />
                                         </td>

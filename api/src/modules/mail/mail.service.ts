@@ -14,7 +14,7 @@ export class EmailService implements IEmailService {
     tls: { minVersion: 'TLSv1.2' },
   });
 
-  async sendPasswordResetEmail(email: string, resetLink: string) {
+  async sendPasswordResetEmail(email: string, resetLink: string): Promise<void> {
     await this.transporter.sendMail({
       from: env.EMAIL_FROM,
       to: email,
@@ -26,7 +26,7 @@ export class EmailService implements IEmailService {
     });
   }
 
-  async sendInviteEmail(email: string, workspaceName: string, inviteLink: string) {
+  async sendInviteEmail(email: string, workspaceName: string, inviteLink: string): Promise<void> {
     await this.transporter.sendMail({
       from: env.EMAIL_FROM,
       to: email,

@@ -14,7 +14,7 @@ export function authMiddleware(req, res, next) {
             email: payload.email,
         };
     }
-    catch (error) {
+    catch {
         throw new AppError('Invalid or expired token', 401);
     }
     next();

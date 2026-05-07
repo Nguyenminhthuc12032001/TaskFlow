@@ -1,3 +1,4 @@
+import type { ResponseConfig } from '@asteasolutions/zod-to-openapi';
 import type { ZodType } from '../../docs/zod.js';
 import {
   createdEnvelopeSchema,
@@ -23,7 +24,7 @@ registry.registerComponent('securitySchemes', 'refreshCookie', {
   name: 'refreshToken',
 });
 
-export const ok200 = (schema: ZodType) => ({
+export const ok200 = (schema: ZodType): ResponseConfig => ({
   description: 'Success',
   content: {
     'application/json': {
@@ -32,7 +33,7 @@ export const ok200 = (schema: ZodType) => ({
   },
 });
 
-export const created201 = (schema: ZodType) => ({
+export const created201 = (schema: ZodType): ResponseConfig => ({
   description: 'Created',
   content: {
     'application/json': {
@@ -41,7 +42,7 @@ export const created201 = (schema: ZodType) => ({
   },
 });
 
-export const fail400 = {
+export const fail400: ResponseConfig = {
   description: 'Bad request',
   content: {
     'application/json': {
@@ -50,7 +51,7 @@ export const fail400 = {
   },
 };
 
-export const fail401 = {
+export const fail401: ResponseConfig = {
   description: 'Unauthorized',
   content: {
     'application/json': {
@@ -59,7 +60,7 @@ export const fail401 = {
   },
 };
 
-export const fail403 = {
+export const fail403: ResponseConfig = {
   description: 'Forbidden',
   content: {
     'application/json': {
@@ -68,7 +69,7 @@ export const fail403 = {
   },
 };
 
-export const fail404 = {
+export const fail404: ResponseConfig = {
   description: 'Not found',
   content: {
     'application/json': {
@@ -77,12 +78,12 @@ export const fail404 = {
   },
 };
 
-export const fail409 = {
+export const fail409: ResponseConfig = {
   description: 'Conflict',
   content: { 'application/json': { schema: failEnvelopeSchema } },
 };
 
-export const fail500 = {
+export const fail500: ResponseConfig = {
   description: 'Internal server error',
   content: {
     'application/json': {

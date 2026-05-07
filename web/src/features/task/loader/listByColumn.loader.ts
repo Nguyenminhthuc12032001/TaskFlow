@@ -5,16 +5,40 @@ import { feedbackMessage } from "../../../app/shared/constants/feedback-messages
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
-export async function ListByColumnLoader({params}: LoaderFunctionArgs) {
+export async function ListByColumnLoader({params, request}: LoaderFunctionArgs) {
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
         projectId: params.projectId,
         columnId: params.columnId
     };
+    const url = new URL(request.url);
+    const rawQuery = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "priority",
+        "dueStartDate",
+        "dueEndDate",
+    ]);
+    const { dueStartDate, dueEndDate, ...query } = rawQuery;
+    const taskQuery = {
+        ...query,
+        ...(dueStartDate || dueEndDate
+            ? {
+                dueDateRange: {
+                    startDate: dueStartDate,
+                    endDate: dueEndDate,
+                },
+            }
+            : {}),
+    };
 
     try {
-        const promise = taskApi.listByColumn(paramsData);
+        const promise = taskApi.listByColumn(paramsData, taskQuery);
 
         notify.promise(promise, {
             loading: "Loading tasks... ",

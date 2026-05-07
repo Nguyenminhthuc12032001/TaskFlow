@@ -14,7 +14,9 @@ registry.registerComponent('securitySchemes', 'csrfToken', {
   name: 'x-csrf-token',
 });
 
-export function generateOpenAPIDocument() {
+type OpenAPIDocument = ReturnType<OpenApiGeneratorV3['generateDocument']>;
+
+export function generateOpenAPIDocument(): OpenAPIDocument {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
   return generator.generateDocument({

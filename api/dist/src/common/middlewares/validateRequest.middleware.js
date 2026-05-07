@@ -25,7 +25,6 @@ export function validateQuery(schema) {
         if (!result.success) {
             throw new AppError('Invalid query parameters', 400, 'VALIDATION_ERROR', z.treeifyError(result.error));
         }
-        req.query = result.data;
         next();
     };
 }

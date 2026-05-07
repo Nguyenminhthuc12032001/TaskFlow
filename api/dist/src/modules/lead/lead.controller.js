@@ -1,4 +1,4 @@
-import { listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
+import { listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 export class LeadController {
@@ -44,15 +44,11 @@ export class LeadController {
                     ...(lead.email != null && { email: lead.email }),
                     ...(lead.phone != null && { phone: lead.phone }),
                     ...(lead.source != null && { source: lead.source }),
-                    workspace: {
-                        id: lead.workspace.id,
-                        name: lead.workspace.name,
-                    },
                 })),
                 paginationMeta,
             };
             const envelope = ok(safeLeads);
-            const envelopeSchema = okEnvelopeSchema(safeLeadsWithWorkspaceSchema);
+            const envelopeSchema = okEnvelopeSchema(safeLeadsSchema);
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(200).json(validatedEnvelope);
         };

@@ -1,6 +1,13 @@
-import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
+import { workspaceParamsSchema, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { safeProjectResponseSchema, listProjectsResponseSchema, updateBodySchema, createBodySchema } from "../../../../api/src/modules/project/project.schemas";
+import {
+    createBodySchema,
+    listProjectsQuerySchema,
+    listProjectsResponseSchema,
+    safeProjectResponseSchema,
+    updateBodySchema,
+    type ListProjectsQueryType,
+} from "../../../../api/src/modules/project/project.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
@@ -20,7 +27,7 @@ export const projectApi = {
 
     listByWorkspace: async (workspaceId: unknown, query: unknown) => {
         const validatedWorkspaceId: WorkspaceParamsType = validate(workspaceParamsSchema)({ workspaceId: workspaceId });
-        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+        const validatedQuery: ListProjectsQueryType = validate(listProjectsQuerySchema)(query);
 
         const response = await http.get(`/projects/${validatedWorkspaceId.workspaceId}`, { params: validatedQuery });
 

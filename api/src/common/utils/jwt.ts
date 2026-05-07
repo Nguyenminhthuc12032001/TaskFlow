@@ -11,13 +11,13 @@ export type AccessTokenPayload = {
   name?: string;
 };
 
-export function signAccessToken(payload: AccessTokenPayload) {
+export function signAccessToken(payload: AccessTokenPayload): string {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: env.TTL_ACCESS_TOKEN as ms.StringValue,
   });
 }
 
-export function verifyAccessToken(token: string) {
+export function verifyAccessToken(token: string): AccessTokenPayload {
   return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
 }
 
@@ -28,13 +28,13 @@ export type RefreshTokenPayload = {
   version?: number;
 };
 
-export function signRefreshToken(payload: RefreshTokenPayload) {
+export function signRefreshToken(payload: RefreshTokenPayload): string {
   return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
     expiresIn: env.TTL_REFRESH_TOKEN as ms.StringValue,
   });
 }
 
-export function verifyRefreshToken(token: string) {
+export function verifyRefreshToken(token: string): RefreshTokenPayload {
   return jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload;
 }
 
@@ -45,13 +45,13 @@ export type ResetTokenPayload = {
   email: string;
 };
 
-export function signResetToken(payload: ResetTokenPayload) {
+export function signResetToken(payload: ResetTokenPayload): string {
   return jwt.sign(payload, env.JWT_RESET_SECRET, {
     expiresIn: env.TTL_RESET_TOKEN as ms.StringValue,
   });
 }
 
-export function verifyResetToken(token: string) {
+export function verifyResetToken(token: string): ResetTokenPayload {
   return jwt.verify(token, env.JWT_RESET_SECRET) as ResetTokenPayload;
 }
 
@@ -64,12 +64,12 @@ export type InviteTokenPayload = {
   role: WorkspaceRole;
 };
 
-export function signInviteToken(payload: InviteTokenPayload) {
+export function signInviteToken(payload: InviteTokenPayload): string {
   return jwt.sign(payload, env.JWT_INVITE_SECRET, {
     expiresIn: env.TTL_INVITE_TOKEN as ms.StringValue,
   });
 }
 
-export function verifyInviteToken(token: string) {
+export function verifyInviteToken(token: string): InviteTokenPayload {
   return jwt.verify(token, env.JWT_INVITE_SECRET) as InviteTokenPayload;
 }

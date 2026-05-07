@@ -68,7 +68,6 @@ export class ColumnService {
             return column;
         });
     }
-    async bulkUpdateStatus(data, ctx) { }
     async reOrder(data, ctx, paginationQuery) {
         const oldColumns = await this.columnRepo.allColumnsByProject(ctx);
         oldColumns.map((c) => {

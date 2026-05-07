@@ -1,12 +1,12 @@
-import { ActivityAction, type Prisma } from '../../../prisma/generated/client.js';
+import { ActivityAction, type Prisma, type Task, type TaskAssignee } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
-import type { TaskRepo } from './task.repo.js';
+import type { TaskRepo, TaskWithAssignees, TaskWithAssigneeUsers } from './task.repo.js';
 import type {
   AssignBodyType,
   BulkRemoveBodyType,
@@ -23,7 +23,7 @@ export class TaskService {
     readonly taskRepo: TaskRepo,
   ) { }
 
-  async create(data: CreateBodyType, ctx: ResourceContext) {
+  async create(data: CreateBodyType, ctx: ResourceContext): Promise<Task> {
     const result = await this.prisma.$transaction(async (tx) => {
       const tasks = await this.taskRepo.allTasksByColumn(ctx, tx);
 
@@ -74,7 +74,7 @@ export class TaskService {
     return result;
   }
 
-  async assign(data: AssignBodyType, ctx: ResourceContext) {
+  async assign(data: AssignBodyType, ctx: ResourceContext): Promise<TaskAssignee> {
     const result = await this.prisma.$transaction(async (tx) => {
       const existAssignee = await this.taskRepo.isExistAssignee(data.userId, ctx, tx);
 
@@ -113,7 +113,7 @@ export class TaskService {
     return result;
   }
 
-  async get(ctx: ResourceContext) {
+  async get(ctx: ResourceContext): Promise<TaskWithAssigneeUsers> {
     const task = await this.taskRepo.get(ctx);
 
     if (!task) {
@@ -123,7 +123,7 @@ export class TaskService {
     return task;
   }
 
-  async listByColumn(ctx: ResourceContext, listTaskByColumnQuery: ListTaskByColumnQueryType) {
+  async listByColumn(ctx: ResourceContext, listTaskByColumnQuery: ListTaskByColumnQueryType): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(listTaskByColumnQuery.page, listTaskByColumnQuery.limit);
 
     const dateRange = buildDateRange({
@@ -140,7 +140,7 @@ export class TaskService {
     return { tasks, paginationMeta };
   }
 
-  async update(data: UpdateBodyType, ctx: ResourceContext) {
+  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Task> {
     const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
     if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? '') && t.id !== ctx.TaskId)) {
@@ -173,7 +173,7 @@ export class TaskService {
     return result;
   }
 
-  async reOrder(data: ReOrderBodyType, ctx: ResourceContext, paginationQuery: PaginationQueryType) {
+  async reOrder(data: ReOrderBodyType, ctx: ResourceContext, paginationQuery: PaginationQueryType): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
     await this.prisma.$transaction(async (tx) => {
       await Promise.all(
         data.map(async ({ taskId, position }) => {
@@ -213,15 +213,15 @@ export class TaskService {
     return { tasks, paginationMeta };
   }
 
-  async archivTask(ctx: ResourceContext) {
+  async archivTask(ctx: ResourceContext): Promise<Task> {
     return await this.taskRepo.archivTask(ctx);
   }
 
-  async restoreTask(ctx: ResourceContext) {
+  async restoreTask(ctx: ResourceContext): Promise<Task> {
     return await this.taskRepo.restoreTask(ctx);
   }
 
-  async remove(ctx: ResourceContext) {
+  async remove(ctx: ResourceContext): Promise<Task> {
     return await this.prisma.$transaction(async (tx) => {
       const task = await this.taskRepo.remove(ctx);
 
@@ -239,7 +239,7 @@ export class TaskService {
     });
   }
 
-  async bulkRemove(data: BulkRemoveBodyType, ctx: ResourceContext) {
+  async bulkRemove(data: BulkRemoveBodyType, ctx: ResourceContext): Promise<Task[]> {
     const result = await this.prisma.$transaction(async (tx) => {
       const tasks = await Promise.all(
         data.map(async ({ taskId }) => {

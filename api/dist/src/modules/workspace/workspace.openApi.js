@@ -1,5 +1,5 @@
 import { registry } from '../../docs/openapi.js';
-import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, updateBodySchema, updateResponseSchema, listWorkspaceQuerySchema, listMemberByWorkspaceQuerySchema, listInviteeCandidatesQuerySchema, } from './workspace.schemas.js';
+import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, deleteResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteCandidatesResponseSchema, inviteBodySchema, inviteResponseSchema, membersResponseSchema, removeMemberResponseSchema, safeMemberResponseSchema, updateBodySchema, updateResponseSchema, listWorkspaceQuerySchema, listMemberByWorkspaceQuerySchema, listInviteeCandidatesQuerySchema, } from './workspace.schemas.js';
 import { created201, fail400, fail401, fail403, fail404, fail409, fail500, ok200, } from '../auth/auth.openApi.js';
 import z from '../../docs/zod.js';
 export const defaultResponse = (schema, exclude = []) => {
@@ -81,7 +81,7 @@ registry.registerPath({
             workspaceId: z.uuid(),
         }),
     },
-    responses: defaultResponse(membersResponseSchema, [201, 409]),
+    responses: defaultResponse(safeMemberResponseSchema, [201, 409]),
 });
 registry.registerPath({
     method: 'get',

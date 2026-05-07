@@ -11,7 +11,7 @@ import {
   updateBodySchema,
   updateStageBodySchema,
 } from './lead.schemas.js';
-import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
+import { emptyBodySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 import { LeadService } from './lead.service.js';
 import { prisma } from '../../db/prisma.js';
 import { LeadRepo } from './lead.repo.js';

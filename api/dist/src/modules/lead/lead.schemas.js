@@ -124,13 +124,6 @@ export const safeLeadSchema = z.object({
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
 });
-export const safeLeadWorkspaceSchema = z.object({
-    id: z.uuid(),
-    name: z.string(),
-});
-export const safeLeadWithWorkspaceSchema = safeLeadSchema.extend({
-    workspace: safeLeadWorkspaceSchema,
-});
 export const safeLeadDetailSchema = z.object({
     id: z.uuid(),
     workspaceId: z.uuid(),
@@ -170,8 +163,4 @@ export const safeLeadTaskLinkSchema = z.object({
 export const safeLeadsSchema = z.object({
     data: z.array(safeLeadSchema),
     paginationMeta: paginationMetaSchema
-});
-export const safeLeadsWithWorkspaceSchema = z.object({
-    data: z.array(safeLeadWithWorkspaceSchema),
-    paginationMeta: paginationMetaSchema,
 });

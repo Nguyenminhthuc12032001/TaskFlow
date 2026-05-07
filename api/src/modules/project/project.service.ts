@@ -1,10 +1,11 @@
-import { ActivityAction, ColumnType, type Prisma } from '../../../prisma/generated/client.js';
+import { ActivityAction, ColumnType, type Prisma, type Project } from '../../../prisma/generated/client.js';
 import type { ProjectUpdateInput } from '../../../prisma/generated/models.js';
-import { AppError } from '../../common/errors/AppError.js'; 
+import { AppError } from '../../common/errors/AppError.js';
+import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
-import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
+import type { DbClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 
 import { ProjectRepo } from './project.repo.js';
@@ -16,9 +17,9 @@ export class ProjectService {
     readonly projectRepo: ProjectRepo,
 
     readonly activityService: ActivityService,
-  ) {}
+  ) { }
 
-  async create(data: CreateBodyType, ctx: ResourceContext) {
+  async create(data: CreateBodyType, ctx: ResourceContext): Promise<Project> {
     const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
     if (projects.some((p) => p.name === data.name)) {
@@ -69,7 +70,7 @@ export class ProjectService {
     });
   }
 
-  async get(ctx: ResourceContext) {
+  async get(ctx: ResourceContext): Promise<Project> {
     const result = await this.projectRepo.get(ctx);
     if (!result) {
       throw new AppError('Project not found', 404);
@@ -78,7 +79,7 @@ export class ProjectService {
     return result;
   }
 
-  async listByWorkspace(ctx: ResourceContext, paginationQuery: ListProjectsQueryType) {
+  async listByWorkspace(ctx: ResourceContext, paginationQuery: ListProjectsQueryType): Promise<{ projects: Project[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
 
     const dateRange = buildDateRange({
@@ -91,23 +92,23 @@ export class ProjectService {
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 
     const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, dateRange, { take, skip });
-    
+
     return { projects, paginationMeta };
   }
 
-  async listByUser(actorId: string) {
+  async listByUser(actorId: string): Promise<Project[]> {
     return await this.projectRepo.listByUser(actorId);
   }
 
   async update(
     data: UpdateBodyType,
     ctx: ResourceContext,
-  ) {
+  ): Promise<Project> {
     const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
-    if (projects.some((p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId)) { 
+    if (projects.some((p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId)) {
       throw new AppError('Duplicate name is not allowed', 409);
-    } 
+    }
 
     const updateData: ProjectUpdateInput = {
       name: data.name,
@@ -131,7 +132,7 @@ export class ProjectService {
     });
   }
 
-  async remove(ctx: ResourceContext) {
+  async remove(ctx: ResourceContext): Promise<Project> {
     return await this.prisma.$transaction(async (tx) => {
       const project = await this.projectRepo.remove(ctx, tx);
 

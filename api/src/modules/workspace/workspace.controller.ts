@@ -44,7 +44,7 @@ import type { WorkspaceParamsType } from '../../common/schemas/common.schemas.js
 export class WorkspaceController {
   constructor(private workspaceService: WorkspaceService) { }
 
-  create = async (req: Request<{}, {}, CreateWorkspaceBody>, res: Response) => {
+  create = async (req: Request<{}, {}, CreateWorkspaceBody>, res: Response): Promise<Response> => {
     const workspace = await this.workspaceService.create(req.body, req.user!.id);
 
     const workspaceResponse: SafeWorkspaceResponse = {
@@ -62,7 +62,7 @@ export class WorkspaceController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  getById = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  getById = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const workspace = await this.workspaceService.getById(req.params.workspaceId);
 
     const workspaceResponse: SafeWorkspaceDetailResponse = {
@@ -81,7 +81,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  getByUserId = async (req: Request, res: Response) => {
+  getByUserId = async (req: Request, res: Response): Promise<Response> => {
     const listWorkspaceQuery: ListWorkspaceQuery = listWorkspaceQuerySchema.parse(req.query);
 
     const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user!.id, listWorkspaceQuery);
@@ -107,7 +107,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  getMembersById = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  getMembersById = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery = listMemberByWorkspaceQuerySchema.parse(req.query);
 
     const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, listMemberByWorkspaceQuery);
@@ -133,7 +133,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  getMemberByUserId = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  getMemberByUserId = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const member = await this.workspaceService.getMemberByUserId(req.params.workspaceId, req.user!.id);
 
     const memberResponse: SafeMemberResponse = {
@@ -151,9 +151,9 @@ export class WorkspaceController {
     const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
     return res.status(200).json(validatedEnvelope);
-  }
+  };
 
-  getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const listInviteeCandidatesQuery: ListInviteeCandidatesQuery = listInviteeCandidatesQuerySchema.parse(req.query);
 
     const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, listInviteeCandidatesQuery);
@@ -172,9 +172,9 @@ export class WorkspaceController {
     const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
     return res.status(200).json(validatedEnvelope);
-  }
+  };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response): Promise<Response> => {
     const updateData: UpdateWorkspaceBody = { name: req.body.name };
     const result = await this.workspaceService.update(
       req.params.workspaceId,
@@ -197,7 +197,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const result = await this.workspaceService.delete(req.params.workspaceId, req.user!.id);
 
     const safeWorkspaceResponse: SafeWorkspaceResponse = {
@@ -215,7 +215,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response) => {
+  invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response): Promise<Response> => {
     const result = await this.workspaceService.inviteMember(
       req.params.workspaceId,
       req.body.userId,
@@ -241,7 +241,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  accept = async (req: Request<{}, {}, AcceptBody>, res: Response) => {
+  accept = async (req: Request<{}, {}, AcceptBody>, res: Response): Promise<Response> => {
     const result = await this.workspaceService.acceptInvite(req.body.token, req.user!.id);
 
     const acceptResponse: AcceptResponse = {
@@ -258,7 +258,7 @@ export class WorkspaceController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  removeMember = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  removeMember = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const result = await this.workspaceService.removeMember(
       req.params.workspaceId,
       req.params.memberId!,
@@ -280,5 +280,7 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  changeRole = async (req: Request, res: Response) => { };
+  changeRole = async (_req: Request, res: Response): Promise<Response> => {
+    return res.status(501).json({ message: 'Not implemented' });
+  };
 }

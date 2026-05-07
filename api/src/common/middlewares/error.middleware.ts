@@ -3,7 +3,7 @@ import { AppError } from '../errors/AppError.js';
 import { fail } from '../utils/response/format.js';
 import { log } from '../logger/logger.js';
 
-export function errorMiddleware(err: any, req: Request, res: Response, next: NextFunction) {
+export function errorMiddleware(err: unknown, req: Request, res: Response, _next: NextFunction): Response {
   if (err instanceof AppError) {
     return res.status(err.status).json(fail(err.message, err.code, err.detail));
   }
@@ -17,5 +17,5 @@ export function errorMiddleware(err: any, req: Request, res: Response, next: Nex
     'Unhandled error',
   );
 
-  res.status(500).json(fail(`Internal Server Error: ${err}`));
+  return res.status(500).json(fail(`Internal Server Error: ${err}`));
 }

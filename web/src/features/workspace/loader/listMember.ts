@@ -6,16 +6,20 @@ import type { SafeMembersResponse } from "../../../../../api/src/modules/workspa
 import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { ZodError } from "zod"; 
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ListMemberLoader({ params, request }: LoaderFunctionArgs) { 
     const workspaceId = params.workspaceId
 
     const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get('page') ?? undefined,
-        limit: url.searchParams.get('limit') ?? undefined
-    };
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "role",
+    ]);
 
     try {
         const promise = workspaceApi.listMember(workspaceId, query);

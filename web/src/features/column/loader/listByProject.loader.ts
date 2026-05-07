@@ -4,22 +4,32 @@ import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
-import { z, ZodError } from "zod";  
+import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
-export async function ListByProjectLoader({ params }: LoaderFunctionArgs) {
+export async function ListByProjectLoader({ params, request }: LoaderFunctionArgs) {
     const workspaceId = params.workspaceId;
     const projectId = params.projectId;
+    const url = new URL(request.url);
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "type",
+    ]);
 
     try {
-        const promise = columnApi.listByProject(workspaceId, projectId);
+        const promise = columnApi.listByProject(workspaceId, projectId, query);
 
         notify.promise(promise, {
             loading: "Loading columns... ",
             success: feedbackMessage.column.listByProjectSuccess,
             error: feedbackMessage.column.listByProjectFailed
         });
-        
-        return await promise; 
+
+        return await promise;
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {

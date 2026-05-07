@@ -11,7 +11,7 @@ export default [
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -31,6 +31,7 @@ export default [
         },
       ],
       '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-empty-object-type': ['error', { allowObjectTypes: 'always' }], 
     },
   },
   {

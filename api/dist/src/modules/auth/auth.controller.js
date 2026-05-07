@@ -63,11 +63,7 @@ export class AuthController {
                 sameSite: 'lax',
                 path: '/api/auth',
             });
-            const user = {
-                id: result.user.id,
-                name: result.user.name,
-                email: result.user.email
-            };
+            const user = result.safeUser;
             const refreshResponse = {
                 user,
                 accessToken: result.accessToken,

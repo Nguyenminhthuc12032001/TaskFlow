@@ -1,7 +1,23 @@
-import type { Prisma, TaskPriority } from '../../../prisma/generated/client.js';
+import type { Prisma, Task, TaskAssignee, TaskPriority } from '../../../prisma/generated/client.js';
 import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
+
+export type TaskWithAssigneeUsers = Prisma.TaskGetPayload<{
+  include: {
+    assignees: {
+      include: {
+        user: true;
+      };
+    };
+  };
+}>;
+
+export type TaskWithAssignees = Prisma.TaskGetPayload<{
+  include: {
+    assignees: true;
+  };
+}>;
 
 export class TaskRepo {
   constructor(readonly prisma: DbClient) { }
@@ -9,7 +25,7 @@ export class TaskRepo {
   async create(
     data: Prisma.TaskCreateInput,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Task> {
     return await db.task.create({ data });
   }
 
@@ -17,7 +33,7 @@ export class TaskRepo {
     userId: string,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<TaskAssignee | null> {
     return await db.taskAssignee.findFirst({
       where: {
         task: {
@@ -48,14 +64,14 @@ export class TaskRepo {
   async assign(
     data: Prisma.TaskAssigneeCreateInput,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<TaskAssignee> {
     return await db.taskAssignee.create({ data });
   }
 
   async get(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<TaskWithAssigneeUsers | null> {
     return await db.task.findUnique({
       include: {
         assignees: {
@@ -92,7 +108,7 @@ export class TaskRepo {
     priority: TaskPriority | undefined,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<TaskWithAssignees[]> {
     return await db.task.findMany({
       include: {
         assignees: true,
@@ -143,7 +159,7 @@ export class TaskRepo {
   async allTasksByColumn(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<TaskWithAssignees[]> {
     return await db.task.findMany({
       include: {
         assignees: true,
@@ -177,7 +193,7 @@ export class TaskRepo {
     dueDateRange: DataRangeQueryType | undefined,
     priority: TaskPriority | undefined,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<number> {
     return await db.task.count({
       where: {
         column: {
@@ -221,7 +237,7 @@ export class TaskRepo {
     data: Prisma.TaskUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Task> {
     return await db.task.update({
       data,
       where: {
@@ -250,7 +266,7 @@ export class TaskRepo {
   async archivTask(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Task> {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -281,7 +297,7 @@ export class TaskRepo {
   async restoreTask(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Task> {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -312,7 +328,7 @@ export class TaskRepo {
   async remove(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Task> {
     return await db.task.delete({
       where: {
         id: ctx.TaskId,

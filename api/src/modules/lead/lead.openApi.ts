@@ -1,4 +1,3 @@
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
@@ -10,7 +9,6 @@ import {
   safeLeadDetailSchema,
   safeLeadSchema,
   safeLeadsSchema,
-  safeLeadsWithWorkspaceSchema,
   safeLeadTaskLinkSchema,
   updateBodySchema,
   updateStageBodySchema,
@@ -35,7 +33,7 @@ registry.registerPath({
   request: {
     query: listLeadByActorQuerySchema,
   },
-  responses: defaultResponse(safeLeadsWithWorkspaceSchema, [201, 409]),
+  responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });
 
 registry.registerPath({
@@ -120,7 +118,7 @@ registry.registerPath({
       taskId: z.uuid(),
     }),
   },
-  responses: defaultResponse(safeLeadTaskLinkSchema, [201]),
+  responses: defaultResponse(safeLeadTaskLinkSchema, [200]),
 });
 
 registry.registerPath({
@@ -134,7 +132,7 @@ registry.registerPath({
       taskId: z.uuid(),
     }),
   },
-  responses: defaultResponse(safeLeadTaskLinkSchema, [201, 409]),
+  responses: defaultResponse(safeLeadSchema, [201, 409]),
 });
 
 registry.registerPath({

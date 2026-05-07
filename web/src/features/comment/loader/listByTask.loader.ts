@@ -6,17 +6,27 @@ import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../ap
 import type { ActionError } from "../../type";
 import { ZodError } from "../../../../../api/src/docs/zod";
 import { z } from "zod/mini";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
-export async function ListByTaskLoader({ params }: LoaderFunctionArgs) {
+export async function ListByTaskLoader({ params, request }: LoaderFunctionArgs) {
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
         projectId: params.projectId,
         columnId: params.columnId,
         taskId: params.taskId
     };
+    const url = new URL(request.url);
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "parentId",
+    ]);
 
     try {
-        const promise = commentApi.listByTask(paramsData);
+        const promise = commentApi.listByTask(paramsData, query);
 
         notify.promise(promise, {
             loading: "Loading comments... ",

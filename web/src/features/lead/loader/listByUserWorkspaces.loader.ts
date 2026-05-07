@@ -5,14 +5,19 @@ import { notify } from "../../../app/shared/lib/notify";
 import type { ActionError } from "../../type";
 import { leadApi } from "../lead.api";
 import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ListLeadByUserWorkspacesLoader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get("page") ?? undefined,
-        limit: url.searchParams.get("limit") ?? undefined,
-    };
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "stage",
+        "workspaceId",
+    ]);
 
     try {
         const promise = leadApi.listByUserWorkspaces(query);

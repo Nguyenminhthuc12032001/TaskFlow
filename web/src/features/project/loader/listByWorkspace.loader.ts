@@ -5,16 +5,19 @@ import { feedbackMessage } from "../../../app/shared/constants/feedback-messages
 import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import z, { ZodError } from "zod"; 
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ProjectsByWorkspaceLoader({ params, request }: LoaderFunctionArgs ) {
     const workspaceId = params.workspaceId;
 
     const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get('page') ?? undefined,
-        limit: url.searchParams.get('limit') ?? undefined
-    };
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+    ]);
     
     try {
         const promise = projectApi.listByWorkspace(workspaceId, query);

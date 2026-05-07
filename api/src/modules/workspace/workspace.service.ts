@@ -1,7 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import {
   ActivityAction,
+  type Invite,
   type Prisma,
+  type Workspace,
+  type WorkspaceMember,
   type WorkspaceRole,
 } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
@@ -11,7 +14,13 @@ import {
   type InviteTokenPayload,
 } from '../../common/utils/jwt.js';
 import { type DbClient } from '../../db/prisma.js';
-import { WorkspaceRepo } from './workspace.repo.js';
+import {
+  WorkspaceRepo,
+  type InviteCandidate,
+  type WorkspaceMemberWithUser,
+  type WorkspaceWithCreator,
+  type WorkspaceWithCreatorAndActorMembership,
+} from './workspace.repo.js';
 import type { CreateWorkspaceBody, ListInviteeCandidatesQuery, ListMemberByWorkspaceQuery, ListWorkspaceQuery, UpdateWorkspaceBody } from './workspace.schemas.js';
 import { AuthRepo } from '../auth/auth.repo.js';
 import { env } from '../../config/env.js';
@@ -21,10 +30,24 @@ import { hashValue, verifyHash } from '../../common/utils/crypto.js';
 import type { IEmailService } from '../mail/mail.interface.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { ProjectRepo } from '../project/project.repo.js';
-import type { DataRangeQueryType, PaginationMetaType } from '../../common/schemas/common.schemas.js';
+import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 
+type WorkspacesByUserResult = {
+  workspaces: WorkspaceWithCreatorAndActorMembership[];
+  paginationMeta: PaginationMetaType;
+};
+
+type WorkspaceMembersResult = {
+  members: WorkspaceMemberWithUser[];
+  paginationMeta: PaginationMetaType;
+};
+
+type InviteCandidatesResult = {
+  users: InviteCandidate[];
+  paginationMeta: PaginationMetaType;
+};
 
 export class WorkspaceService {
   constructor(
@@ -36,7 +59,7 @@ export class WorkspaceService {
     readonly prisma: DbClient,
   ) { }
 
-  async create(workspaceData: CreateWorkspaceBody, actorId: string) {
+  async create(workspaceData: CreateWorkspaceBody, actorId: string): Promise<Workspace> {
 
     const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
 
@@ -74,7 +97,7 @@ export class WorkspaceService {
     return result;
   }
 
-  async getById(workspaceId: string) {
+  async getById(workspaceId: string): Promise<WorkspaceWithCreator> {
     const workspace = await this.workspaceRepo.findById(workspaceId);
     if (!workspace) {
       throw new AppError('Workspace not found or access denied', 404);
@@ -83,7 +106,7 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async getByUserId(actorId: string, listWorkspaceQuery: ListWorkspaceQuery) {
+  async getByUserId(actorId: string, listWorkspaceQuery: ListWorkspaceQuery): Promise<WorkspacesByUserResult> {
 
     const { safePage, safeLimit, take, skip } = buildPagination(listWorkspaceQuery.page, listWorkspaceQuery.limit);
 
@@ -101,7 +124,7 @@ export class WorkspaceService {
     return { workspaces, paginationMeta };
   }
 
-  async listMembers(workspaceId: string, listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery) {
+  async listMembers(workspaceId: string, listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery): Promise<WorkspaceMembersResult> {
     const { safePage, safeLimit, take, skip } = buildPagination(listMemberByWorkspaceQuery.page, listMemberByWorkspaceQuery.limit);
 
     const dateRange = buildDateRange({
@@ -118,7 +141,7 @@ export class WorkspaceService {
     return { members, paginationMeta };
   }
 
-  async listInviteCandidates(workspaceId: string, listInviteeCandidatesQuery: ListInviteeCandidatesQuery) {
+  async listInviteCandidates(workspaceId: string, listInviteeCandidatesQuery: ListInviteeCandidatesQuery): Promise<InviteCandidatesResult> {
     const { safePage, safeLimit, take, skip } = buildPagination(listInviteeCandidatesQuery.page, listInviteeCandidatesQuery.limit);
 
     const dateRange = buildDateRange({
@@ -135,7 +158,7 @@ export class WorkspaceService {
     return { users, paginationMeta };
   }
 
-  async getMemberByUserId(workspaceId: string, actorId: string) {
+  async getMemberByUserId(workspaceId: string, actorId: string): Promise<WorkspaceMemberWithUser> {
     const member = await this.workspaceRepo.findMembership(workspaceId, actorId);
     if (!member) {
       throw new AppError('Member not found', 404);
@@ -143,7 +166,7 @@ export class WorkspaceService {
     return member;
   }
 
-  async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string) {
+  async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string): Promise<Workspace> {
     const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
 
     if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
@@ -169,7 +192,7 @@ export class WorkspaceService {
     return result;
   }
 
-  async delete(workspaceId: string, actorId: string) {
+  async delete(workspaceId: string, actorId: string): Promise<Workspace> {
     const result = await this.prisma.$transaction(async (tx) => {
       await this.activityService.logActivity(
         workspaceId,
@@ -194,7 +217,7 @@ export class WorkspaceService {
     inviteeId: string,
     role: WorkspaceRole,
     actorId: string,
-  ) {
+  ): Promise<Invite> {
     const result = await this.prisma.$transaction(async (tx) => {
       const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
       if (!actor) {
@@ -313,12 +336,12 @@ export class WorkspaceService {
     return result.invite;
   }
 
-  async acceptInvite(token: string, actorId: string) {
+  async acceptInvite(token: string, actorId: string): Promise<WorkspaceMember> {
     let payload: InviteTokenPayload;
 
     try {
       payload = verifyInviteToken(token);
-    } catch (error) {
+    } catch {
       log.warn({ actorId }, 'Accept invite failed: invalid token');
       throw new AppError('Invalid invite token', 401);
     }
@@ -378,7 +401,7 @@ export class WorkspaceService {
     return result;
   }
 
-  async removeMember(workspaceId: string, memberId: string, actorId: string) {
+  async removeMember(workspaceId: string, memberId: string, actorId: string): Promise<WorkspaceMember> {
     if (actorId !== memberId) {
       const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
       if (!actor) {

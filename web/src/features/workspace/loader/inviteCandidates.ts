@@ -4,12 +4,21 @@ import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { ZodError } from "zod";
 import type { InviteCandidatesResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
-export async function InviteCandidatesLoader({ params }: LoaderFunctionArgs) {
+export async function InviteCandidatesLoader({ params, request }: LoaderFunctionArgs) {
     const workspaceId = params.workspaceId;
+    const url = new URL(request.url);
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+    ]);
 
     try {
-        const data = await workspaceApi.listInviteCandidates(workspaceId);
+        const data = await workspaceApi.listInviteCandidates(workspaceId, query);
 
         return data satisfies InviteCandidatesResponse;
     } catch (error) {

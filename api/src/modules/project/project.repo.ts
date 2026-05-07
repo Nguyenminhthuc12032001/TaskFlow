@@ -1,4 +1,4 @@
-import type { Prisma } from '../../../prisma/generated/client.js';
+import type { Prisma, Project } from '../../../prisma/generated/client.js';
 import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
@@ -9,14 +9,14 @@ export class ProjectRepo {
   async create(
     data: Prisma.ProjectCreateInput,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Project> {
     return await db.project.create({ data });
   }
 
   async get(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Project | null> {
     return await db.project.findFirst({
       where: {
         id: ctx.projectId,
@@ -38,7 +38,7 @@ export class ProjectRepo {
     dateRange: DataRangeQueryType,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Project[]> {
     return await db.project.findMany({
       where: {
         workspaceId: ctx.workspaceId,
@@ -83,7 +83,7 @@ export class ProjectRepo {
   async allProjectsByWorkspace(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Project[]> {
     return await db.project.findMany({
       where: {
         workspaceId: ctx.workspaceId,
@@ -101,7 +101,7 @@ export class ProjectRepo {
     });
   }
 
-  async listByUser(actorId: string, db: DbOrTxClient = this.prisma) {
+  async listByUser(actorId: string, db: DbOrTxClient = this.prisma): Promise<Project[]> {
     return await db.project.findMany({
       where: {
         workspace: {
@@ -122,7 +122,7 @@ export class ProjectRepo {
     data: Prisma.ProjectUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Project> {
     return await db.project.update({
       where: {
         id: ctx.projectId,
@@ -145,7 +145,7 @@ export class ProjectRepo {
   async remove(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Project> {
     return await db.project.delete({
       where: {
         id: ctx.projectId,
@@ -169,7 +169,7 @@ export class ProjectRepo {
     search: string | undefined,
     dateRange: DataRangeQueryType,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<number> {
     return await db.project.count({
       where: {
         workspaceId: ctx.workspaceId,

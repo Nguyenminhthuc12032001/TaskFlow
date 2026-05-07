@@ -1,13 +1,13 @@
-import { ActivityAction, Prisma } from '../../../prisma/generated/client.js';
+import { ActivityAction, Prisma, type Lead, type LeadTaskLink } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { TaskRepo } from '../task/task.repo.js';
-import type { LeadRepo } from './lead.repo.js';
+import type { LeadRepo, LeadWithTaskLinks } from './lead.repo.js';
 import type {
   CreateBodyType,
   CreateFollowUpBodyType,
@@ -25,7 +25,7 @@ export class LeadService {
     readonly activityService: ActivityService,
   ) {}
 
-  async create(data: CreateBodyType, ctx: ResourceContext) {
+  async create(data: CreateBodyType, ctx: ResourceContext): Promise<Lead> {
     if (data.email && (await this.leadRepo.existEmail(data.email, ctx))) {
       throw new AppError('Duplicate email is not allowed', 409);
     }
@@ -62,7 +62,7 @@ export class LeadService {
     });
   }
 
-  async get(ctx: ResourceContext) {
+  async get(ctx: ResourceContext): Promise<LeadWithTaskLinks> {
     const lead = await this.leadRepo.get(ctx);
 
     if (!lead) {
@@ -72,7 +72,7 @@ export class LeadService {
     return lead;
   }
 
-  async listByWorkspace(ctx: ResourceContext, listLeadQuery: ListLeadsQueryType) {
+  async listByWorkspace(ctx: ResourceContext, listLeadQuery: ListLeadsQueryType): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(listLeadQuery.page, listLeadQuery.limit);
 
     const dateRange = buildDateRange({
@@ -89,7 +89,7 @@ export class LeadService {
     return { leads, paginationMeta };
   }
 
-  async listByActorWorkspaces(actorId: string, listLeadByActorQuery: ListLeadByActorQueryType) {
+  async listByActorWorkspaces(actorId: string, listLeadByActorQuery: ListLeadByActorQueryType): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(listLeadByActorQuery.page, listLeadByActorQuery.limit);
 
     const dateRange = buildDateRange({
@@ -106,7 +106,7 @@ export class LeadService {
     return { leads, paginationMeta };
   }
 
-  async update(data: UpdateBodyType, ctx: ResourceContext) {
+  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Lead> {
     if (data.email) {
       const duplicateEmail = await this.leadRepo.existEmail(data.email, ctx);
 
@@ -148,7 +148,7 @@ export class LeadService {
     });
   }
 
-  async updateStage(data: UpdateStageBodyType, ctx: ResourceContext) {
+  async updateStage(data: UpdateStageBodyType, ctx: ResourceContext): Promise<Lead> {
     const dataUpdateStage: Prisma.LeadUpdateInput = {
       stage: data.stage,
     };
@@ -170,7 +170,7 @@ export class LeadService {
     });
   }
 
-  async linkTask(ctx: ResourceContext) {
+  async linkTask(ctx: ResourceContext): Promise<LeadTaskLink> {
     const duplicateLinkTask = await this.leadRepo.existLinkTask(ctx);
 
     if (duplicateLinkTask) {
@@ -199,7 +199,7 @@ export class LeadService {
     });
   }
 
-  async unlinkTask(ctx: ResourceContext) {
+  async unlinkTask(ctx: ResourceContext): Promise<LeadTaskLink> {
     return await this.prisma.$transaction(async (tx) => {
       const leadTaskLink = await this.leadRepo.unlinkTask(ctx, tx);
 
@@ -217,7 +217,7 @@ export class LeadService {
     });
   }
 
-  async createFollowUpTask(data: CreateFollowUpBodyType, ctx: ResourceContext) {
+  async createFollowUpTask(data: CreateFollowUpBodyType, ctx: ResourceContext): Promise<LeadTaskLink> {
     const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
     if (data.position) {
@@ -265,7 +265,7 @@ export class LeadService {
     });
   }
 
-  async remove(ctx: ResourceContext) {
+  async remove(ctx: ResourceContext): Promise<Lead> {
     return await this.prisma.$transaction(async (tx) => {
       const lead = await this.leadRepo.remove(ctx, tx);
 

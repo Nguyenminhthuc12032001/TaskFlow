@@ -1,6 +1,9 @@
-import { ActivityAction, type Prisma } from '../../../prisma/generated/client.js';
+import { ActivityAction, type Column, type Prisma } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type {
+  PaginationMetaType,
+  PaginationQueryType,
+} from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
@@ -19,7 +22,7 @@ export class ColumnService {
   async create(
     data: CreateBodyType,
     ctx: ResourceContext,
-  ) {
+  ): Promise<Column> {
     const columns = await this.columnRepo.allColumnsByProject(ctx);
 
     if (columns.length >= 10) {
@@ -60,7 +63,7 @@ export class ColumnService {
     });
   }
 
-  async listByProjectId(ctx: ResourceContext, listColumnQuery: ListColumnQueryType) {
+  async listByProjectId(ctx: ResourceContext, listColumnQuery: ListColumnQueryType): Promise<{ columns: Column[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(listColumnQuery.page, listColumnQuery.limit);
     
     const dateRange = buildDateRange({
@@ -77,7 +80,7 @@ export class ColumnService {
     return { columns, paginationMeta };
   }
 
-  async get(ctx: ResourceContext) {
+  async get(ctx: ResourceContext): Promise<Column> {
     const column = await this.columnRepo.get(ctx);
 
     if (!column) {
@@ -90,7 +93,7 @@ export class ColumnService {
   async update(
     data: UpdateBodyType,
     ctx: ResourceContext,
-  ) {
+  ): Promise<Column> {
     const columns = await this.columnRepo.allColumnsByProject(ctx);
 
     if (columns.some((c) => c.name === data.name && c.id !== ctx.columnId)) {
@@ -119,15 +122,13 @@ export class ColumnService {
 
       return column;
     });
-  }
-
-  async bulkUpdateStatus(data: any, ctx: ResourceContext) {}
+  } 
 
   async reOrder(
     data: ReOrderBodyType,
     ctx: ResourceContext,
     paginationQuery: PaginationQueryType
-  ) {
+  ): Promise<{ columns: Column[]; paginationMeta: PaginationMetaType }> {
     const oldColumns = await this.columnRepo.allColumnsByProject(ctx);
 
     oldColumns.map((c) => {
@@ -185,7 +186,7 @@ export class ColumnService {
     return { columns, paginationMeta };
   }
  
-  async remove(ctx: ResourceContext) {
+  async remove(ctx: ResourceContext): Promise<Column> {
     return this.prisma.$transaction(async (tx) => {
       const column = await this.columnRepo.remove(ctx, tx);
 

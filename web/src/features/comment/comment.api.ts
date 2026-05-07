@@ -1,6 +1,13 @@
 import { workspaceParamsSchema } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { createBodySchema, safeCommentSchema, safeCommentsSchema, updateBodySchema } from "../../../../api/src/modules/comment/comment.schemas";
+import {
+    createBodySchema,
+    listCommentsQuerySchema,
+    safeCommentSchema,
+    safeCommentsSchema,
+    updateBodySchema,
+    type ListCommentsQueryType,
+} from "../../../../api/src/modules/comment/comment.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
@@ -43,10 +50,11 @@ export const commentApi = {
         return validatedEnvelop.data;
     },
 
-    listByTask: async (ctx: unknown) => {
+    listByTask: async (ctx: unknown, query: unknown = {}) => {
         const validatedCtx = validate(workspaceParamsSchema)(ctx);
+        const validatedQuery: ListCommentsQueryType = validate(listCommentsQuerySchema)(query);
 
-        const response = await http.get(`/comments/${validatedCtx.workspaceId}/${validatedCtx.projectId}/${validatedCtx.columnId}/${validatedCtx.taskId}`);
+        const response = await http.get(`/comments/${validatedCtx.workspaceId}/${validatedCtx.projectId}/${validatedCtx.columnId}/${validatedCtx.taskId}`, { params: validatedQuery });
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeCommentsSchema);

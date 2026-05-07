@@ -1,9 +1,11 @@
+import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Link,
   useFetcher,
   useLoaderData,
   useRouteLoaderData,
+  useSearchParams,
 } from "react-router-dom";
 
 import {
@@ -28,7 +30,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { ListByProjectLoader } from "../../../../features/column/loader/listByProject.loader";
 import type { GetByIdLoader } from "../../../../features/workspace/loader/getById";
 import type { ColumnType } from "../../../../../../api/prisma/generated/enums";
-import { EyeIcon, PlusIcon } from "../../../../components/ui/Icons";
+import { EyeIcon, PlusIcon, XIcon } from "../../../../components/ui/Icons";
+import { getQueryLink } from "../../../../app/shared/lib/query";
 
 type LoaderData = Awaited<ReturnType<typeof ListByProjectLoader>>;
 
@@ -64,6 +67,26 @@ function formatColumnType(type: ColumnType) {
     default:
       return type;
   }
+}
+
+type ColumnTypeFilter = "" | ColumnType;
+
+const columnTypeFilterOptions: Array<{ value: ColumnTypeFilter; label: string }> = [
+  { value: "", label: "All types" },
+  { value: "todo", label: "To do" },
+  { value: "in_process", label: "In process" },
+  { value: "done", label: "Done" },
+  { value: "custom", label: "Custom" },
+];
+
+const defaultPageSizeOptions = [6, 10, 20, 50, 100];
+
+function isColumnType(value: string | null): value is ColumnType {
+  return value === "todo" || value === "in_process" || value === "done" || value === "custom";
+}
+
+function getPageSizeOptions(currentLimit: number) {
+  return Array.from(new Set([...defaultPageSizeOptions, currentLimit])).sort((a, b) => a - b);
 }
 
 function normalizePositions(columns: ColumnItem[]) {
@@ -159,6 +182,7 @@ export function ListColumnPage() {
   const workspaceData =
     useRouteLoaderData<typeof GetByIdLoader>("workspace-detail");
   const fetcher = useFetcher();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const role =
     workspaceData &&
@@ -200,6 +224,23 @@ export function ListColumnPage() {
     !hasColumnData(loaderData) && hasErrorMessage(loaderData)
       ? loaderData.errorMessage
       : null;
+  const pagination = hasColumnData(loaderData) ? loaderData.paginationMeta : null;
+  const query = searchParams.get("search")?.trim() ?? "";
+  const typeFromUrl = searchParams.get("type");
+  const activeType = isColumnType(typeFromUrl) ? typeFromUrl : "";
+  const startDate = searchParams.get("startDate") ?? "";
+  const endDate = searchParams.get("endDate") ?? "";
+  const pageSizeOptions = getPageSizeOptions(pagination?.limit ?? 10);
+  const hasFilters = Boolean(query || activeType || startDate || endDate);
+  const filterKey = [query, activeType, startDate, endDate, pagination?.limit ?? 10].join("|");
+  const hasQueryFilter = hasFilters;
+  const canReorder =
+    canEditColumn &&
+    !isSaving &&
+    !hasQueryFilter &&
+    (!pagination || pagination.totalPages <= 1);
+  const getPageLink = (page: number) =>
+    getQueryLink(searchParams, { page, limit: pagination?.limit ?? 10 });
 
   function submitReorder(nextColumns: ColumnItem[]) {
     const formData = new FormData();
@@ -213,11 +254,57 @@ export function ListColumnPage() {
       )
     );
 
-    fetcher.submit(formData, { method: "post" });
+    fetcher.submit(formData, {
+      method: "post",
+      action: getQueryLink(searchParams, {
+        page: pagination?.page ?? 1,
+        limit: pagination?.limit ?? 10,
+      }),
+    });
+  }
+
+  function handleFilterSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const nextSearch = formData.get("search")?.toString().trim() ?? "";
+    const nextType = formData.get("type")?.toString() ?? "";
+    const nextStartDate = formData.get("startDate")?.toString() ?? "";
+    const nextEndDate = formData.get("endDate")?.toString() ?? "";
+    const nextLimit = formData.get("limit")?.toString() ?? String(pagination?.limit ?? 10);
+    const params = new URLSearchParams(searchParams);
+
+    [
+      ["search", nextSearch],
+      ["type", nextType],
+      ["startDate", nextStartDate],
+      ["endDate", nextEndDate],
+      ["limit", nextLimit],
+    ].forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+
+    params.set("page", "1");
+    setSearchParams(params);
+  }
+
+  function handleClearFilters() {
+    const params = new URLSearchParams(searchParams);
+
+    params.delete("search");
+    params.delete("type");
+    params.delete("startDate");
+    params.delete("endDate");
+    params.set("page", "1");
+    setSearchParams(params);
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    if (!canEditColumn || isSaving) return;
+    if (!canReorder) return;
 
     const { active, over } = event;
 
@@ -270,6 +357,105 @@ export function ListColumnPage() {
         </div>
       </div>
 
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <form
+          key={filterKey}
+          onSubmit={handleFilterSubmit}
+          className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(220px,1fr)_180px_160px_160px_120px_auto]"
+        >
+          <label className="min-w-0">
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Search
+            </span>
+            <input
+              name="search"
+              defaultValue={query}
+              placeholder="Column name"
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </label>
+
+          <label>
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Type
+            </span>
+            <select
+              name="type"
+              defaultValue={activeType}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            >
+              {columnTypeFilterOptions.map((option) => (
+                <option key={option.value || "all"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+              From
+            </span>
+            <input
+              type="date"
+              name="startDate"
+              defaultValue={startDate}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </label>
+
+          <label>
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+              To
+            </span>
+            <input
+              type="date"
+              name="endDate"
+              defaultValue={endDate}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            />
+          </label>
+
+          <label>
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Per page
+            </span>
+            <select
+              name="limit"
+              defaultValue={String(pagination?.limit ?? 10)}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+            >
+              {pageSizeOptions.map((limit) => (
+                <option key={limit} value={limit}>
+                  {limit}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="flex items-end gap-2">
+            <button
+              type="submit"
+              className="inline-flex h-11 flex-1 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white transition hover:bg-slate-800 lg:flex-none"
+            >
+              Apply
+            </button>
+
+            {hasFilters ? (
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                aria-label="Clear filters"
+                title="Clear filters"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
+        </form>
+      </div>
+
       {(actionError || isSaving) && (
         <div
           className={[
@@ -285,12 +471,26 @@ export function ListColumnPage() {
 
       {columns.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">No columns yet</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {hasFilters ? "No columns match these filters" : "No columns yet"}
+          </h2>
           <p className="mt-2 text-sm text-slate-500">
-            Create your first column to start organizing tasks.
+            {hasFilters
+              ? "Try changing the search, type, or date range to find more columns."
+              : "Create your first column to start organizing tasks."}
           </p>
 
-          {canEditColumn && (
+          {hasFilters ? (
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : canEditColumn && (
             <div className="mt-6">
               <Link
                 to="create"
@@ -318,12 +518,52 @@ export function ListColumnPage() {
                   <SortableColumnCard
                     key={column.id}
                     column={column}
-                    disabled={!canEditColumn || isSaving}
+                    disabled={!canReorder}
                   />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
+        </div>
+      )}
+
+      {pagination && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-slate-600">
+            Page <span className="font-semibold text-slate-900">{pagination.page}</span>
+            {" / "}
+            <span className="font-semibold text-slate-900">{pagination.totalPages}</span>
+            {" - "}
+            Total <span className="font-semibold text-slate-900">{pagination.totalItems}</span> columns
+          </div>
+
+          <div className="flex items-center gap-3">
+            {pagination.hasPrevPage ? (
+              <Link
+                to={getPageLink(pagination.page - 1)}
+                className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Previous
+              </Link>
+            ) : (
+              <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-400 opacity-50">
+                Previous
+              </span>
+            )}
+
+            {pagination.hasNextPage ? (
+              <Link
+                to={getPageLink(pagination.page + 1)}
+                className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-400 opacity-50">
+                Next
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>

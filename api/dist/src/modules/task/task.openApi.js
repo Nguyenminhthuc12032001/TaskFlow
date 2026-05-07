@@ -2,7 +2,7 @@ import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
-import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, listTaskByColumnQuerySchema, reOrderBodySchema, safeAssigneeSchema, safeTaskSchema, safeTasksSchema, updateBodySchema, } from './task.schemas.js';
+import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, listTaskByColumnQuerySchema, reOrderBodySchema, safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, updateBodySchema, } from './task.schemas.js';
 const defaultPath = '/api/tasks/{workspaceId}/{projectId}/{columnId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -38,7 +38,7 @@ registry.registerPath({
         },
         params: withTaskId,
     },
-    responses: defaultResponse(safeAssigneeSchema, [201]),
+    responses: defaultResponse(safeAssigneeSchema, [200]),
 });
 registry.registerPath({
     method: 'get',
@@ -49,7 +49,7 @@ registry.registerPath({
     request: {
         params: withTaskId,
     },
-    responses: defaultResponse(safeTaskSchema, [201, 409]),
+    responses: defaultResponse(safeTaskDetailSchema, [201, 409]),
 });
 registry.registerPath({
     method: 'get',

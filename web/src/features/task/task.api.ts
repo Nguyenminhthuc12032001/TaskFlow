@@ -1,6 +1,18 @@
-import { workspaceParamsSchema } from "../../../../api/src/common/schemas/common.schemas";
+import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType } from "../../../../api/src/common/schemas/common.schemas";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
-import { assignBodySchema, bulkRemoveBodySchema, createBodySchema, reOrderBodySchema, safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, updateBodySchema } from "../../../../api/src/modules/task/task.schemas";
+import {
+    assignBodySchema,
+    bulkRemoveBodySchema,
+    createBodySchema,
+    listTaskByColumnQuerySchema,
+    reOrderBodySchema,
+    safeAssigneeSchema,
+    safeTaskDetailSchema,
+    safeTaskSchema,
+    safeTasksSchema,
+    updateBodySchema,
+    type ListTaskByColumnQueryType,
+} from "../../../../api/src/modules/task/task.schemas";
 import { http } from "../../app/shared/lib/http-interceptors";
 import { validate } from "../../app/shared/lib/validate";
 
@@ -18,10 +30,11 @@ export const taskApi = {
         return validatedEnvelop.data;
     },
 
-    listByColumn: async (ctx: unknown) => {
+    listByColumn: async (ctx: unknown, query: unknown = {}) => {
         const validatedParams = validate(workspaceParamsSchema)(ctx);
+        const validatedQuery: ListTaskByColumnQueryType = validate(listTaskByColumnQuerySchema)(query);
 
-        const response = await http.get(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`);
+        const response = await http.get(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`, { params: validatedQuery });
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeTasksSchema);
@@ -79,11 +92,12 @@ export const taskApi = {
         return validatedEnvelop.data;
     },
 
-    reOrder: async (ctx: unknown, data: unknown) => {
+    reOrder: async (ctx: unknown, data: unknown, query: unknown = {}) => {
         const validatedParams = validate(workspaceParamsSchema)(ctx);
         const validatedData = validate(reOrderBodySchema)(data);
+        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
 
-        const response = await http.patch(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`, validatedData);
+        const response = await http.patch(`/tasks/${validatedParams.workspaceId}/${validatedParams.projectId}/${validatedParams.columnId}`, validatedData, { params: validatedQuery });
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(safeTasksSchema);

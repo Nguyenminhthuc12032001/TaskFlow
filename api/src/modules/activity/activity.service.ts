@@ -13,7 +13,7 @@ export class ActivityService {
     entityId?: string,
     meta?: unknown,
     db: DbOrTxClient | undefined = undefined,
-  ) {
+  ): Promise<void> {
     await this.activityRepo.log(
       {
         action,

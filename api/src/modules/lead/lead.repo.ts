@@ -1,7 +1,18 @@
-import type { LeadStage, Prisma } from '../../../prisma/generated/client.js';
+import type { GetBatchResult } from '@prisma/client/runtime/client';
+import type { Lead, LeadStage, LeadTaskLink, Prisma } from '../../../prisma/generated/client.js';
 import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
+
+export type LeadWithTaskLinks = Prisma.LeadGetPayload<{
+  include: {
+    taskLinks: {
+      include: {
+        task: true;
+      };
+    };
+  };
+}>;
 
 export class LeadRepo {
   constructor(readonly prisma: DbClient) { }
@@ -9,11 +20,11 @@ export class LeadRepo {
   async create(
     data: Prisma.LeadCreateInput,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Lead> {
     return await db.lead.create({ data });
   }
 
-  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma) {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<LeadWithTaskLinks | null> {
     return await db.lead.findUnique({
       where: {
         id: ctx.LeadId,
@@ -45,7 +56,8 @@ export class LeadRepo {
     dateRange: DataRangeQueryType,
     stage: LeadStage | undefined,
     { skip, take }: { skip: number; take: number },
-    db: DbOrTxClient = this.prisma) {
+    db: DbOrTxClient = this.prisma
+  ): Promise<Lead[]> {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -77,7 +89,7 @@ export class LeadRepo {
       take,
       orderBy: {
         createdAt: 'desc'
-      }
+      } 
     });
   }
 
@@ -89,7 +101,7 @@ export class LeadRepo {
     workspaceId: string | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Lead[]> {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -117,14 +129,6 @@ export class LeadRepo {
         ...(stage ? { stage } : {}),
         ...(workspaceId ? { workspaceId } : {})
       },
-      include: {
-        workspace: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
       skip,
       take,
       orderBy: {
@@ -137,7 +141,7 @@ export class LeadRepo {
     ctx: ResourceContext,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Lead[]> {
     return await db.lead.findMany({
       where: {
         workspace: {
@@ -166,7 +170,7 @@ export class LeadRepo {
     dateRange: DataRangeQueryType,
     stage: LeadStage | undefined,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<number> {
     return await db.lead.count({
       where: {
         workspace: {
@@ -204,7 +208,7 @@ export class LeadRepo {
     stage: LeadStage | undefined,
     workspaceId: string | undefined,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<number> {
     return await db.lead.count({
       where: {
         workspace: {
@@ -239,7 +243,7 @@ export class LeadRepo {
     data: Prisma.LeadUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Lead> {
     return await db.lead.update({
       data,
       where: {
@@ -277,14 +281,14 @@ export class LeadRepo {
   async linkTask(
     data: Prisma.LeadTaskLinkCreateInput,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<LeadTaskLink> {
     return await db.leadTaskLink.create({ data });
   }
 
   async unlinkTask(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<LeadTaskLink> {
     return await db.leadTaskLink.delete({
       where: {
         leadId_taskId: {
@@ -328,7 +332,7 @@ export class LeadRepo {
   async remove(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Lead> {
     return await db.lead.delete({
       where: {
         id: ctx.LeadId,
@@ -365,7 +369,7 @@ export class LeadRepo {
   async removeLeadTaskLink(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<GetBatchResult> {
     return await db.leadTaskLink.deleteMany({
       where: {
         leadId: ctx.LeadId,
@@ -407,7 +411,7 @@ export class LeadRepo {
     email: string,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Lead | null> {
     return await db.lead.findFirst({
       where: {
         email,
@@ -445,7 +449,7 @@ export class LeadRepo {
     phone: string,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Lead | null> {
     return await db.lead.findFirst({
       where: {
         phone,
@@ -482,7 +486,7 @@ export class LeadRepo {
   async existLinkTask(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<LeadTaskLink | null> {
     return await db.leadTaskLink.findUnique({
       where: {
         leadId_taskId: { leadId: ctx.LeadId!, taskId: ctx.TaskId! },

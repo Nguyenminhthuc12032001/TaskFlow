@@ -1,8 +1,29 @@
 import { http } from "../../app/shared/lib/http-interceptors"; 
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../../../../api/src/common/utils/response/format";
 import { validate } from "../../app/shared/lib/validate"
-import { acceptBodySchema, acceptResponseSchema, createBodySchema, createResponseSchema, getByIdResponseSchema, getByUserIdResponseSchema, inviteBodySchema, inviteCandidatesResponseSchema, inviteResponseSchema, membersResponseSchema, safeMemberResponseSchema, updateBodySchema, updateResponseSchema, type CreateWorkspaceBody } from "../../../../api/src/modules/workspace/workspace.schemas";
-import { paginationQuerySchema, workspaceParamsSchema, type PaginationQueryType, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
+import {
+    acceptBodySchema,
+    acceptResponseSchema,
+    createBodySchema,
+    createResponseSchema,
+    getByIdResponseSchema,
+    getByUserIdResponseSchema,
+    inviteBodySchema,
+    inviteCandidatesResponseSchema,
+    inviteResponseSchema,
+    listInviteeCandidatesQuerySchema,
+    listMemberByWorkspaceQuerySchema,
+    listWorkspaceQuerySchema,
+    membersResponseSchema,
+    safeMemberResponseSchema,
+    updateBodySchema,
+    updateResponseSchema,
+    type CreateWorkspaceBody,
+    type ListInviteeCandidatesQuery,
+    type ListMemberByWorkspaceQuery,
+    type ListWorkspaceQuery,
+} from "../../../../api/src/modules/workspace/workspace.schemas";
+import { workspaceParamsSchema, type WorkspaceParamsType } from "../../../../api/src/common/schemas/common.schemas";
 
 export const workspaceApi = {
     create: async (data: unknown) => {
@@ -19,7 +40,7 @@ export const workspaceApi = {
 
     listByUser: async (query: unknown) => {
 
-        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+        const validatedQuery: ListWorkspaceQuery = validate(listWorkspaceQuerySchema)(query);
 
         const response = await http.get('/workspaces', 
             { params: validatedQuery }
@@ -68,7 +89,7 @@ export const workspaceApi = {
 
     listMember: async (id: unknown, query: unknown) => {
         const validatedId: WorkspaceParamsType = validate(workspaceParamsSchema)({ workspaceId: id });
-        const validatedQuery: PaginationQueryType = validate(paginationQuerySchema)(query);
+        const validatedQuery: ListMemberByWorkspaceQuery = validate(listMemberByWorkspaceQuerySchema)(query);
 
         const response = await http.get(`/workspaces/members/${validatedId.workspaceId}`, 
             { params: validatedQuery }
@@ -93,10 +114,13 @@ export const workspaceApi = {
         return validatedEnvelop.data;
     },
 
-    listInviteCandidates: async (id: unknown) => {
+    listInviteCandidates: async (id: unknown, query: unknown = {}) => {
         const validatedId = validate(workspaceParamsSchema)({ workspaceId: id });
+        const validatedQuery: ListInviteeCandidatesQuery = validate(listInviteeCandidatesQuerySchema)(query);
 
-        const response = await http.get(`/workspaces/invitees/${validatedId.workspaceId}`);
+        const response = await http.get(`/workspaces/invitees/${validatedId.workspaceId}`,
+            { params: validatedQuery }
+        );
 
         const envelop = response.data;
         const envelopSchema = okEnvelopeSchema(inviteCandidatesResponseSchema);

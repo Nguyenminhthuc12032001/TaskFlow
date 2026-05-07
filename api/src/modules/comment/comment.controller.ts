@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
+import { type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import {
   listCommentsQuerySchema,
   safeCommentSchema,
@@ -23,7 +23,7 @@ import { validateResponse } from '../../common/utils/response/validate.js';
 export class CommentController {
   constructor(readonly commentService: CommentService) { }
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -50,7 +50,7 @@ export class CommentController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -79,7 +79,7 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  listByTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  listByTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const listCommentsQuery: ListCommentsQueryType = listCommentsQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
@@ -113,7 +113,7 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -142,7 +142,7 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  reply = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
+  reply = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -171,7 +171,7 @@ export class CommentController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

@@ -178,6 +178,8 @@ export class WorkspaceController {
             const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
             return res.status(200).json(validatedEnvelope);
         };
-        this.changeRole = async (req, res) => { };
+        this.changeRole = async (_req, res) => {
+            return res.status(501).json({ message: 'Not implemented' });
+        };
     }
 }

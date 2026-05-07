@@ -1,7 +1,7 @@
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
-import { createBodySchema, createFollowUpTaskBodySchema, listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema, } from './lead.schemas.js';
+import { createBodySchema, createFollowUpTaskBodySchema, listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema, } from './lead.schemas.js';
 const defaultPath = '/api/leads/{workspaceId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -18,7 +18,7 @@ registry.registerPath({
     request: {
         query: listLeadByActorQuerySchema,
     },
-    responses: defaultResponse(safeLeadsWithWorkspaceSchema, [201, 409]),
+    responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });
 registry.registerPath({
     method: 'post',
@@ -97,7 +97,7 @@ registry.registerPath({
             taskId: z.uuid(),
         }),
     },
-    responses: defaultResponse(safeLeadTaskLinkSchema, [201]),
+    responses: defaultResponse(safeLeadTaskLinkSchema, [200]),
 });
 registry.registerPath({
     method: 'delete',
@@ -110,7 +110,7 @@ registry.registerPath({
             taskId: z.uuid(),
         }),
     },
-    responses: defaultResponse(safeLeadTaskLinkSchema, [201, 409]),
+    responses: defaultResponse(safeLeadSchema, [201, 409]),
 });
 registry.registerPath({
     method: 'post',

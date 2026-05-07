@@ -49,8 +49,7 @@ export function validateQuery<T extends ZodType>(schema: T) {
         z.treeifyError(result.error),
       );
     }
-
-    req.query = result.data as Request['query'];
+ 
     next();
   };
 }

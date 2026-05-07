@@ -5,6 +5,7 @@ import { taskApi } from "../task.api";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ReorderTaskAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
@@ -17,6 +18,8 @@ export async function ReorderTaskAction({ params, request }: ActionFunctionArgs)
     }
 
     const data: unknown = JSON.parse(rawItems);
+    const url = new URL(request.url);
+    const query = getQueryFromSearchParams(url.searchParams, ["page", "limit"]);
 
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
@@ -25,7 +28,7 @@ export async function ReorderTaskAction({ params, request }: ActionFunctionArgs)
     };
 
     try {
-        const promise = taskApi.reOrder(paramsData, data);
+        const promise = taskApi.reOrder(paramsData, data, query);
 
         notify.promise(promise, {
             loading: "Reordering tasks... ",

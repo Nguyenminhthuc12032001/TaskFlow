@@ -1,3 +1,4 @@
+import type { RouteConfig } from '@asteasolutions/zod-to-openapi';
 import { registry } from '../../docs/openapi.js';
 import {
   acceptBodySchema,
@@ -12,6 +13,7 @@ import {
   inviteResponseSchema,
   membersResponseSchema,
   removeMemberResponseSchema,
+  safeMemberResponseSchema,
   updateBodySchema,
   updateResponseSchema,
   listWorkspaceQuerySchema,
@@ -30,11 +32,13 @@ import {
 } from '../auth/auth.openApi.js';
 import z, { type ZodType } from '../../docs/zod.js';
 
+type ResponseStatus = 200 | 201 | 400 | 401 | 403 | 404 | 409 | 500;
+
 export const defaultResponse = (
   schema: ZodType,
-  exclude: Array<200 | 201 | 400 | 401 | 403 | 404 | 409 | 500> = [],
-) => {
-  const responses = {
+  exclude: ResponseStatus[] = [],
+): RouteConfig['responses'] => {
+  const responses: RouteConfig['responses'] = {
     200: ok200(schema),
     201: created201(schema),
     400: fail400,
@@ -120,7 +124,7 @@ registry.registerPath({
       workspaceId: z.uuid(),
     }),
   },
-  responses: defaultResponse(membersResponseSchema, [201, 409]),
+  responses: defaultResponse(safeMemberResponseSchema, [201, 409]),
 })
 
 registry.registerPath({

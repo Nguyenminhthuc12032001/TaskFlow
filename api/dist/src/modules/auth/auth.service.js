@@ -88,7 +88,7 @@ export class AuthService {
         try {
             payload = verifyRefreshToken(refreshToken);
         }
-        catch (error) {
+        catch {
             throw new AppError('Invalid or expired refresh token', 401);
         }
         const token = await this.authRepo.findRefreshToken(payload.jti);
@@ -108,7 +108,7 @@ export class AuthService {
         try {
             payload = verifyRefreshToken(refreshToken);
         }
-        catch (error) {
+        catch {
             log.warn('Refresh token failed: invalid or expired token');
             throw new AppError('Invalid or expired refresh token', 401);
         }
@@ -146,7 +146,12 @@ export class AuthService {
             name: user.name,
         };
         const accessToken = signAccessToken(accessTokenPayload);
-        return { accessToken, refreshToken: newRefreshToken, user };
+        const safeUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        };
+        return { accessToken, refreshToken: newRefreshToken, safeUser };
     }
     ;
     async forgotPassword(data) {
@@ -171,7 +176,7 @@ export class AuthService {
         try {
             payLoad = verifyResetToken(data.resetToken);
         }
-        catch (error) {
+        catch {
             log.warn('Reset password failed: invalid or expired token');
             throw new AppError('Invalid or expired reset token', 401);
         }
@@ -211,7 +216,12 @@ export class AuthService {
             log.info({ userId }, 'Password change successfully');
             return user;
         });
-        return result;
+        const safeUser = {
+            id: result.id,
+            email: result.email,
+            name: result.name,
+        };
+        return safeUser;
     }
     ;
     async me(userId) {

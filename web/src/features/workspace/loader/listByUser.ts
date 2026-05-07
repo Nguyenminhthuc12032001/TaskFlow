@@ -6,14 +6,18 @@ import { HttpError } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { ZodError } from "zod";
 import type { SafeWorkspacesResponse } from "../../../../../api/src/modules/workspace/workspace.schemas";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ListByUserLoader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
-
-    const query = {
-        page: url.searchParams.get('page') ?? undefined,
-        limit: url.searchParams.get('limit') ?? undefined
-    };
+    const query = getQueryFromSearchParams(url.searchParams, [
+        "page",
+        "limit",
+        "search",
+        "startDate",
+        "endDate",
+        "actorRole",
+    ]);
 
     try {
         const promise = workspaceApi.listByUser(query);

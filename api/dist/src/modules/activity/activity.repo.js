@@ -4,6 +4,11 @@ export class ActivityRepo {
         return db.activityLog.create({ data });
     }
     async deleteByWorkspaceId(workspaceId, actorId, db = prisma) {
-        return db.activityLog;
+        return db.activityLog.deleteMany({
+            where: {
+                workspaceId,
+                actorId,
+            },
+        });
     }
 }

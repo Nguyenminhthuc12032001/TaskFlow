@@ -34,7 +34,7 @@ export class AuthService {
     private prisma: DbClient,
   ) { }
 
-  async register(data: RegisterBody) {
+  async register(data: RegisterBody): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
     const existing = await this.authRepo.findUserByEmail(data.email);
     if (existing) {
       log.info(
@@ -89,7 +89,7 @@ export class AuthService {
     return result;
   };
 
-  async login(data: LoginBody) {
+  async login(data: LoginBody): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
     const match = await this.authRepo.findUserByEmail(data.email);
     if (!match) {
       log.info(
@@ -141,11 +141,11 @@ export class AuthService {
     return { safeUser, accessToken, refreshToken };
   };
 
-  async logout(refreshToken: string) {
+  async logout(refreshToken: string): Promise<void> {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch (error) {
+    } catch {
       throw new AppError('Invalid or expired refresh token', 401);
     }
 
@@ -162,11 +162,11 @@ export class AuthService {
     if (result.count === 0) throw new AppError('Refresh token not found or expired', 401);
   };
 
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string; safeUser: SafeUserResponse }> {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
-    } catch (error) {
+    } catch {
       log.warn('Refresh token failed: invalid or expired token');
       throw new AppError('Invalid or expired refresh token', 401);
     }
@@ -222,10 +222,16 @@ export class AuthService {
     };
     const accessToken = signAccessToken(accessTokenPayload);
 
-    return { accessToken, refreshToken: newRefreshToken, user };
+    const safeUser: SafeUserResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+
+    return { accessToken, refreshToken: newRefreshToken, safeUser };
   };
 
-  async forgotPassword(data: ForgotPasswordBody) {
+  async forgotPassword(data: ForgotPasswordBody): Promise<void> {
     const user = await this.authRepo.findUserByEmail(data.email);
     if (!user) {
       return;
@@ -250,11 +256,11 @@ export class AuthService {
     log.info({ userId: user.id }, 'Password reset email sent');
   };
 
-  async resetPassword(data: ResetPasswordBody) {
+  async resetPassword(data: ResetPasswordBody): Promise<void> {
     let payLoad;
     try {
       payLoad = verifyResetToken(data.resetToken);
-    } catch (error) {
+    } catch {
       log.warn('Reset password failed: invalid or expired token');
       throw new AppError('Invalid or expired reset token', 401);
     }
@@ -282,7 +288,7 @@ export class AuthService {
     });
   };
 
-  async changePassword(userId: string, data: ChangePasswordBody) {
+  async changePassword(userId: string, data: ChangePasswordBody): Promise<SafeUserResponse> {
     const user = await this.authRepo.findUserById(userId);
     if (!user) {
       throw new AppError('User not found', 404);
@@ -310,10 +316,16 @@ export class AuthService {
       return user;
     });
 
-    return result;
+    const safeUser: SafeUserResponse = {
+      id: result.id,
+      email: result.email,
+      name: result.name,
+    };
+
+    return safeUser;
   };
 
-  async me(userId: string) {
+  async me(userId: string): Promise<SafeUserResponse> {
     const user = await this.authRepo.findUserById(userId);
     if (!user) {
       throw new AppError('User not found', 404);

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { AppError } from '../errors/AppError.js';
 
-export function authMiddleware(req: Request, res: Response, next: NextFunction) {
+export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -19,7 +19,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
       name: payload.name,
       email: payload.email,
     };
-  } catch (error) {
+  } catch {
     throw new AppError('Invalid or expired token', 401);
   }
 

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { paginationMetaSchema, paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
+import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import {
   listColumnQuerySchema,
@@ -24,7 +24,7 @@ import { validateResponse } from '../../common/utils/response/validate.js';
 export class ColumnController {
   constructor(readonly columnService: ColumnService) { }
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -49,7 +49,7 @@ export class ColumnController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  listByProject = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  listByProject = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const listColumnQuery: ListColumnQueryType = listColumnQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -78,7 +78,7 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -104,7 +104,7 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -130,7 +130,7 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response) => {
+  reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response): Promise<Response> => {
     const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -159,7 +159,7 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

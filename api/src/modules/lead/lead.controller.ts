@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
+import { type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { LeadService } from './lead.service.js';
 import {
@@ -8,13 +8,11 @@ import {
   safeLeadDetailSchema,
   safeLeadSchema,
   safeLeadsSchema,
-  safeLeadsWithWorkspaceSchema,
   safeLeadTaskLinkSchema,
   type ListLeadByActorQueryType,
   type ListLeadsQueryType,
   type SafeLeadDetailType,
   type SafeLeadsType,
-  type SafeLeadsWithWorkspaceType,
   type SafeLeadTaskLinkType,
   type SafeLeadType,
 } from './lead.schemas.js';
@@ -29,7 +27,7 @@ import { validateResponse } from '../../common/utils/response/validate.js';
 export class LeadController {
   constructor(readonly leadService: LeadService) { }
 
-  create = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       ActorId: req.user!.id,
@@ -58,12 +56,12 @@ export class LeadController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  listByActorWorkspaces = async (req: Request, res: Response) => {
+  listByActorWorkspaces = async (req: Request, res: Response): Promise<Response> => {
     const listLeadByActorQuery: ListLeadByActorQueryType = listLeadByActorQuerySchema.parse(req.query);
 
     const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user!.id, listLeadByActorQuery);
 
-    const safeLeads: SafeLeadsWithWorkspaceType = {
+    const safeLeads: SafeLeadsType = {
       data: leads.map((lead) => ({
         id: lead.id,
         workspaceId: lead.workspaceId,
@@ -76,22 +74,18 @@ export class LeadController {
         ...(lead.email != null && { email: lead.email }),
         ...(lead.phone != null && { phone: lead.phone }),
         ...(lead.source != null && { source: lead.source }),
-        workspace: {
-          id: lead.workspace.id,
-          name: lead.workspace.name,
-        },
       })),
       paginationMeta,
     };
 
     const envelope = ok(safeLeads);
-    const envelopeSchema = okEnvelopeSchema(safeLeadsWithWorkspaceSchema);
+    const envelopeSchema = okEnvelopeSchema(safeLeadsSchema);
     const validatedEnvelope = validateResponse(envelopeSchema)(envelope);
 
     return res.status(200).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
@@ -133,7 +127,7 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  listByWorkspace = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  listByWorkspace = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const listLeadsQuery: ListLeadsQueryType = listLeadsQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
@@ -167,7 +161,7 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
@@ -197,7 +191,7 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  updateStage = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  updateStage = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
@@ -227,7 +221,7 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  linkTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  linkTask = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
@@ -249,7 +243,7 @@ export class LeadController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  unlinkTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  unlinkTask = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
@@ -271,7 +265,7 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  createFollowUpTask = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  createFollowUpTask = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -294,7 +288,7 @@ export class LeadController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,

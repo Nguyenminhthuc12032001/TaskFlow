@@ -83,7 +83,7 @@ const toSafeTaskDetail = (task: TaskDetailResponseSource): SafeTaskDetail => ({
 export class TaskController {
   constructor(readonly taskService: TaskService) { }
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response) => {
+  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -102,7 +102,7 @@ export class TaskController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -122,7 +122,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  listByColumn = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  listByColumn = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const listTaskByColumnQuery: ListTaskByColumnQueryType = listTaskByColumnQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
@@ -147,7 +147,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response) => {
+  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -167,7 +167,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response) => {
+  reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response): Promise<Response> => {
     const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
@@ -191,7 +191,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -214,7 +214,7 @@ export class TaskController {
   bulkRemove = async (
     req: Request<WorkspaceParamsType, {}, BulkRemoveBodyType, {}, {}>,
     res: Response,
-  ) => {
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -243,7 +243,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  assign = async (req: Request<WorkspaceParamsType, {}, AssignBodyType, {}, {}>, res: Response) => {
+  assign = async (req: Request<WorkspaceParamsType, {}, AssignBodyType, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -266,7 +266,7 @@ export class TaskController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  archivTask = async (req: Request<WorkspaceParamsType, {}, {}, {}>, res: Response) => {
+  archivTask = async (req: Request<WorkspaceParamsType, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -286,7 +286,7 @@ export class TaskController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  restoreTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response) => {
+  restoreTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

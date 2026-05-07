@@ -5,7 +5,7 @@ import { log } from './common/logger/logger.js';
 try {
   const env = loadEnv();
   app.listen(env.PORT, () => {
-    console.log(`Server running on http://localhost:${env.PORT}`);
+    log.info(`Server running on http://localhost:${env.PORT}`);
   });
 } catch (err) {
   log.error(

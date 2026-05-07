@@ -9,7 +9,7 @@ import { validateBody, validateParams, validateQuery } from '../../common/middle
 import { createBodySchema, listProjectsQuerySchema, updateBodySchema } from './project.schemas.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
-import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
+import { emptyBodySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 
 const projectController = new ProjectController(
   new ProjectService(

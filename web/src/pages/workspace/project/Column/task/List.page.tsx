@@ -1,3 +1,4 @@
+import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Link,
@@ -30,7 +31,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { ListByColumnLoader } from "../../../../../features/task/loader/listByColumn.loader";
 import { ListMemberLoader } from "../../../../../features/workspace/loader/listMember";
 import { useAuth } from "../../../../../features/auth/auth.store";
-import { EyeIcon, PlusIcon } from "../../../../../components/ui/Icons";
+import { EyeIcon, PlusIcon, XIcon } from "../../../../../components/ui/Icons";
+import { getQueryLink } from "../../../../../app/shared/lib/query";
 
 type LoaderData = Awaited<ReturnType<typeof ListByColumnLoader>>;
 type TaskListData = Extract<LoaderData, { data: unknown[] }>;
@@ -113,8 +115,14 @@ const priorityFilterOptions: Array<{
     })),
 ];
 
+const defaultPageSizeOptions = [6, 10, 20, 50, 100];
+
 function isPriority(value: string | null): value is Priority {
     return !!value && value in priorityMeta;
+}
+
+function getPageSizeOptions(currentLimit: number) {
+    return Array.from(new Set([...defaultPageSizeOptions, currentLimit])).sort((a, b) => a - b);
 }
 
 function PriorityBadge({ priority }: { priority: TaskItem["priority"] }) {
@@ -536,8 +544,6 @@ export function ListTaskPage() {
         ? fetcher.data.errorMessage
         : null;
 
-    const canReorder = !activePriority && !isSaving && !assigningTaskId;
-
     if (!isTaskListData(data)) {
         return (
             <section className="rounded-3xl border border-red-100 bg-red-50 p-6">
@@ -558,6 +564,39 @@ export function ListTaskPage() {
         );
     }
 
+    const pagination = data.paginationMeta;
+    const query = searchParams.get("search")?.trim() ?? "";
+    const startDate = searchParams.get("startDate") ?? "";
+    const endDate = searchParams.get("endDate") ?? "";
+    const dueStartDate = searchParams.get("dueStartDate") ?? "";
+    const dueEndDate = searchParams.get("dueEndDate") ?? "";
+    const pageSizeOptions = getPageSizeOptions(pagination.limit);
+    const hasFilters = Boolean(
+        activePriority ||
+            query ||
+            startDate ||
+            endDate ||
+            dueStartDate ||
+            dueEndDate
+    );
+    const filterKey = [
+        query,
+        activePriority ?? "",
+        startDate,
+        endDate,
+        dueStartDate,
+        dueEndDate,
+        pagination.limit,
+    ].join("|");
+    const hasQueryFilter = hasFilters;
+    const canReorder =
+        !hasQueryFilter &&
+        pagination.totalPages <= 1 &&
+        !isSaving &&
+        !assigningTaskId;
+    const getPageLink = (page: number) =>
+        getQueryLink(searchParams, { page, limit: pagination.limit });
+
     function handlePriorityFilter(priority: PriorityFilter) {
         const nextSearchParams = new URLSearchParams(searchParams);
 
@@ -567,7 +606,52 @@ export function ListTaskPage() {
             nextSearchParams.set("priority", priority);
         }
 
+        nextSearchParams.set("page", "1");
         setSearchParams(nextSearchParams);
+    }
+
+    function handleFilterSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const nextSearch = formData.get("search")?.toString().trim() ?? "";
+        const nextStartDate = formData.get("startDate")?.toString() ?? "";
+        const nextEndDate = formData.get("endDate")?.toString() ?? "";
+        const nextDueStartDate = formData.get("dueStartDate")?.toString() ?? "";
+        const nextDueEndDate = formData.get("dueEndDate")?.toString() ?? "";
+        const nextLimit = formData.get("limit")?.toString() ?? String(pagination.limit);
+        const params = new URLSearchParams(searchParams);
+
+        [
+            ["search", nextSearch],
+            ["startDate", nextStartDate],
+            ["endDate", nextEndDate],
+            ["dueStartDate", nextDueStartDate],
+            ["dueEndDate", nextDueEndDate],
+            ["limit", nextLimit],
+        ].forEach(([key, value]) => {
+            if (value) {
+                params.set(key, value);
+            } else {
+                params.delete(key);
+            }
+        });
+
+        params.set("page", "1");
+        setSearchParams(params);
+    }
+
+    function handleClearFilters() {
+        const params = new URLSearchParams(searchParams);
+
+        params.delete("search");
+        params.delete("priority");
+        params.delete("startDate");
+        params.delete("endDate");
+        params.delete("dueStartDate");
+        params.delete("dueEndDate");
+        params.set("page", "1");
+        setSearchParams(params);
     }
 
     function submitReorder(nextTasks: TaskItem[]) {
@@ -585,6 +669,10 @@ export function ListTaskPage() {
 
         fetcher.submit(formData, {
             method: "post",
+            action: getQueryLink(searchParams, {
+                page: pagination.page,
+                limit: pagination.limit,
+            }),
         });
     }
 
@@ -608,7 +696,9 @@ export function ListTaskPage() {
         submitReorder(reordered);
     }
 
-    const taskCountText = activePriority
+    const taskCountText = hasFilters
+        ? `${visibleTasks.length} task${visibleTasks.length !== 1 ? "s" : ""} match current filters`
+        : activePriority
         ? `${visibleTasks.length} ${priorityMeta[
               activePriority
           ].label.toLowerCase()} priority task${
@@ -658,9 +748,15 @@ export function ListTaskPage() {
                             })}
                         </div>
 
-                        {activePriority && (
+                        {hasQueryFilter && (
                             <p className="mt-3 text-xs text-zinc-400">
-                                Reordering is available in All view only.
+                                Reordering is available after clearing filters.
+                            </p>
+                        )}
+
+                        {!hasQueryFilter && pagination.totalPages > 1 && (
+                            <p className="mt-3 text-xs text-zinc-400">
+                                Reordering is available when all tasks fit on one page.
                             </p>
                         )}
 
@@ -679,6 +775,112 @@ export function ListTaskPage() {
                         Task
                     </Link>
                 </div>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <form
+                    key={filterKey}
+                    onSubmit={handleFilterSubmit}
+                    className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(220px,1fr)_150px_150px_150px_150px_120px_auto]"
+                >
+                    <label className="min-w-0">
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Search
+                        </span>
+                        <input
+                            name="search"
+                            defaultValue={query}
+                            placeholder="Task title"
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        />
+                    </label>
+
+                    <label>
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Created from
+                        </span>
+                        <input
+                            type="date"
+                            name="startDate"
+                            defaultValue={startDate}
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        />
+                    </label>
+
+                    <label>
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Created to
+                        </span>
+                        <input
+                            type="date"
+                            name="endDate"
+                            defaultValue={endDate}
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        />
+                    </label>
+
+                    <label>
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Due from
+                        </span>
+                        <input
+                            type="date"
+                            name="dueStartDate"
+                            defaultValue={dueStartDate}
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        />
+                    </label>
+
+                    <label>
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Due to
+                        </span>
+                        <input
+                            type="date"
+                            name="dueEndDate"
+                            defaultValue={dueEndDate}
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        />
+                    </label>
+
+                    <label>
+                        <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            Per page
+                        </span>
+                        <select
+                            name="limit"
+                            defaultValue={String(pagination.limit)}
+                            className="h-11 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm text-zinc-950 outline-none transition focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100"
+                        >
+                            {pageSizeOptions.map((limit) => (
+                                <option key={limit} value={limit}>
+                                    {limit}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <div className="flex items-end gap-2">
+                        <button
+                            type="submit"
+                            className="inline-flex h-11 flex-1 items-center justify-center rounded-xl bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 lg:flex-none"
+                        >
+                            Apply
+                        </button>
+
+                        {hasFilters ? (
+                            <button
+                                type="button"
+                                onClick={handleClearFilters}
+                                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-500 transition hover:bg-zinc-50 hover:text-zinc-950"
+                                aria-label="Clear filters"
+                                title="Clear filters"
+                            >
+                                <XIcon className="h-4 w-4" />
+                            </button>
+                        ) : null}
+                    </div>
+                </form>
             </div>
 
             <Outlet />
@@ -704,26 +906,32 @@ export function ListTaskPage() {
                         </div>
 
                         <h3 className="mt-4 text-base font-semibold text-zinc-950">
-                            {activePriority
-                                ? `No ${priorityMeta[
-                                      activePriority
-                                  ].label.toLowerCase()} priority tasks`
-                                : "No tasks yet"}
+                            {hasFilters ? "No tasks match these filters" : "No tasks yet"}
                         </h3>
 
                         <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">
-                            {activePriority
-                                ? "There are no tasks with this priority in the current column."
+                            {hasFilters
+                                ? "Try changing the search, priority, created date, or due date filters."
                                 : "Create the first task for this column and start organizing your work."}
                         </p>
 
-                        <Link
-                            to="create"
-                            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
-                        >
-                            <PlusIcon className="h-4 w-4" />
-                            Task
-                        </Link>
+                        {hasFilters ? (
+                            <button
+                                type="button"
+                                onClick={handleClearFilters}
+                                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
+                            >
+                                Clear filters
+                            </button>
+                        ) : (
+                            <Link
+                                to="create"
+                                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
+                            >
+                                <PlusIcon className="h-4 w-4" />
+                                Task
+                            </Link>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -756,6 +964,44 @@ export function ListTaskPage() {
                     </SortableContext>
                 </DndContext>
             )}
+
+            <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-zinc-600">
+                    Page <span className="font-semibold text-zinc-950">{pagination.page}</span>
+                    {" / "}
+                    <span className="font-semibold text-zinc-950">{pagination.totalPages}</span>
+                    {" - "}
+                    Total <span className="font-semibold text-zinc-950">{pagination.totalItems}</span> tasks
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {pagination.hasPrevPage ? (
+                        <Link
+                            to={getPageLink(pagination.page - 1)}
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+                        >
+                            Previous
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-400 opacity-50">
+                            Previous
+                        </span>
+                    )}
+
+                    {pagination.hasNextPage ? (
+                        <Link
+                            to={getPageLink(pagination.page + 1)}
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+                        >
+                            Next
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-400 opacity-50">
+                            Next
+                        </span>
+                    )}
+                </div>
+            </div>
         </section>
     );
 }

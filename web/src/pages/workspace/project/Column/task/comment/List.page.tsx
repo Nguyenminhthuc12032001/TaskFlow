@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useRouteLoaderData, useSearchParams } from "react-router-dom";
 import type { SafeCommentsType } from "../../../../../../../../api/src/modules/comment/comment.schemas";
 import { useAuth } from "../../../../../../features/auth/auth.store";
 import type { ActionError } from "../../../../../../features/type";
 import type { GetByIdLoader } from "../../../../../../features/workspace/loader/getById";
+import { getQueryLink } from "../../../../../../app/shared/lib/query";
 import { CreateCommentSection } from "./Create.section";
 import { DetailCommentSection } from "./Detail.section";
 import { ReplySection } from "./Reply.section";
@@ -40,6 +41,7 @@ function sortByCreatedAt(comments: CommentItem[]) {
 export function ListCommentPage() {
     const data = useLoaderData() as LoaderData;
     const workspaceData = useRouteLoaderData<typeof GetByIdLoader>("workspace-detail");
+    const [searchParams] = useSearchParams();
     const auth = useAuth();
     const [replyingToId, setReplyingToId] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -97,6 +99,9 @@ export function ListCommentPage() {
     }
 
     const totalComments = data.paginationMeta.totalItems;
+    const pagination = data.paginationMeta;
+    const getPageLink = (page: number) =>
+        getQueryLink(searchParams, { page, limit: pagination.limit });
 
     return (
         <main className="space-y-5">
@@ -228,6 +233,44 @@ export function ListCommentPage() {
                     </div>
                 )}
             </section>
+
+            <div className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-zinc-600">
+                    Page <span className="font-semibold text-zinc-950">{pagination.page}</span>
+                    {" / "}
+                    <span className="font-semibold text-zinc-950">{pagination.totalPages}</span>
+                    {" - "}
+                    Total <span className="font-semibold text-zinc-950">{pagination.totalItems}</span> comments
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {pagination.hasPrevPage ? (
+                        <Link
+                            to={getPageLink(pagination.page - 1)}
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+                        >
+                            Previous
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-400 opacity-50">
+                            Previous
+                        </span>
+                    )}
+
+                    {pagination.hasNextPage ? (
+                        <Link
+                            to={getPageLink(pagination.page + 1)}
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+                        >
+                            Next
+                        </Link>
+                    ) : (
+                        <span className="inline-flex h-9 cursor-not-allowed items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-400 opacity-50">
+                            Next
+                        </span>
+                    )}
+                </div>
+            </div>
         </main>
     );
 }

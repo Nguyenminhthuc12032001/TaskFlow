@@ -1,4 +1,4 @@
-import type { ColumnType, Prisma } from '../../../prisma/generated/client.js';
+import type { Column, ColumnType, Prisma } from '../../../prisma/generated/client.js';
 import type { DataRangeQueryType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
@@ -6,7 +6,7 @@ import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 export class ColumnRepo {
   constructor(readonly prisma: DbClient) { }
 
-  async create(data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma) {
+  async create(data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma): Promise<Column> {
     return await db.column.create({ data });
   }
 
@@ -17,7 +17,7 @@ export class ColumnRepo {
     type: ColumnType | undefined,
     { skip, take }: { skip: number; take: number },
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Column[]> {
     return await db.column.findMany({
       where: {
         project: {
@@ -56,7 +56,7 @@ export class ColumnRepo {
   async allColumnsByProject(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Column[]> {
     return await db.column.findMany({
       where: {
         project: {
@@ -83,7 +83,7 @@ export class ColumnRepo {
     dateRange: DataRangeQueryType,
     type: ColumnType | undefined,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<number> {
     return await db.column.count({
       where: {
         project: {
@@ -117,7 +117,7 @@ export class ColumnRepo {
   async get(
     ctx: ResourceContext, 
     db: DbOrTxClient = this.prisma
-  ) {
+  ): Promise<Column | null> {
     return await db.column.findFirst({
       where: {
         id: ctx.columnId,
@@ -140,7 +140,7 @@ export class ColumnRepo {
     data: Prisma.ColumnUpdateInput,
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Column> {
     return await db.column.update({
       where: {
         id: ctx.columnId,
@@ -166,7 +166,7 @@ export class ColumnRepo {
   async remove(
     ctx: ResourceContext,
     db: DbOrTxClient = this.prisma,
-  ) {
+  ): Promise<Column> {
     return await db.column.delete({
       where: {
         id: ctx.columnId,

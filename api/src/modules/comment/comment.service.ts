@@ -1,6 +1,6 @@
-import { ActivityAction, Prisma } from '../../../prisma/generated/client.js';
+import { ActivityAction, Prisma, type Comment } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
@@ -16,7 +16,7 @@ export class CommentService {
     readonly commentRepo: CommentRepo,
   ) {}
 
-  async create(data: CreateBodyType, ctx: ResourceContext) {
+  async create(data: CreateBodyType, ctx: ResourceContext): Promise<Comment> {
     const dataCreate: Prisma.CommentCreateInput = {
       content: data.content,
       task: {
@@ -48,7 +48,7 @@ export class CommentService {
     });
   }
 
-  async reply(data: CreateBodyType, ctx: ResourceContext) {
+  async reply(data: CreateBodyType, ctx: ResourceContext): Promise<Comment> {
     const dataReply: Prisma.CommentCreateInput = {
       content: data.content,
       parent: {
@@ -85,7 +85,7 @@ export class CommentService {
     });
   }
 
-  async get(ctx: ResourceContext) {
+  async get(ctx: ResourceContext): Promise<Comment> {
     const comment = await this.commentRepo.get(ctx);
 
     if (!comment) {
@@ -95,7 +95,7 @@ export class CommentService {
     return comment;
   }
 
-  async listByTask(ctx: ResourceContext, listCommentsQuery: ListCommentsQueryType) {
+  async listByTask(ctx: ResourceContext, listCommentsQuery: ListCommentsQueryType): Promise<{ comments: Comment[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(listCommentsQuery.page, listCommentsQuery.limit);
 
     const dateRange = buildDateRange({
@@ -112,7 +112,7 @@ export class CommentService {
     return { comments, paginationMeta };
   }
 
-  async update(data: UpdateBodyType, ctx: ResourceContext) {
+  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Comment> {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);
@@ -129,7 +129,7 @@ export class CommentService {
     return await this.commentRepo.update(updateData, ctx);
   }
 
-  async remove(ctx: ResourceContext) {
+  async remove(ctx: ResourceContext): Promise<Comment> {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);

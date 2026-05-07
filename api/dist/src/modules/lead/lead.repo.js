@@ -93,14 +93,6 @@ export class LeadRepo {
                 ...(stage ? { stage } : {}),
                 ...(workspaceId ? { workspaceId } : {})
             },
-            include: {
-                workspace: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
-            },
             skip,
             take,
             orderBy: {

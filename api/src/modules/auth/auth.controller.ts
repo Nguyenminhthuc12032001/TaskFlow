@@ -28,7 +28,7 @@ import type { AuthService } from './auth.service.js';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
+  register = async (req: Request<{}, {}, RegisterBody>, res: Response): Promise<Response> => {
     const result = await this.authService.register(req.body);
 
     res.cookie('refreshToken', result.refreshToken, {
@@ -51,7 +51,7 @@ export class AuthController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
+  login = async (req: Request<{}, {}, LoginBody>, res: Response): Promise<Response> => {
     const result = await this.authService.login(req.body);
 
     res.cookie('refreshToken', result.refreshToken, {
@@ -72,7 +72,7 @@ export class AuthController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  logout = async (req: Request, res: Response) => {
+  logout = async (req: Request, res: Response): Promise<Response> => {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) return res.sendStatus(204);
 
@@ -88,7 +88,7 @@ export class AuthController {
     return res.sendStatus(204);
   };
 
-  refresh = async (req: Request, res: Response) => {
+  refresh = async (req: Request, res: Response): Promise<Response> => {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
       throw new AppError('Refresh token missing', 401);
@@ -103,11 +103,7 @@ export class AuthController {
       path: '/api/auth',
     });
 
-    const user: SafeUserResponse = {
-      id: result.user.id,
-      name: result.user.name,
-      email: result.user.email
-    }
+    const user: SafeUserResponse = result.safeUser;
 
     const refreshResponse: RefreshResponse = {
       user,
@@ -120,13 +116,13 @@ export class AuthController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  forgotPassword = async (req: Request<{}, {}, ForgotPasswordBody>, res: Response) => {
+  forgotPassword = async (req: Request<{}, {}, ForgotPasswordBody>, res: Response): Promise<Response> => {
     await this.authService.forgotPassword(req.body);
 
     return res.sendStatus(204);
   };
 
-  resetPassword = async (req: Request<{}, {}, ResetPasswordBody>, res: Response) => {
+  resetPassword = async (req: Request<{}, {}, ResetPasswordBody>, res: Response): Promise<Response> => {
     await this.authService.resetPassword(req.body);
 
     res.clearCookie('refreshToken', {
@@ -139,7 +135,7 @@ export class AuthController {
     return res.sendStatus(204);
   };
 
-  changePassword = async (req: Request<{}, {}, ChangePasswordBody>, res: Response) => {
+  changePassword = async (req: Request<{}, {}, ChangePasswordBody>, res: Response): Promise<Response> => {
     await this.authService.changePassword(req.user!.id, req.body);
 
     res.clearCookie('refreshToken', {
@@ -152,7 +148,7 @@ export class AuthController {
     return res.sendStatus(204);
   };
 
-  me = async (req: Request, res: Response) => {
+  me = async (req: Request, res: Response): Promise<Response> => {
     const meResponse: SafeUserResponse = await this.authService.me(req.user!.id);
 
     const envelope = ok(meResponse);

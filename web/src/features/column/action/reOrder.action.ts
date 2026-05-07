@@ -5,12 +5,15 @@ import { feedbackMessage } from "../../../app/shared/constants/feedback-messages
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
 import type { ActionError } from "../../type";
 import { z, ZodError } from "zod";
+import { getQueryFromSearchParams } from "../../../app/shared/lib/query";
 
 export async function ReOrderColumnAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData(); 
 
     const projectId = params.projectId;
     const workspaceId = params.workspaceId;
+    const url = new URL(request.url);
+    const query = getQueryFromSearchParams(url.searchParams, ["page", "limit"]);
 
     const rawItems = formData.get('items'); 
 
@@ -23,7 +26,7 @@ export async function ReOrderColumnAction({ params, request }: ActionFunctionArg
     const data: unknown = JSON.parse(rawItems);
 
     try {
-        const promise = columnApi.reOrder(workspaceId, projectId, data);
+        const promise = columnApi.reOrder(workspaceId, projectId, data, query);
 
         notify.promise(promise, {
             loading: "Updating column...",
