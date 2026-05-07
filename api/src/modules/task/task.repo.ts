@@ -88,7 +88,7 @@ export class TaskRepo {
     ctx: ResourceContext,
     search: string | undefined,
     dateRange: DataRangeQueryType,
-    dueDateRange: DataRangeQueryType,
+    dueDateRange: DataRangeQueryType | undefined,
     priority: TaskPriority | undefined,
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma
@@ -174,7 +174,7 @@ export class TaskRepo {
     ctx: ResourceContext,
     search: string | undefined,
     dateRange: DataRangeQueryType,
-    dueDateRange: DataRangeQueryType,
+    dueDateRange: DataRangeQueryType | undefined,
     priority: TaskPriority | undefined,
     db: DbOrTxClient = this.prisma
   ) {

@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class ColumnService {
     constructor(prisma, columnRepo, activityService) {
@@ -32,11 +33,15 @@ export class ColumnService {
             return column;
         });
     }
-    async listByProjectId(ctx, paginationQuery) {
-        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countColumns = await this.columnRepo.countColumnsByProject(ctx, paginationQuery.search);
+    async listByProjectId(ctx, listColumnQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(listColumnQuery.page, listColumnQuery.limit);
+        const dateRange = buildDateRange({
+            startDate: listColumnQuery.startDate,
+            endDate: listColumnQuery.endDate
+        });
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx, listColumnQuery.search, dateRange, listColumnQuery.type);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
-        const columns = await this.columnRepo.listByProject(ctx, paginationQuery.search, { skip, take });
+        const columns = await this.columnRepo.listByProject(ctx, listColumnQuery.search, dateRange, listColumnQuery.type, { skip, take });
         return { columns, paginationMeta };
     }
     async get(ctx) {
@@ -94,9 +99,9 @@ export class ColumnService {
             }, tx);
         });
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined);
+        const countColumns = await this.columnRepo.countColumnsByProject(ctx, undefined, { startDate: undefined, endDate: undefined }, undefined);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countColumns);
-        const columns = await this.columnRepo.listByProject(ctx, undefined, { skip, take });
+        const columns = await this.columnRepo.listByProject(ctx, undefined, { startDate: undefined, endDate: undefined }, undefined, { skip, take });
         return { columns, paginationMeta };
     }
     async remove(ctx) {

@@ -63,7 +63,7 @@ export class TaskRepo {
             },
         });
     }
-    async listByColumn(ctx, search, { take, skip }, db = this.prisma) {
+    async listByColumn(ctx, search, dateRange, dueDateRange, priority, { take, skip }, db = this.prisma) {
         return await db.task.findMany({
             include: {
                 assignees: true,
@@ -88,7 +88,20 @@ export class TaskRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(dueDateRange?.startDate || dueDateRange?.endDate ? {
+                    dueDate: {
+                        ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
+                        ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(priority ? { priority } : {})
             },
             orderBy: {
                 position: 'asc'
@@ -123,7 +136,7 @@ export class TaskRepo {
             }
         });
     }
-    async countTasksByColumn(ctx, search, db = this.prisma) {
+    async countTasksByColumn(ctx, search, dateRange, dueDateRange, priority, db = this.prisma) {
         return await db.task.count({
             where: {
                 column: {
@@ -145,7 +158,20 @@ export class TaskRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(dueDateRange?.startDate || dueDateRange?.endDate ? {
+                    dueDate: {
+                        ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
+                        ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(priority ? { priority } : {})
             },
         });
     }

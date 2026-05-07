@@ -1,7 +1,6 @@
-import { listProjectsResponseSchema, safeProjectResponseSchema, } from './project.schemas.js';
+import { listProjectsQuerySchema, listProjectsResponseSchema, safeProjectResponseSchema, } from './project.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 export class ProjectController {
     constructor(projectService) {
         this.projectService = projectService;
@@ -45,12 +44,12 @@ export class ProjectController {
             return res.status(200).json(validatedEnvelope);
         };
         this.listByWorkspace = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const listProjectsQuery = listProjectsQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 ActorId: req.user.id,
             };
-            const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, paginationQuery);
+            const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, listProjectsQuery);
             const safeProjectResponse = {
                 data: projects.map((p) => ({
                     workspaceId: p.workspaceId,

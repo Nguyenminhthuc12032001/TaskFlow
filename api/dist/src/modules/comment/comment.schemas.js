@@ -1,6 +1,11 @@
-// REQUEST
-import { paginationMetaSchema } from '../../common/schemas/common.schemas.js';
+import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
+// REQUEST
+export const listCommentsQuerySchema = paginationQuerySchema.extend({
+    search: searchQuerySchema,
+    ...dataRangeQuerySchema.shape,
+    parentId: z.uuid().optional(),
+});
 export const createBodySchema = z
     .object({
     content: z

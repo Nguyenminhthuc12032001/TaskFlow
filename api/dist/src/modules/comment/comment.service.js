@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class CommentService {
     constructor(prisma, activityService, commentRepo) {
@@ -59,11 +60,15 @@ export class CommentService {
         }
         return comment;
     }
-    async listByTask(ctx, paginationQuery) {
-        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countComments = await this.commentRepo.countCommentsByTask(ctx, paginationQuery.search);
+    async listByTask(ctx, listCommentsQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(listCommentsQuery.page, listCommentsQuery.limit);
+        const dateRange = buildDateRange({
+            startDate: listCommentsQuery.startDate,
+            endDate: listCommentsQuery.endDate
+        });
+        const countComments = await this.commentRepo.countCommentsByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countComments);
-        const comments = await this.commentRepo.listByTask(ctx, paginationQuery.search, { skip, take });
+        const comments = await this.commentRepo.listByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId, { skip, take });
         return { comments, paginationMeta };
     }
     async update(data, ctx) {

@@ -1,4 +1,4 @@
-import { safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, } from './task.schemas.js';
+import { safeAssigneeSchema, safeTaskDetailSchema, safeTaskSchema, safeTasksSchema, listTaskByColumnQuerySchema, } from './task.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
@@ -64,14 +64,14 @@ export class TaskController {
             return res.status(200).json(validatedEnvelope);
         };
         this.listByColumn = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const listTaskByColumnQuery = listTaskByColumnQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
                 columnId: req.params.columnId,
                 ActorId: req.user.id,
             };
-            const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, paginationQuery);
+            const { tasks, paginationMeta } = await this.taskService.listByColumn(ctx, listTaskByColumnQuery);
             const safeTasks = {
                 data: tasks.map(toSafeTask),
                 paginationMeta

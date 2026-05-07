@@ -1,5 +1,4 @@
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
-import { safeCommentSchema, safeCommentsSchema, } from './comment.schemas.js';
+import { listCommentsQuerySchema, safeCommentSchema, safeCommentsSchema, } from './comment.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 export class CommentController {
@@ -52,7 +51,7 @@ export class CommentController {
             return res.status(200).json(validatedEnvelope);
         };
         this.listByTask = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const listCommentsQuery = listCommentsQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
@@ -60,7 +59,7 @@ export class CommentController {
                 TaskId: req.params.taskId,
                 ActorId: req.user.id,
             };
-            const { comments, paginationMeta } = await this.commentService.listByTask(ctx, paginationQuery);
+            const { comments, paginationMeta } = await this.commentService.listByTask(ctx, listCommentsQuery);
             const safeComments = {
                 data: comments.map((comment) => ({
                     id: comment.id,

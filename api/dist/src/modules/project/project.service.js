@@ -1,5 +1,6 @@
 import { ActivityAction, ColumnType } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class ProjectService {
     constructor(prisma, projectRepo, activityService) {
@@ -52,9 +53,13 @@ export class ProjectService {
     }
     async listByWorkspace(ctx, paginationQuery) {
         const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search);
+        const dateRange = buildDateRange({
+            startDate: paginationQuery.startDate,
+            endDate: paginationQuery.endDate
+        });
+        const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search, dateRange);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
-        const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, { take, skip });
+        const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, dateRange, { take, skip });
         return { projects, paginationMeta };
     }
     async listByUser(actorId) {

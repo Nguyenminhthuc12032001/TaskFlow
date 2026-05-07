@@ -1,8 +1,7 @@
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
-import { createBodySchema, createFollowUpTaskBodySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema, } from './lead.schemas.js';
+import { createBodySchema, createFollowUpTaskBodySchema, listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, updateBodySchema, updateStageBodySchema, } from './lead.schemas.js';
 const defaultPath = '/api/leads/{workspaceId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -17,7 +16,7 @@ registry.registerPath({
     summary: 'List leads across actor workspaces',
     security: [{ bearerAuth: [] }],
     request: {
-        query: paginationQuerySchema,
+        query: listLeadByActorQuerySchema,
     },
     responses: defaultResponse(safeLeadsWithWorkspaceSchema, [201, 409]),
 });
@@ -55,7 +54,7 @@ registry.registerPath({
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
-        query: paginationQuerySchema
+        query: listLeadsQuerySchema
     },
     responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });

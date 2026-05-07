@@ -8,7 +8,7 @@ import { safeUserSchema } from '../auth/auth.schemas.js';
 export const listTaskByColumnQuerySchema = paginationQuerySchema.extend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
-  dueDateRange: dataRangeQuerySchema,
+  dueDateRange: dataRangeQuerySchema.optional(),
   priority: z.enum(TaskPriority).optional(),
 })
 export type ListTaskByColumnQueryType = z.infer<typeof listTaskByColumnQuerySchema>;

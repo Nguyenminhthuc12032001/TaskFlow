@@ -32,7 +32,7 @@ export class CommentRepo {
             },
         });
     }
-    async listByTask(ctx, search, { skip, take }, db = this.prisma) {
+    async listByTask(ctx, search, dateRange, parentId, { skip, take }, db = this.prisma) {
         return await db.comment.findMany({
             where: {
                 task: {
@@ -56,6 +56,15 @@ export class CommentRepo {
                     content: {
                         contains: search,
                         mode: 'insensitive',
+                    }
+                } : {}),
+                ...(parentId ? {
+                    parentId
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
                     }
                 } : {})
             },
@@ -92,7 +101,7 @@ export class CommentRepo {
             }
         });
     }
-    async countCommentsByTask(ctx, search, db = this.prisma) {
+    async countCommentsByTask(ctx, search, dateRange, parentId, db = this.prisma) {
         return await db.comment.count({
             where: {
                 task: {
@@ -116,6 +125,13 @@ export class CommentRepo {
                     content: {
                         contains: search,
                         mode: 'insensitive',
+                    }
+                } : {}),
+                ...(parentId ? { parentId } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
                     }
                 } : {})
             },

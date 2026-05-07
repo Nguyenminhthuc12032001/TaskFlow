@@ -1,8 +1,7 @@
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
 import { registry } from '../../docs/openapi.js';
 import z from '../../docs/zod.js';
 import { defaultResponse } from '../workspace/workspace.openApi.js';
-import { createBodySchema, safeCommentSchema, safeCommentsSchema, updateBodySchema, } from './comment.schemas.js';
+import { createBodySchema, listCommentsQuerySchema, safeCommentSchema, safeCommentsSchema, updateBodySchema, } from './comment.schemas.js';
 const defaultPath = '/api/comments/{workspaceId}/{projectId}/{columnId}/{taskId}';
 const defaultParams = z.object({
     workspaceId: z.uuid(),
@@ -49,7 +48,7 @@ registry.registerPath({
     security: [{ bearerAuth: [] }],
     request: {
         params: defaultParams,
-        query: paginationQuerySchema
+        query: listCommentsQuerySchema
     },
     responses: defaultResponse(safeCommentsSchema, [201, 409]),
 });

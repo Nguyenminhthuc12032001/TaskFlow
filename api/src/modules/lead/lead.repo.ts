@@ -64,7 +64,14 @@ export class LeadRepo {
             contains: search,
             mode: 'insensitive',
           }
-        } : {})
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+          }
+        } : {}),
+        ...(stage ? { stage } : {})
       },
       skip,
       take,
@@ -178,7 +185,14 @@ export class LeadRepo {
             contains: search,
             mode: 'insensitive',
           }
-        } : {})
+        } : {}),
+        ...(dateRange?.startDate || dateRange?.endDate ? {
+          createdAt: {
+            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+          }
+        } : {}),
+        ...(stage ? { stage } : {})
       },
     });
   }

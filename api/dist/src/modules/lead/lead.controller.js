@@ -1,5 +1,4 @@
-import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
-import { safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
+import { listLeadByActorQuerySchema, listLeadsQuerySchema, safeLeadDetailSchema, safeLeadSchema, safeLeadsSchema, safeLeadsWithWorkspaceSchema, safeLeadTaskLinkSchema, } from './lead.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 export class LeadController {
@@ -30,8 +29,8 @@ export class LeadController {
             return res.status(201).json(validatedEnvelope);
         };
         this.listByActorWorkspaces = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
-            const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user.id, paginationQuery);
+            const listLeadByActorQuery = listLeadByActorQuerySchema.parse(req.query);
+            const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user.id, listLeadByActorQuery);
             const safeLeads = {
                 data: leads.map((lead) => ({
                     id: lead.id,
@@ -95,12 +94,12 @@ export class LeadController {
             return res.status(200).json(validatedEnvelope);
         };
         this.listByWorkspace = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const listLeadsQuery = listLeadsQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 ActorId: req.user.id,
             };
-            const { leads, paginationMeta } = await this.leadService.listByWorkspace(ctx, paginationQuery);
+            const { leads, paginationMeta } = await this.leadService.listByWorkspace(ctx, listLeadsQuery);
             const safeLeads = {
                 data: leads.map((lead) => ({
                     id: lead.id,

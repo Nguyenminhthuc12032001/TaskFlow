@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class LeadService {
     constructor(prisma, leadRepo, taskRepo, activityService) {
@@ -38,18 +39,26 @@ export class LeadService {
         }
         return lead;
     }
-    async listByWorkspace(ctx, paginationQuery) {
-        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx, paginationQuery.search);
+    async listByWorkspace(ctx, listLeadQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(listLeadQuery.page, listLeadQuery.limit);
+        const dateRange = buildDateRange({
+            startDate: listLeadQuery.startDate,
+            endDate: listLeadQuery.endDate
+        });
+        const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx, listLeadQuery.search, dateRange, listLeadQuery.stage);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
-        const leads = await this.leadRepo.listByWorkspace(ctx, paginationQuery.search, { skip, take });
+        const leads = await this.leadRepo.listByWorkspace(ctx, listLeadQuery.search, dateRange, listLeadQuery.stage, { skip, take });
         return { leads, paginationMeta };
     }
-    async listByActorWorkspaces(actorId, paginationQuery) {
-        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId, paginationQuery.search);
+    async listByActorWorkspaces(actorId, listLeadByActorQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(listLeadByActorQuery.page, listLeadByActorQuery.limit);
+        const dateRange = buildDateRange({
+            startDate: listLeadByActorQuery.startDate,
+            endDate: listLeadByActorQuery.endDate
+        });
+        const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId, listLeadByActorQuery.search, dateRange, listLeadByActorQuery.stage, listLeadByActorQuery.workspaceId);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
-        const leads = await this.leadRepo.listByActorWorkspaces(actorId, paginationQuery.search, { skip, take });
+        const leads = await this.leadRepo.listByActorWorkspaces(actorId, listLeadByActorQuery.search, dateRange, listLeadByActorQuery.stage, listLeadByActorQuery.workspaceId, { skip, take });
         return { leads, paginationMeta };
     }
     async update(data, ctx) {

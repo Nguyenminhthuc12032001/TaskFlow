@@ -50,6 +50,7 @@ export function validateQuery<T extends ZodType>(schema: T) {
       );
     }
 
+    req.query = result.data as Request['query'];
     next();
   };
 }

@@ -5,7 +5,7 @@ export class ColumnRepo {
     async create(data, db = this.prisma) {
         return await db.column.create({ data });
     }
-    async listByProject(ctx, search, { skip, take }, db = this.prisma) {
+    async listByProject(ctx, search, dateRange, type, { skip, take }, db = this.prisma) {
         return await db.column.findMany({
             where: {
                 project: {
@@ -23,6 +23,13 @@ export class ColumnRepo {
                     name: {
                         contains: search,
                         mode: 'insensitive',
+                    }
+                } : {}),
+                ...(type ? { type } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
                     }
                 } : {})
             },
@@ -53,7 +60,7 @@ export class ColumnRepo {
             }
         });
     }
-    async countColumnsByProject(ctx, search, db = this.prisma) {
+    async countColumnsByProject(ctx, search, dateRange, type, db = this.prisma) {
         return await db.column.count({
             where: {
                 project: {
@@ -71,6 +78,13 @@ export class ColumnRepo {
                     name: {
                         contains: search,
                         mode: 'insensitive',
+                    }
+                } : {}),
+                ...(type ? { type } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
                     }
                 } : {})
             },

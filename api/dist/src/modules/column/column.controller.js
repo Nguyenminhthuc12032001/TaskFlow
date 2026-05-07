@@ -1,5 +1,5 @@
 import { paginationQuerySchema } from '../../common/schemas/common.schemas.js';
-import { safeColumnSchema, safeColumnsSchema, } from './column.schemas.js';
+import { listColumnQuerySchema, safeColumnSchema, safeColumnsSchema, } from './column.schemas.js';
 import { created, createdEnvelopeSchema, ok, okEnvelopeSchema, } from '../../common/utils/response/format.js';
 import { validateResponse } from '../../common/utils/response/validate.js';
 export class ColumnController {
@@ -26,13 +26,13 @@ export class ColumnController {
             return res.status(201).json(validatedEnvelope);
         };
         this.listByProject = async (req, res) => {
-            const paginationQuery = paginationQuerySchema.parse(req.query);
+            const listColumnQuery = listColumnQuerySchema.parse(req.query);
             const ctx = {
                 workspaceId: req.params.workspaceId,
                 projectId: req.params.projectId,
                 ActorId: req.user.id,
             };
-            const { columns, paginationMeta } = await this.columnService.listByProjectId(ctx, paginationQuery);
+            const { columns, paginationMeta } = await this.columnService.listByProjectId(ctx, listColumnQuery);
             const safeColumns = {
                 data: columns.map((c) => ({
                     id: c.id,

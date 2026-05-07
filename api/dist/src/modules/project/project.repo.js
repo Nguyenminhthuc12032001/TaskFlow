@@ -20,7 +20,7 @@ export class ProjectRepo {
             },
         });
     }
-    async listByWorkspace(ctx, search, { take, skip }, db = this.prisma) {
+    async listByWorkspace(ctx, search, dateRange, { take, skip }, db = this.prisma) {
         return await db.project.findMany({
             where: {
                 workspaceId: ctx.workspaceId,
@@ -32,10 +32,26 @@ export class ProjectRepo {
                     },
                 },
                 ...(search ? {
-                    name: {
-                        contains: search,
-                        mode: 'insensitive',
-                    }
+                    OR: [
+                        {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            }
+                        },
+                        {
+                            description: {
+                                contains: search,
+                                mode: 'insensitive',
+                            }
+                        }
+                    ]
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+                    },
                 } : {})
             },
             skip,
@@ -115,7 +131,7 @@ export class ProjectRepo {
             },
         });
     }
-    async countProjectsByWorkspace(ctx, search, db = this.prisma) {
+    async countProjectsByWorkspace(ctx, search, dateRange, db = this.prisma) {
         return await db.project.count({
             where: {
                 workspaceId: ctx.workspaceId,
@@ -127,10 +143,26 @@ export class ProjectRepo {
                     },
                 },
                 ...(search ? {
-                    name: {
-                        contains: search,
-                        mode: 'insensitive',
-                    }
+                    OR: [
+                        {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            }
+                        },
+                        {
+                            description: {
+                                contains: search,
+                                mode: 'insensitive',
+                            }
+                        }
+                    ]
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+                    },
                 } : {})
             },
         });

@@ -30,7 +30,7 @@ export class LeadRepo {
             }
         });
     }
-    async listByWorkspace(ctx, search, { skip, take }, db = this.prisma) {
+    async listByWorkspace(ctx, search, dateRange, stage, { skip, take }, db = this.prisma) {
         return await db.lead.findMany({
             where: {
                 workspace: {
@@ -49,7 +49,14 @@ export class LeadRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(stage ? { stage } : {})
             },
             skip,
             take,
@@ -58,7 +65,7 @@ export class LeadRepo {
             }
         });
     }
-    async listByActorWorkspaces(actorId, search, { skip, take }, db = this.prisma) {
+    async listByActorWorkspaces(actorId, search, dateRange, stage, workspaceId, { skip, take }, db = this.prisma) {
         return await db.lead.findMany({
             where: {
                 workspace: {
@@ -76,7 +83,15 @@ export class LeadRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(stage ? { stage } : {}),
+                ...(workspaceId ? { workspaceId } : {})
             },
             include: {
                 workspace: {
@@ -115,7 +130,7 @@ export class LeadRepo {
             }
         });
     }
-    async countLeadsByWorkspace(ctx, search, db = this.prisma) {
+    async countLeadsByWorkspace(ctx, search, dateRange, stage, db = this.prisma) {
         return await db.lead.count({
             where: {
                 workspace: {
@@ -134,11 +149,18 @@ export class LeadRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(stage ? { stage } : {})
             },
         });
     }
-    async countLeadsByActorWorkspaces(actorId, search, db = this.prisma) {
+    async countLeadsByActorWorkspaces(actorId, search, dateRange, stage, workspaceId, db = this.prisma) {
         return await db.lead.count({
             where: {
                 workspace: {
@@ -156,7 +178,15 @@ export class LeadRepo {
                         contains: search,
                         mode: 'insensitive',
                     }
-                } : {})
+                } : {}),
+                ...(dateRange?.startDate || dateRange?.endDate ? {
+                    createdAt: {
+                        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+                    }
+                } : {}),
+                ...(stage ? { stage } : {}),
+                ...(workspaceId ? { workspaceId } : {})
             },
         });
     }

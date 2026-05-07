@@ -18,9 +18,22 @@ export const searchQuerySchema = z.preprocess((value) => {
     .min(1, "Search query must be at least 1 character long")
     .max(100, "Search query must be at most 100 characters long")
     .optional());
+const optionalDateQuerySchema = z.preprocess((value) => {
+    if (typeof value === 'string' && value.trim().length === 0)
+        return undefined;
+    return value;
+}, z.coerce.date().optional());
 export const dataRangeQuerySchema = z.object({
-    startDate: z.coerce.date().optional(),
-    endDate: z.coerce.date().optional()
+    startDate: optionalDateQuerySchema,
+    endDate: optionalDateQuerySchema
+}).superRefine((data, ctx) => {
+    if (data.startDate && data.endDate && data.startDate > data.endDate) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'Start date must be before end date',
+            path: ['startDate'],
+        });
+    }
 });
 export const paginationQuerySchema = z.object({
     page: z.coerce.number().int().min(1, 'Page must be a positive integer').default(1),

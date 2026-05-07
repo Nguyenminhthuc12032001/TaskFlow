@@ -1,3 +1,11 @@
+function buildDateRangeFilter(dateRange) {
+    if (!dateRange?.startDate && !dateRange?.endDate)
+        return undefined;
+    return {
+        ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+        ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+    };
+}
 export class WorkspaceRepo {
     constructor(prisma) {
         this.prisma = prisma;
@@ -27,20 +35,33 @@ export class WorkspaceRepo {
             },
         });
     }
-    async findMembers(workspaceId, search, { take, skip }, db = this.prisma) {
+    async findMembers(workspaceId, search, dateRange, role, { take, skip }, db = this.prisma) {
+        const joinedAtFilter = buildDateRangeFilter(dateRange);
         return db.workspaceMember.findMany({
             where: {
                 workspaceId,
                 ...(search
                     ? {
                         user: {
-                            name: {
-                                contains: search,
-                                mode: 'insensitive',
-                            }
+                            OR: [
+                                {
+                                    name: {
+                                        contains: search,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                                {
+                                    email: {
+                                        contains: search,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            ],
                         }
                     }
-                    : {})
+                    : {}),
+                ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
+                ...(role ? { role } : {}),
             },
             include: {
                 user: {
@@ -54,7 +75,8 @@ export class WorkspaceRepo {
             }
         });
     }
-    async findInviteCandidates(workspaceId, search, { take, skip }, db = this.prisma) {
+    async findInviteCandidates(workspaceId, search, dateRange, { take, skip }, db = this.prisma) {
+        const createdAtFilter = buildDateRangeFilter(dateRange);
         const pendingInvites = await db.invite.findMany({
             where: {
                 workspaceId,
@@ -80,12 +102,23 @@ export class WorkspaceRepo {
                     : {}),
                 ...(search
                     ? {
-                        email: {
-                            contains: search,
-                            mode: 'insensitive',
-                        }
+                        OR: [
+                            {
+                                name: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                email: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                        ],
                     }
-                    : {})
+                    : {}),
+                ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
             },
             select: {
                 id: true,
@@ -100,7 +133,8 @@ export class WorkspaceRepo {
             ],
         });
     }
-    async countInviteCandidates(workspaceId, search, db = this.prisma) {
+    async countInviteCandidates(workspaceId, search, dateRange, db = this.prisma) {
+        const createdAtFilter = buildDateRangeFilter(dateRange);
         const pendingInvites = await db.invite.findMany({
             where: {
                 workspaceId,
@@ -108,13 +142,6 @@ export class WorkspaceRepo {
                     gt: new Date(),
                 },
                 usedAt: null,
-                ...(search
-                    ? {
-                        email: {
-                            contains: search,
-                            mode: 'insensitive',
-                        }
-                    } : {})
             },
             select: {
                 email: true,
@@ -132,11 +159,22 @@ export class WorkspaceRepo {
                     ? { email: { notIn: pendingInviteEmails } }
                     : {}),
                 ...(search ? {
-                    email: {
-                        contains: search,
-                        mode: 'insensitive',
-                    }
-                } : {})
+                    OR: [
+                        {
+                            name: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            email: {
+                                contains: search,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                } : {}),
+                ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
             },
         });
     }
@@ -154,20 +192,37 @@ export class WorkspaceRepo {
             },
         });
     }
-    async findByUserId(userId, search, { take, skip }, db = this.prisma) {
+    async findByUserId(userId, search, dateRange, actorRole, { take, skip }, db = this.prisma) {
+        const createdAtFilter = buildDateRangeFilter(dateRange);
         return db.workspace.findMany({
             where: {
                 members: {
-                    some: { userId },
+                    some: {
+                        userId,
+                        ...(actorRole ? { role: actorRole } : {}),
+                    },
                 },
                 ...(search
                     ? {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive',
-                        }
+                        OR: [
+                            {
+                                name: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                creator: {
+                                    name: {
+                                        contains: search,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            },
+                        ],
                     }
                     : {}),
+                ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
             },
             include: {
                 creator: {
@@ -267,35 +322,65 @@ export class WorkspaceRepo {
             },
         });
     }
-    async countWorkspaceMembers(workspaceId, search, db = this.prisma) {
+    async countWorkspaceMembers(workspaceId, search, dateRange, role, db = this.prisma) {
+        const joinedAtFilter = buildDateRangeFilter(dateRange);
         return db.workspaceMember.count({
             where: {
                 workspaceId,
                 ...(search ? {
                     user: {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive',
-                        }
+                        OR: [
+                            {
+                                name: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                email: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                        ],
                     }
-                } : {})
+                } : {}),
+                ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
+                ...(role ? { role } : {}),
             },
         });
     }
-    async countWorkspacesByUserId(userId, search, db = this.prisma) {
+    async countWorkspacesByUserId(userId, search, dateRange, actorRole, db = this.prisma) {
+        const createdAtFilter = buildDateRangeFilter(dateRange);
         return db.workspace.count({
             where: {
                 members: {
-                    some: { userId },
+                    some: {
+                        userId,
+                        ...(actorRole ? { role: actorRole } : {}),
+                    },
                 },
                 ...(search
                     ? {
-                        name: {
-                            contains: search,
-                            mode: 'insensitive',
-                        }
+                        OR: [
+                            {
+                                name: {
+                                    contains: search,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                creator: {
+                                    name: {
+                                        contains: search,
+                                        mode: 'insensitive',
+                                    },
+                                },
+                            },
+                        ],
                     }
                     : {}),
+                ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
             },
         });
     }

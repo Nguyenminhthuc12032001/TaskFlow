@@ -1,5 +1,6 @@
 import { ActivityAction } from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
+import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 export class TaskService {
     constructor(prisma, activityService, taskRepo) {
@@ -73,11 +74,15 @@ export class TaskService {
         }
         return task;
     }
-    async listByColumn(ctx, paginationQuery) {
-        const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countTasks = await this.taskRepo.countTasksByColumn(ctx, paginationQuery.search);
+    async listByColumn(ctx, listTaskByColumnQuery) {
+        const { safePage, safeLimit, skip, take } = buildPagination(listTaskByColumnQuery.page, listTaskByColumnQuery.limit);
+        const dateRange = buildDateRange({
+            startDate: listTaskByColumnQuery.startDate,
+            endDate: listTaskByColumnQuery.endDate
+        });
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx, listTaskByColumnQuery.search, dateRange, listTaskByColumnQuery.dueDateRange, listTaskByColumnQuery.priority);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
-        const tasks = await this.taskRepo.listByColumn(ctx, paginationQuery.search, { take, skip });
+        const tasks = await this.taskRepo.listByColumn(ctx, listTaskByColumnQuery.search, dateRange, listTaskByColumnQuery.dueDateRange, listTaskByColumnQuery.priority, { take, skip });
         return { tasks, paginationMeta };
     }
     async update(data, ctx) {
@@ -109,9 +114,9 @@ export class TaskService {
             await this.activityService.logActivity(ctx.workspaceId, ActivityAction.UPDATE_TASK, 'tasks', ctx.ActorId, undefined, { result }, tx);
         });
         const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
-        const countTasks = await this.taskRepo.countTasksByColumn(ctx, undefined);
+        const countTasks = await this.taskRepo.countTasksByColumn(ctx, undefined, { startDate: undefined, endDate: undefined }, { startDate: undefined, endDate: undefined }, undefined);
         const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
-        const tasks = await this.taskRepo.listByColumn(ctx, undefined, { take, skip });
+        const tasks = await this.taskRepo.listByColumn(ctx, undefined, { startDate: undefined, endDate: undefined }, { startDate: undefined, endDate: undefined }, undefined, { take, skip });
         return { tasks, paginationMeta };
     }
     async archivTask(ctx) {
