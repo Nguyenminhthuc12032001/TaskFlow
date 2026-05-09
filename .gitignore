@@ -1,0 +1,11 @@
+node_modules/
+dist/
+api/dist/
+web/dist/
+api/prisma/generated/
+.codex-logs/
+*.log
+
+.env
+.env.*
+!.env.example
