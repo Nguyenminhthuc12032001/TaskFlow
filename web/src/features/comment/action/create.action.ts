@@ -3,11 +3,13 @@ import { commentApi } from "../comment.api";
 import { notify } from "../../../app/shared/lib/notify";
 import { feedbackMessage } from "../../../app/shared/constants/feedback-messages";
 import { HttpError, normalizeZodError, type ZodTreeErrorNode } from "../../../app/shared/lib/http-error";
-import { ZodError, z } from "zod"; 
+import { ZodError, z } from "zod";
 import type { ActionError } from "../../type";
 
 export async function CreateCommentAction({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
+    const resetKeyValue = formData.get("resetKey");
+    const resetKey = typeof resetKeyValue === "string" ? resetKeyValue : "initial";
 
     const paramsData: unknown = {
         workspaceId: params.workspaceId,
@@ -31,20 +33,22 @@ export async function CreateCommentAction({ params, request }: ActionFunctionArg
 
         await promise;
 
-        return null; 
+        return { resetKey: crypto.randomUUID() };
     } catch (error) {
         if (error instanceof HttpError) {
             if (error.status === 400) {
                 return {
+                    resetKey,
                     fieldErrors: normalizeZodError(error.details as ZodTreeErrorNode),
                     errorMessage: error.message
-                } satisfies ActionError
+                } satisfies ActionError & { resetKey: string }
             }
 
             if (error.status === 403 || error.status === 404) {
                 return {
+                    resetKey,
                     errorMessage: error.message
-                } satisfies ActionError
+                } satisfies ActionError & { resetKey: string }
             }
         }
 
@@ -52,11 +56,12 @@ export async function CreateCommentAction({ params, request }: ActionFunctionArg
             const { formErrors, fieldErrors } = z.flattenError(error);
 
             return {
+                resetKey,
                 formErrors,
                 fieldErrors
-            } satisfies ActionError
+            } satisfies ActionError & { resetKey: string };
         }
 
-        throw error;    
+        throw error;
     }
 }

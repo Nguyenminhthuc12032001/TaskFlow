@@ -1,5 +1,5 @@
 import z from '../../../docs/zod.js';
-export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T): z.ZodType =>
+export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
   z
     .object({
       ok: z.literal(true),
@@ -7,7 +7,7 @@ export const okEnvelopeSchema = <T extends z.ZodType>(dataSchema: T): z.ZodType 
     })
     .strict();
 
-export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T): z.ZodType =>
+export const createdEnvelopeSchema = <T extends z.ZodType>(dataSchema: T) =>
   z
     .object({
       ok: z.literal(true),

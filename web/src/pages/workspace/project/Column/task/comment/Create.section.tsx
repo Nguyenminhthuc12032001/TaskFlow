@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useFetcher } from "react-router-dom";
 import type { CreateCommentAction } from "../../../../../../features/comment/action/create.action";
 import { MessageCircleIcon } from "../../../../../../components/ui/Icons";
@@ -17,7 +17,25 @@ function getContentError(data: CreateCommentActionData | undefined) {
 
 export function CreateCommentSection() {
     const fetcher = useFetcher<CreateCommentActionData>();
-    const wasSubmittingRef = useRef(false);
+    const resetKey = fetcher.data?.resetKey ?? "initial";
+
+    return (
+        <CreateCommentForm
+            key={resetKey}
+            fetcher={fetcher}
+            resetKey={resetKey}
+        />
+    );
+}
+
+
+function CreateCommentForm({
+    fetcher,
+    resetKey,
+}: {
+    fetcher: ReturnType<typeof useFetcher<CreateCommentActionData>>;
+    resetKey: string;
+}) {
     const [content, setContent] = useState("");
     const contentError = getContentError(fetcher.data);
     const errorMessage =
@@ -25,19 +43,6 @@ export function CreateCommentSection() {
             ? fetcher.data.errorMessage
             : undefined;
     const isSubmitting = fetcher.state === "submitting";
-
-    useEffect(() => {
-        if (fetcher.state !== "idle") {
-            wasSubmittingRef.current = true;
-            return;
-        }
-
-        if (!wasSubmittingRef.current) return;
-
-        wasSubmittingRef.current = false;
-        if (fetcher.data !== null) return;
-        setContent("");
-    }, [fetcher.state, fetcher.data]);
 
     return (
         <section className="rounded-lg border border-zinc-200/80 bg-white p-5 shadow-sm">
@@ -63,6 +68,7 @@ export function CreateCommentSection() {
             </div>
 
             <fetcher.Form method="post" action="create" className="space-y-3">
+                <input type="hidden" name="resetKey" value={resetKey} />
                 <div>
                     <label htmlFor="comment-content" className="sr-only">
                         New comment
