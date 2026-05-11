@@ -1,11 +1,16 @@
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 
 // REQUEST
 
 export const listProjectsQuerySchema = paginationQuerySchema.extend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape
+  ...dataRangeQuerySchema.shape,
 });
 export type ListProjectsQueryType = z.infer<typeof listProjectsQuerySchema>;
 
@@ -61,6 +66,6 @@ export type SafeProjectResponseType = z.infer<typeof safeProjectResponseSchema>;
 
 export const listProjectsResponseSchema = z.object({
   data: z.array(safeProjectResponseSchema),
-  paginationMeta: paginationMetaSchema
+  paginationMeta: paginationMetaSchema,
 });
 export type ListProjectResponseType = z.infer<typeof listProjectsResponseSchema>;

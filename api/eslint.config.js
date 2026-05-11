@@ -31,7 +31,7 @@ export default [
         },
       ],
       '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-empty-object-type': ['error', { allowObjectTypes: 'always' }], 
+      '@typescript-eslint/no-empty-object-type': ['error', { allowObjectTypes: 'always' }],
     },
   },
   {

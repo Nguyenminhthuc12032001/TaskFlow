@@ -6,7 +6,11 @@ export class ActivityRepo {
     return db.activityLog.create({ data });
   }
 
-  async deleteByWorkspaceId(workspaceId: string, actorId: string, db: DbOrTxClient = prisma): Promise<Prisma.BatchPayload> {
+  async deleteByWorkspaceId(
+    workspaceId: string,
+    actorId: string,
+    db: DbOrTxClient = prisma,
+  ): Promise<Prisma.BatchPayload> {
     return db.activityLog.deleteMany({
       where: {
         workspaceId,

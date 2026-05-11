@@ -3,7 +3,12 @@ import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { safeTaskSchema } from '../task/task.schemas.js';
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 
 // REQUEST
 
@@ -137,7 +142,7 @@ export const safeLeadSchema = z.object({
     .max(200, 'Note must be at most 100 characters long'),
   createdBy: z.uuid(),
   createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(), 
+  updatedAt: z.coerce.date(),
 });
 export type SafeLeadType = z.infer<typeof safeLeadSchema>;
 
@@ -171,7 +176,7 @@ export const safeLeadDetailSchema = z.object({
   createdBy: z.uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  taskLinks: z.array(safeTaskSchema),  
+  taskLinks: z.array(safeTaskSchema),
 });
 export type SafeLeadDetailType = z.infer<typeof safeLeadDetailSchema>;
 
@@ -183,6 +188,6 @@ export type SafeLeadTaskLinkType = z.infer<typeof safeLeadTaskLinkSchema>;
 
 export const safeLeadsSchema = z.object({
   data: z.array(safeLeadSchema),
-  paginationMeta: paginationMetaSchema
+  paginationMeta: paginationMetaSchema,
 });
 export type SafeLeadsType = z.infer<typeof safeLeadsSchema>;

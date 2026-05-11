@@ -21,9 +21,12 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 
 export class CommentController {
-  constructor(readonly commentService: CommentService) { }
+  constructor(readonly commentService: CommentService) {}
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  create = async (
+    req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -50,7 +53,10 @@ export class CommentController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  get = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -79,7 +85,10 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  listByTask = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  listByTask = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const listCommentsQuery: ListCommentsQueryType = listCommentsQuerySchema.parse(req.query);
 
     const ctx: ResourceContext = {
@@ -90,19 +99,21 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const { comments, paginationMeta } = await this.commentService.listByTask(ctx, listCommentsQuery);
+    const { comments, paginationMeta } = await this.commentService.listByTask(
+      ctx,
+      listCommentsQuery,
+    );
 
     const safeComments: SafeCommentsType = {
-      data:
-        comments.map((comment) => ({
-          id: comment.id,
-          taskId: comment.taskId,
-          authorId: comment.authorId,
-          parentId: comment.parentId ?? undefined,
-          content: comment.content,
-          createdAt: comment.createdAt,
-          updatedAt: comment.updatedAt,
-        })),
+      data: comments.map((comment) => ({
+        id: comment.id,
+        taskId: comment.taskId,
+        authorId: comment.authorId,
+        parentId: comment.parentId ?? undefined,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+      })),
       paginationMeta,
     };
 
@@ -113,7 +124,10 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  update = async (
+    req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -142,7 +156,10 @@ export class CommentController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  reply = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  reply = async (
+    req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -171,7 +188,10 @@ export class CommentController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  remove = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

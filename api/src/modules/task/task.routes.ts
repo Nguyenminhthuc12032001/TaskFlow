@@ -6,7 +6,11 @@ import { ActivityService } from '../activity/activity.service.js';
 import { TaskRepo } from './task.repo.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
-import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '../../common/middlewares/validateRequest.middleware.js';
 import {
   assignBodySchema,
   bulkRemoveBodySchema,
@@ -15,7 +19,11 @@ import {
   reOrderBodySchema,
   updateBodySchema,
 } from './task.schemas.js';
-import { emptyBodySchema, paginationQuerySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
+import {
+  emptyBodySchema,
+  paginationQuerySchema,
+  workspaceParamsSchema,
+} from '../../common/schemas/common.schemas.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
 
 const taskController = new TaskController(

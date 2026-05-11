@@ -1,10 +1,7 @@
 import { AppError } from '../errors/AppError.js';
 import type { DataRangeQueryType } from '../schemas/common.schemas.js';
 
-export function buildDateRange(query: {
-  startDate?: Date;
-  endDate?: Date;
-}): DataRangeQueryType {
+export function buildDateRange(query: { startDate?: Date; endDate?: Date }): DataRangeQueryType {
   const now = new Date();
 
   if (query.startDate && query.startDate > now) {

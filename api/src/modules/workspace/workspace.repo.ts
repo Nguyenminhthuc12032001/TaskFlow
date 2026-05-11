@@ -64,11 +64,11 @@ function buildDateRangeFilter(dateRange: DataRangeQueryType): Prisma.DateTimeFil
 }
 
 export class WorkspaceRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
   async create(
     workspaceData: Prisma.WorkspaceCreateInput,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Workspace> {
     return db.workspace.create({
       data: workspaceData,
@@ -87,7 +87,7 @@ export class WorkspaceRepo {
   async findMembership(
     workspaceId: string,
     userId: string,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<WorkspaceMemberWithUser | null> {
     return db.workspaceMember.findUnique({
       where: {
@@ -110,7 +110,7 @@ export class WorkspaceRepo {
     dateRange: DataRangeQueryType,
     role: WorkspaceRole | undefined,
     { take, skip }: { take: number; skip: number },
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<WorkspaceMemberWithUser[]> {
     const joinedAtFilter = buildDateRangeFilter(dateRange);
 
@@ -119,23 +119,23 @@ export class WorkspaceRepo {
         workspaceId,
         ...(search
           ? {
-            user: {
-              OR: [
-                {
-                  name: {
-                    contains: search,
-                    mode: 'insensitive',
+              user: {
+                OR: [
+                  {
+                    name: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-                {
-                  email: {
-                    contains: search,
-                    mode: 'insensitive',
+                  {
+                    email: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
                   },
-                },
-              ],
+                ],
+              },
             }
-          }
           : {}),
         ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
         ...(role ? { role } : {}),
@@ -149,7 +149,7 @@ export class WorkspaceRepo {
       take,
       orderBy: {
         joinedAt: 'desc',
-      }
+      },
     });
   }
 
@@ -184,26 +184,24 @@ export class WorkspaceRepo {
             workspaceId,
           },
         },
-        ...(pendingInviteEmails.length > 0
-          ? { email: { notIn: pendingInviteEmails } }
-          : {}),
+        ...(pendingInviteEmails.length > 0 ? { email: { notIn: pendingInviteEmails } } : {}),
         ...(search
           ? {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
+              OR: [
+                {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
                 },
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
+                {
+                  email: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
                 },
-              },
-            ],
-          }
+              ],
+            }
           : {}),
         ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
@@ -214,10 +212,7 @@ export class WorkspaceRepo {
       },
       skip,
       take,
-      orderBy: [
-        { name: 'asc' },
-        { email: 'asc' },
-      ],
+      orderBy: [{ name: 'asc' }, { email: 'asc' }],
     });
   }
 
@@ -225,7 +220,7 @@ export class WorkspaceRepo {
     workspaceId: string,
     search: string | undefined,
     dateRange: DataRangeQueryType,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     const createdAtFilter = buildDateRangeFilter(dateRange);
 
@@ -251,25 +246,25 @@ export class WorkspaceRepo {
             workspaceId,
           },
         },
-        ...(pendingInviteEmails.length > 0
-          ? { email: { notIn: pendingInviteEmails } }
+        ...(pendingInviteEmails.length > 0 ? { email: { notIn: pendingInviteEmails } } : {}),
+        ...(search
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  email: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
           : {}),
-        ...(search ? {
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-            {
-              email: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        } : {}),
         ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
     });
@@ -277,7 +272,7 @@ export class WorkspaceRepo {
 
   async findById(
     workspaceId: string,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<WorkspaceWithCreator | null> {
     return db.workspace.findUnique({
       where: {
@@ -299,7 +294,8 @@ export class WorkspaceRepo {
     dateRange: DataRangeQueryType,
     actorRole: WorkspaceRole | undefined,
     { take, skip }: { take: number; skip: number },
-    db: DbOrTxClient = this.prisma): Promise<WorkspaceWithCreatorAndActorMembership[]> {
+    db: DbOrTxClient = this.prisma,
+  ): Promise<WorkspaceWithCreatorAndActorMembership[]> {
     const createdAtFilter = buildDateRangeFilter(dateRange);
 
     return db.workspace.findMany({
@@ -312,23 +308,23 @@ export class WorkspaceRepo {
         },
         ...(search
           ? {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                creator: {
+              OR: [
+                {
                   name: {
                     contains: search,
                     mode: 'insensitive',
                   },
                 },
-              },
-            ],
-          }
+                {
+                  creator: {
+                    name: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              ],
+            }
           : {}),
         ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },
@@ -349,14 +345,12 @@ export class WorkspaceRepo {
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
-  async findAllByUserId(
-    userId: string,
-    db: DbOrTxClient = this.prisma): Promise<Workspace[]> {
+  async findAllByUserId(userId: string, db: DbOrTxClient = this.prisma): Promise<Workspace[]> {
     return db.workspace.findMany({
       where: {
         members: {
@@ -364,8 +358,8 @@ export class WorkspaceRepo {
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -382,10 +376,7 @@ export class WorkspaceRepo {
     });
   }
 
-  async delete(
-    workspaceId: string,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Workspace> {
+  async delete(workspaceId: string, db: DbOrTxClient = this.prisma): Promise<Workspace> {
     return db.workspace.delete({
       where: { id: workspaceId },
     });
@@ -417,10 +408,7 @@ export class WorkspaceRepo {
     });
   }
 
-  async findInviteByJti(
-    jti: string,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Invite | null> {
+  async findInviteByJti(jti: string, db: DbOrTxClient = this.prisma): Promise<Invite | null> {
     return db.invite.findFirst({
       where: {
         jti,
@@ -432,10 +420,7 @@ export class WorkspaceRepo {
     });
   }
 
-  async markInviteUsed(
-    jti: string,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Prisma.BatchPayload> {
+  async markInviteUsed(jti: string, db: DbOrTxClient = this.prisma): Promise<Prisma.BatchPayload> {
     return db.invite.updateMany({
       where: {
         jti,
@@ -470,31 +455,33 @@ export class WorkspaceRepo {
     search: string | undefined,
     dateRange: DataRangeQueryType,
     role: WorkspaceRole | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     const joinedAtFilter = buildDateRangeFilter(dateRange);
 
     return db.workspaceMember.count({
       where: {
         workspaceId,
-        ...(search ? {
-          user: {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
+        ...(search
+          ? {
+              user: {
+                OR: [
+                  {
+                    name: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
+                  },
+                  {
+                    email: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
+                  },
+                ],
               },
-              {
-                email: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          }
-        } : {}),
+            }
+          : {}),
         ...(joinedAtFilter ? { joinedAt: joinedAtFilter } : {}),
         ...(role ? { role } : {}),
       },
@@ -506,7 +493,7 @@ export class WorkspaceRepo {
     search: string | undefined,
     dateRange: DataRangeQueryType,
     actorRole: WorkspaceRole | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     const createdAtFilter = buildDateRangeFilter(dateRange);
 
@@ -520,23 +507,23 @@ export class WorkspaceRepo {
         },
         ...(search
           ? {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                creator: {
+              OR: [
+                {
                   name: {
                     contains: search,
                     mode: 'insensitive',
                   },
                 },
-              },
-            ],
-          }
+                {
+                  creator: {
+                    name: {
+                      contains: search,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              ],
+            }
           : {}),
         ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
       },

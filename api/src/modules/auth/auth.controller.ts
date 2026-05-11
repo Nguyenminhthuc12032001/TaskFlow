@@ -116,13 +116,19 @@ export class AuthController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  forgotPassword = async (req: Request<{}, {}, ForgotPasswordBody>, res: Response): Promise<Response> => {
+  forgotPassword = async (
+    req: Request<{}, {}, ForgotPasswordBody>,
+    res: Response,
+  ): Promise<Response> => {
     await this.authService.forgotPassword(req.body);
 
     return res.sendStatus(204);
   };
 
-  resetPassword = async (req: Request<{}, {}, ResetPasswordBody>, res: Response): Promise<Response> => {
+  resetPassword = async (
+    req: Request<{}, {}, ResetPasswordBody>,
+    res: Response,
+  ): Promise<Response> => {
     await this.authService.resetPassword(req.body);
 
     res.clearCookie('refreshToken', {
@@ -135,7 +141,10 @@ export class AuthController {
     return res.sendStatus(204);
   };
 
-  changePassword = async (req: Request<{}, {}, ChangePasswordBody>, res: Response): Promise<Response> => {
+  changePassword = async (
+    req: Request<{}, {}, ChangePasswordBody>,
+    res: Response,
+  ): Promise<Response> => {
     await this.authService.changePassword(req.user!.id, req.body);
 
     res.clearCookie('refreshToken', {

@@ -1,6 +1,14 @@
-import { ActivityAction, type Prisma, type Task, type TaskAssignee } from '../../../prisma/generated/client.js';
+import {
+  ActivityAction,
+  type Prisma,
+  type Task,
+  type TaskAssignee,
+} from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
-import type { PaginationMetaType, PaginationQueryType } from '../../common/schemas/common.schemas.js';
+import type {
+  PaginationMetaType,
+  PaginationQueryType,
+} from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
@@ -21,7 +29,7 @@ export class TaskService {
     readonly prisma: DbClient,
     readonly activityService: ActivityService,
     readonly taskRepo: TaskRepo,
-  ) { }
+  ) {}
 
   async create(data: CreateBodyType, ctx: ResourceContext): Promise<Task> {
     const result = await this.prisma.$transaction(async (tx) => {
@@ -123,19 +131,38 @@ export class TaskService {
     return task;
   }
 
-  async listByColumn(ctx: ResourceContext, listTaskByColumnQuery: ListTaskByColumnQueryType): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
-    const { safePage, safeLimit, skip, take } = buildPagination(listTaskByColumnQuery.page, listTaskByColumnQuery.limit);
+  async listByColumn(
+    ctx: ResourceContext,
+    listTaskByColumnQuery: ListTaskByColumnQueryType,
+  ): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
+    const { safePage, safeLimit, skip, take } = buildPagination(
+      listTaskByColumnQuery.page,
+      listTaskByColumnQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listTaskByColumnQuery.startDate,
-      endDate: listTaskByColumnQuery.endDate
+      endDate: listTaskByColumnQuery.endDate,
     });
 
-    const countTasks = await this.taskRepo.countTasksByColumn(ctx, listTaskByColumnQuery.search, dateRange, listTaskByColumnQuery.dueDateRange, listTaskByColumnQuery.priority);
+    const countTasks = await this.taskRepo.countTasksByColumn(
+      ctx,
+      listTaskByColumnQuery.search,
+      dateRange,
+      listTaskByColumnQuery.dueDateRange,
+      listTaskByColumnQuery.priority,
+    );
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 
-    const tasks = await this.taskRepo.listByColumn(ctx, listTaskByColumnQuery.search, dateRange, listTaskByColumnQuery.dueDateRange, listTaskByColumnQuery.priority, { take, skip });
+    const tasks = await this.taskRepo.listByColumn(
+      ctx,
+      listTaskByColumnQuery.search,
+      dateRange,
+      listTaskByColumnQuery.dueDateRange,
+      listTaskByColumnQuery.priority,
+      { take, skip },
+    );
 
     return { tasks, paginationMeta };
   }
@@ -143,7 +170,11 @@ export class TaskService {
   async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Task> {
     const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
-    if (tasks.some((t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? '') && t.id !== ctx.TaskId)) {
+    if (
+      tasks.some(
+        (t) => t.title.toLowerCase() === (data.title?.toLowerCase() ?? '') && t.id !== ctx.TaskId,
+      )
+    ) {
       throw new AppError('Duplicate title is not allowed', 409);
     }
 
@@ -173,7 +204,11 @@ export class TaskService {
     return result;
   }
 
-  async reOrder(data: ReOrderBodyType, ctx: ResourceContext, paginationQuery: PaginationQueryType): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
+  async reOrder(
+    data: ReOrderBodyType,
+    ctx: ResourceContext,
+    paginationQuery: PaginationQueryType,
+  ): Promise<{ tasks: TaskWithAssignees[]; paginationMeta: PaginationMetaType }> {
     await this.prisma.$transaction(async (tx) => {
       await Promise.all(
         data.map(async ({ taskId, position }) => {
@@ -202,13 +237,29 @@ export class TaskService {
       );
     });
 
-    const { safePage, safeLimit, skip, take } = buildPagination(paginationQuery.page, paginationQuery.limit);
+    const { safePage, safeLimit, skip, take } = buildPagination(
+      paginationQuery.page,
+      paginationQuery.limit,
+    );
 
-    const countTasks = await this.taskRepo.countTasksByColumn(ctx, undefined, { startDate: undefined, endDate: undefined }, { startDate: undefined, endDate: undefined }, undefined);
+    const countTasks = await this.taskRepo.countTasksByColumn(
+      ctx,
+      undefined,
+      { startDate: undefined, endDate: undefined },
+      { startDate: undefined, endDate: undefined },
+      undefined,
+    );
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countTasks);
 
-    const tasks = await this.taskRepo.listByColumn(ctx, undefined, { startDate: undefined, endDate: undefined }, { startDate: undefined, endDate: undefined }, undefined, { take, skip });
+    const tasks = await this.taskRepo.listByColumn(
+      ctx,
+      undefined,
+      { startDate: undefined, endDate: undefined },
+      { startDate: undefined, endDate: undefined },
+      undefined,
+      { take, skip },
+    );
 
     return { tasks, paginationMeta };
   }

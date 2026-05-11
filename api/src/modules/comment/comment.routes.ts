@@ -2,7 +2,11 @@ import { Router } from 'express';
 import { CommentController } from './comment.controller.js';
 import { authMiddleware } from '../../common/middlewares/auth.middleware.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
-import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '../../common/middlewares/validateRequest.middleware.js';
 import { createBodySchema, listCommentsQuerySchema, updateBodySchema } from './comment.schemas.js';
 import { emptyBodySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 import { CommentService } from './comment.service.js';

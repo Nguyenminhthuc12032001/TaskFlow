@@ -25,7 +25,7 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 
 export class LeadController {
-  constructor(readonly leadService: LeadService) { }
+  constructor(readonly leadService: LeadService) {}
 
   create = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
     const ctx: ResourceContext = {
@@ -46,7 +46,7 @@ export class LeadController {
       updatedAt: lead.updatedAt,
       ...(lead.email != null && { email: lead.email }),
       ...(lead.phone != null && { phone: lead.phone }),
-      ...(lead.source != null && { source: lead.source }), 
+      ...(lead.source != null && { source: lead.source }),
     };
 
     const envelope = created(safeLead);
@@ -57,9 +57,14 @@ export class LeadController {
   };
 
   listByActorWorkspaces = async (req: Request, res: Response): Promise<Response> => {
-    const listLeadByActorQuery: ListLeadByActorQueryType = listLeadByActorQuerySchema.parse(req.query);
+    const listLeadByActorQuery: ListLeadByActorQueryType = listLeadByActorQuerySchema.parse(
+      req.query,
+    );
 
-    const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(req.user!.id, listLeadByActorQuery);
+    const { leads, paginationMeta } = await this.leadService.listByActorWorkspaces(
+      req.user!.id,
+      listLeadByActorQuery,
+    );
 
     const safeLeads: SafeLeadsType = {
       data: leads.map((lead) => ({
@@ -117,7 +122,7 @@ export class LeadController {
         updatedAt: taskLink.task.updatedAt,
         ...(taskLink.task.description != null && { description: taskLink.task.description }),
         ...(taskLink.task.dueDate != null && { dueDate: taskLink.task.dueDate }),
-      }))
+      })),
     };
 
     const envelope = ok(safeLead);
@@ -265,7 +270,10 @@ export class LeadController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  createFollowUpTask = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
+  createFollowUpTask = async (
+    req: Request<WorkspaceParamsType>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

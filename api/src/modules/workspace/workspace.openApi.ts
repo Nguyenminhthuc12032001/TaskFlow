@@ -108,7 +108,7 @@ registry.registerPath({
     params: z.object({
       workspaceId: z.uuid(),
     }),
-    query: listMemberByWorkspaceQuerySchema
+    query: listMemberByWorkspaceQuerySchema,
   },
   responses: defaultResponse(membersResponseSchema, [201, 409]),
 });
@@ -125,7 +125,7 @@ registry.registerPath({
     }),
   },
   responses: defaultResponse(safeMemberResponseSchema, [201, 409]),
-})
+});
 
 registry.registerPath({
   method: 'get',
@@ -140,7 +140,7 @@ registry.registerPath({
     query: listInviteeCandidatesQuerySchema,
   },
   responses: defaultResponse(inviteCandidatesResponseSchema, [201, 409]),
-})
+});
 
 registry.registerPath({
   method: 'patch',

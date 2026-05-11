@@ -1,5 +1,9 @@
 import type { Request, Response } from 'express';
-import { paginationQuerySchema, type PaginationQueryType, type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
+import {
+  paginationQuerySchema,
+  type PaginationQueryType,
+  type WorkspaceParamsType,
+} from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
 import {
   listColumnQuerySchema,
@@ -22,9 +26,12 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 
 export class ColumnController {
-  constructor(readonly columnService: ColumnService) { }
+  constructor(readonly columnService: ColumnService) {}
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  create = async (
+    req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -49,7 +56,10 @@ export class ColumnController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  listByProject = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  listByProject = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const listColumnQuery: ListColumnQueryType = listColumnQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -57,7 +67,10 @@ export class ColumnController {
       ActorId: req.user!.id,
     };
 
-    const { columns, paginationMeta } = await this.columnService.listByProjectId(ctx, listColumnQuery);
+    const { columns, paginationMeta } = await this.columnService.listByProjectId(
+      ctx,
+      listColumnQuery,
+    );
 
     const safeColumns: SafeColumnsType = {
       data: columns.map((c) => ({
@@ -68,7 +81,7 @@ export class ColumnController {
         type: c.type,
         createdAt: c.createdAt,
       })),
-      paginationMeta
+      paginationMeta,
     };
 
     const envelope = ok(safeColumns);
@@ -78,7 +91,10 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  get = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -104,7 +120,10 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  update = async (
+    req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -130,7 +149,10 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  reOrder = async (req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>, res: Response): Promise<Response> => {
+  reOrder = async (
+    req: Request<WorkspaceParamsType, {}, ReOrderBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const paginationQuery: PaginationQueryType = paginationQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
@@ -138,7 +160,11 @@ export class ColumnController {
       ActorId: req.user!.id,
     };
 
-    const { columns, paginationMeta } = await this.columnService.reOrder(req.body, ctx, paginationQuery);
+    const { columns, paginationMeta } = await this.columnService.reOrder(
+      req.body,
+      ctx,
+      paginationQuery,
+    );
 
     const safeColumns: SafeColumnsType = {
       data: columns.map((c) => ({
@@ -149,7 +175,7 @@ export class ColumnController {
         type: c.type,
         createdAt: c.createdAt,
       })),
-      paginationMeta
+      paginationMeta,
     };
 
     const envelope = ok(safeColumns);
@@ -159,7 +185,10 @@ export class ColumnController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  remove = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

@@ -5,18 +5,18 @@ import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceR
 import { ProjectService } from './project.service.js';
 import { ProjectRepo } from './project.repo.js';
 import { prisma } from '../../db/prisma.js';
-import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '../../common/middlewares/validateRequest.middleware.js';
 import { createBodySchema, listProjectsQuerySchema, updateBodySchema } from './project.schemas.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
 import { emptyBodySchema, workspaceParamsSchema } from '../../common/schemas/common.schemas.js';
 
 const projectController = new ProjectController(
-  new ProjectService(
-    prisma,
-    new ProjectRepo(prisma),
-    new ActivityService(new ActivityRepo()),
-  ),
+  new ProjectService(prisma, new ProjectRepo(prisma), new ActivityService(new ActivityRepo())),
 );
 
 const router = Router();

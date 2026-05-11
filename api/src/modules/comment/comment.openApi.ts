@@ -60,7 +60,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: listCommentsQuerySchema
+    query: listCommentsQuerySchema,
   },
   responses: defaultResponse(safeCommentsSchema, [201, 409]),
 });

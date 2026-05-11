@@ -15,16 +15,16 @@ export type LeadWithTaskLinks = Prisma.LeadGetPayload<{
 }>;
 
 export class LeadRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
-  async create(
-    data: Prisma.LeadCreateInput,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Lead> {
+  async create(data: Prisma.LeadCreateInput, db: DbOrTxClient = this.prisma): Promise<Lead> {
     return await db.lead.create({ data });
   }
 
-  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<LeadWithTaskLinks | null> {
+  async get(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<LeadWithTaskLinks | null> {
     return await db.lead.findUnique({
       where: {
         id: ctx.LeadId,
@@ -45,8 +45,8 @@ export class LeadRepo {
           include: {
             task: true,
           },
-        }
-      }
+        },
+      },
     });
   }
 
@@ -56,7 +56,7 @@ export class LeadRepo {
     dateRange: DataRangeQueryType,
     stage: LeadStage | undefined,
     { skip, take }: { skip: number; take: number },
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Lead[]> {
     return await db.lead.findMany({
       where: {
@@ -71,25 +71,29 @@ export class LeadRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(stage ? { stage } : {})
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(stage ? { stage } : {}),
       },
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      } 
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -114,33 +118,37 @@ export class LeadRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
         ...(stage ? { stage } : {}),
-        ...(workspaceId ? { workspaceId } : {})
+        ...(workspaceId ? { workspaceId } : {}),
       },
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
   async allLeadsByWorkspace(
     ctx: ResourceContext,
     { skip, take }: { skip: number; take: number },
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Lead[]> {
     return await db.lead.findMany({
       where: {
@@ -159,8 +167,8 @@ export class LeadRepo {
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -169,7 +177,7 @@ export class LeadRepo {
     search: string | undefined,
     dateRange: DataRangeQueryType,
     stage: LeadStage | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     return await db.lead.count({
       where: {
@@ -184,19 +192,23 @@ export class LeadRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(stage ? { stage } : {})
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(stage ? { stage } : {}),
       },
     });
   }
@@ -207,7 +219,7 @@ export class LeadRepo {
     dateRange: DataRangeQueryType,
     stage: LeadStage | undefined,
     workspaceId: string | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     return await db.lead.count({
       where: {
@@ -221,20 +233,24 @@ export class LeadRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
         ...(stage ? { stage } : {}),
-        ...(workspaceId ? { workspaceId } : {})
+        ...(workspaceId ? { workspaceId } : {}),
       },
     });
   }
@@ -280,15 +296,12 @@ export class LeadRepo {
 
   async linkTask(
     data: Prisma.LeadTaskLinkCreateInput,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<LeadTaskLink> {
     return await db.leadTaskLink.create({ data });
   }
 
-  async unlinkTask(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<LeadTaskLink> {
+  async unlinkTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<LeadTaskLink> {
     return await db.leadTaskLink.delete({
       where: {
         leadId_taskId: {
@@ -329,10 +342,7 @@ export class LeadRepo {
     });
   }
 
-  async remove(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Lead> {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Lead> {
     return await db.lead.delete({
       where: {
         id: ctx.LeadId,
@@ -368,7 +378,7 @@ export class LeadRepo {
 
   async removeLeadTaskLink(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<GetBatchResult> {
     return await db.leadTaskLink.deleteMany({
       where: {
@@ -410,7 +420,7 @@ export class LeadRepo {
   async existEmail(
     email: string,
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Lead | null> {
     return await db.lead.findFirst({
       where: {
@@ -448,7 +458,7 @@ export class LeadRepo {
   async existPhone(
     phone: string,
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Lead | null> {
     return await db.lead.findFirst({
       where: {
@@ -485,7 +495,7 @@ export class LeadRepo {
 
   async existLinkTask(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<LeadTaskLink | null> {
     return await db.leadTaskLink.findUnique({
       where: {

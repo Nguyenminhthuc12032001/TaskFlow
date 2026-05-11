@@ -20,12 +20,9 @@ export type TaskWithAssignees = Prisma.TaskGetPayload<{
 }>;
 
 export class TaskRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
-  async create(
-    data: Prisma.TaskCreateInput,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Task> {
+  async create(data: Prisma.TaskCreateInput, db: DbOrTxClient = this.prisma): Promise<Task> {
     return await db.task.create({ data });
   }
 
@@ -63,14 +60,14 @@ export class TaskRepo {
 
   async assign(
     data: Prisma.TaskAssigneeCreateInput,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<TaskAssignee> {
     return await db.taskAssignee.create({ data });
   }
 
   async get(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<TaskWithAssigneeUsers | null> {
     return await db.task.findUnique({
       include: {
@@ -107,7 +104,7 @@ export class TaskRepo {
     dueDateRange: DataRangeQueryType | undefined,
     priority: TaskPriority | undefined,
     { take, skip }: { take: number; skip: number },
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<TaskWithAssignees[]> {
     return await db.task.findMany({
       include: {
@@ -128,28 +125,34 @@ export class TaskRepo {
             },
           },
         },
-        ...(search ? {
-          title: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(dueDateRange?.startDate || dueDateRange?.endDate ? {
-          dueDate: {
-            ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
-            ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(priority ? { priority } : {})
+        ...(search
+          ? {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(dueDateRange?.startDate || dueDateRange?.endDate
+          ? {
+              dueDate: {
+                ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
+                ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(priority ? { priority } : {}),
       },
       orderBy: {
-        position: 'asc'
+        position: 'asc',
       },
       skip,
       take,
@@ -158,7 +161,7 @@ export class TaskRepo {
 
   async allTasksByColumn(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<TaskWithAssignees[]> {
     return await db.task.findMany({
       include: {
@@ -181,8 +184,8 @@ export class TaskRepo {
         },
       },
       orderBy: {
-        position: 'asc'
-      }
+        position: 'asc',
+      },
     });
   }
 
@@ -192,7 +195,7 @@ export class TaskRepo {
     dateRange: DataRangeQueryType,
     dueDateRange: DataRangeQueryType | undefined,
     priority: TaskPriority | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     return await db.task.count({
       where: {
@@ -210,25 +213,31 @@ export class TaskRepo {
             },
           },
         },
-        ...(search ? {
-          title: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(dueDateRange?.startDate || dueDateRange?.endDate ? {
-          dueDate: {
-            ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
-            ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
-          }
-        } : {}),
-        ...(priority ? { priority } : {})
+        ...(search
+          ? {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(dueDateRange?.startDate || dueDateRange?.endDate
+          ? {
+              dueDate: {
+                ...(dueDateRange.startDate ? { gte: dueDateRange.startDate } : {}),
+                ...(dueDateRange.endDate ? { lte: dueDateRange.endDate } : {}),
+              },
+            }
+          : {}),
+        ...(priority ? { priority } : {}),
       },
     });
   }
@@ -263,10 +272,7 @@ export class TaskRepo {
     });
   }
 
-  async archivTask(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Task> {
+  async archivTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Task> {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -294,10 +300,7 @@ export class TaskRepo {
     });
   }
 
-  async restoreTask(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Task> {
+  async restoreTask(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Task> {
     return await db.task.update({
       where: {
         id: ctx.TaskId,
@@ -325,10 +328,7 @@ export class TaskRepo {
     });
   }
 
-  async remove(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Task> {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Task> {
     return await db.task.delete({
       where: {
         id: ctx.TaskId,

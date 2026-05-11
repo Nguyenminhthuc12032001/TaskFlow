@@ -32,9 +32,11 @@ export class AuthService {
     private emailService: IEmailService,
     private authRepo: AuthRepo,
     private prisma: DbClient,
-  ) { }
+  ) {}
 
-  async register(data: RegisterBody): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
+  async register(
+    data: RegisterBody,
+  ): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
     const existing = await this.authRepo.findUserByEmail(data.email);
     if (existing) {
       log.info(
@@ -87,9 +89,11 @@ export class AuthService {
     });
 
     return result;
-  };
+  }
 
-  async login(data: LoginBody): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
+  async login(
+    data: LoginBody,
+  ): Promise<{ safeUser: SafeUserResponse; accessToken: string; refreshToken: string }> {
     const match = await this.authRepo.findUserByEmail(data.email);
     if (!match) {
       log.info(
@@ -139,7 +143,7 @@ export class AuthService {
     };
 
     return { safeUser, accessToken, refreshToken };
-  };
+  }
 
   async logout(refreshToken: string): Promise<void> {
     let payload;
@@ -160,9 +164,11 @@ export class AuthService {
 
     const result = await this.authRepo.revokeRefreshToken(payload.jti);
     if (result.count === 0) throw new AppError('Refresh token not found or expired', 401);
-  };
+  }
 
-  async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string; safeUser: SafeUserResponse }> {
+  async refresh(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string; safeUser: SafeUserResponse }> {
     let payload;
     try {
       payload = verifyRefreshToken(refreshToken);
@@ -229,7 +235,7 @@ export class AuthService {
     };
 
     return { accessToken, refreshToken: newRefreshToken, safeUser };
-  };
+  }
 
   async forgotPassword(data: ForgotPasswordBody): Promise<void> {
     const user = await this.authRepo.findUserByEmail(data.email);
@@ -254,7 +260,7 @@ export class AuthService {
     const resetLink = `${env.FRONTEND_URL}/auth/reset-password#token=${encodeURIComponent(resetToken)}`;
     await this.emailService.sendPasswordResetEmail(user.email, resetLink);
     log.info({ userId: user.id }, 'Password reset email sent');
-  };
+  }
 
   async resetPassword(data: ResetPasswordBody): Promise<void> {
     let payLoad;
@@ -286,7 +292,7 @@ export class AuthService {
 
       log.info({ userId: payLoad.id }, 'Password reset successful, all refresh tokens revoked');
     });
-  };
+  }
 
   async changePassword(userId: string, data: ChangePasswordBody): Promise<SafeUserResponse> {
     const user = await this.authRepo.findUserById(userId);
@@ -323,7 +329,7 @@ export class AuthService {
     };
 
     return safeUser;
-  };
+  }
 
   async me(userId: string): Promise<SafeUserResponse> {
     const user = await this.authRepo.findUserById(userId);
@@ -338,5 +344,5 @@ export class AuthService {
     };
 
     return safeUser;
-  };
+  }
 }

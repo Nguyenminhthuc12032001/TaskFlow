@@ -4,19 +4,13 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class ProjectRepo {
-  constructor(private readonly prisma: DbClient) { }
+  constructor(private readonly prisma: DbClient) {}
 
-  async create(
-    data: Prisma.ProjectCreateInput,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Project> {
+  async create(data: Prisma.ProjectCreateInput, db: DbOrTxClient = this.prisma): Promise<Project> {
     return await db.project.create({ data });
   }
 
-  async get(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Project | null> {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Project | null> {
     return await db.project.findFirst({
       where: {
         id: ctx.projectId,
@@ -49,34 +43,38 @@ export class ProjectRepo {
             },
           },
         },
-        ...(search ? {
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              }
-            },
-            {
-              description: {
-                contains: search,
-                mode: 'insensitive',
-              }
+        ...(search
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  description: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
             }
-          ]
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
-          },
-        } : {})
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -96,8 +94,8 @@ export class ProjectRepo {
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -113,8 +111,8 @@ export class ProjectRepo {
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -142,10 +140,7 @@ export class ProjectRepo {
     });
   }
 
-  async remove(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Project> {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Project> {
     return await db.project.delete({
       where: {
         id: ctx.projectId,
@@ -168,7 +163,7 @@ export class ProjectRepo {
     ctx: ResourceContext,
     search: string | undefined,
     dateRange: DataRangeQueryType,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     return await db.project.count({
       where: {
@@ -180,28 +175,32 @@ export class ProjectRepo {
             },
           },
         },
-        ...(search ? {
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              }
-            },
-            {
-              description: {
-                contains: search,
-                mode: 'insensitive',
-              }
+        ...(search
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  description: {
+                    contains: search,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
             }
-          ]
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
-          },
-        } : {})
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange?.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange?.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
     });
   }

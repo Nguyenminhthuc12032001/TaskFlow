@@ -21,9 +21,12 @@ import { validateResponse } from '../../common/utils/response/validate.js';
 import { type WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) { }
+  constructor(private readonly projectService: ProjectService) {}
 
-  create = async (req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  create = async (
+    req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       ActorId: req.user!.id,
@@ -47,7 +50,10 @@ export class ProjectController {
     return res.status(201).json(validatedEnvelope);
   };
 
-  get = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  get = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -72,26 +78,31 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  listByWorkspace = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  listByWorkspace = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const listProjectsQuery: ListProjectsQueryType = listProjectsQuerySchema.parse(req.query);
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       ActorId: req.user!.id,
     };
 
-    const { projects, paginationMeta } = await this.projectService.listByWorkspace(ctx, listProjectsQuery);
+    const { projects, paginationMeta } = await this.projectService.listByWorkspace(
+      ctx,
+      listProjectsQuery,
+    );
 
     const safeProjectResponse: ListProjectResponseType = {
-      data:
-        projects.map((p) => ({
-          workspaceId: p.workspaceId,
-          id: p.id,
-          name: p.name,
-          description: p.description ?? '',
-          createdAt: p.createdAt,
-          createdBy: p.createdBy,
-        })),
-        paginationMeta
+      data: projects.map((p) => ({
+        workspaceId: p.workspaceId,
+        id: p.id,
+        name: p.name,
+        description: p.description ?? '',
+        createdAt: p.createdAt,
+        createdBy: p.createdBy,
+      })),
+      paginationMeta,
     };
 
     const envelope = ok(safeProjectResponse);
@@ -101,7 +112,10 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>, res: Response): Promise<Response> => {
+  update = async (
+    req: Request<WorkspaceParamsType, {}, UpdateBodyType, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,
@@ -126,7 +140,10 @@ export class ProjectController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  remove = async (req: Request<WorkspaceParamsType, {}, {}, {}, {}>, res: Response): Promise<Response> => {
+  remove = async (
+    req: Request<WorkspaceParamsType, {}, {}, {}, {}>,
+    res: Response,
+  ): Promise<Response> => {
     const ctx: ResourceContext = {
       workspaceId: req.params.workspaceId,
       projectId: req.params.projectId!,

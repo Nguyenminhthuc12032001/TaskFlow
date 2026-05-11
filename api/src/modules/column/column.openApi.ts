@@ -42,7 +42,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: listColumnQuerySchema
+    query: listColumnQuerySchema,
   },
   responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });
@@ -73,7 +73,7 @@ registry.registerPath({
       required: true,
     },
     params: defaultParams,
-    query: paginationQuerySchema
+    query: paginationQuerySchema,
   },
   responses: defaultResponse(safeColumnsSchema, [201, 409]),
 });

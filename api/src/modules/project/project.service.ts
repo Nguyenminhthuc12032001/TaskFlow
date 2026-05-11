@@ -1,4 +1,9 @@
-import { ActivityAction, ColumnType, type Prisma, type Project } from '../../../prisma/generated/client.js';
+import {
+  ActivityAction,
+  ColumnType,
+  type Prisma,
+  type Project,
+} from '../../../prisma/generated/client.js';
 import type { ProjectUpdateInput } from '../../../prisma/generated/models.js';
 import { AppError } from '../../common/errors/AppError.js';
 import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
@@ -17,7 +22,7 @@ export class ProjectService {
     readonly projectRepo: ProjectRepo,
 
     readonly activityService: ActivityService,
-  ) { }
+  ) {}
 
   async create(data: CreateBodyType, ctx: ResourceContext): Promise<Project> {
     const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
@@ -79,19 +84,34 @@ export class ProjectService {
     return result;
   }
 
-  async listByWorkspace(ctx: ResourceContext, paginationQuery: ListProjectsQueryType): Promise<{ projects: Project[]; paginationMeta: PaginationMetaType }> {
-    const { safePage, safeLimit, take, skip } = buildPagination(paginationQuery.page, paginationQuery.limit);
+  async listByWorkspace(
+    ctx: ResourceContext,
+    paginationQuery: ListProjectsQueryType,
+  ): Promise<{ projects: Project[]; paginationMeta: PaginationMetaType }> {
+    const { safePage, safeLimit, take, skip } = buildPagination(
+      paginationQuery.page,
+      paginationQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: paginationQuery.startDate,
-      endDate: paginationQuery.endDate
+      endDate: paginationQuery.endDate,
     });
 
-    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(ctx, paginationQuery.search, dateRange);
+    const countProjectsByWorkspace = await this.projectRepo.countProjectsByWorkspace(
+      ctx,
+      paginationQuery.search,
+      dateRange,
+    );
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countProjectsByWorkspace);
 
-    const projects = await this.projectRepo.listByWorkspace(ctx, paginationQuery.search, dateRange, { take, skip });
+    const projects = await this.projectRepo.listByWorkspace(
+      ctx,
+      paginationQuery.search,
+      dateRange,
+      { take, skip },
+    );
 
     return { projects, paginationMeta };
   }
@@ -100,13 +120,14 @@ export class ProjectService {
     return await this.projectRepo.listByUser(actorId);
   }
 
-  async update(
-    data: UpdateBodyType,
-    ctx: ResourceContext,
-  ): Promise<Project> {
+  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Project> {
     const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
-    if (projects.some((p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId)) {
+    if (
+      projects.some(
+        (p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId,
+      )
+    ) {
       throw new AppError('Duplicate name is not allowed', 409);
     }
 

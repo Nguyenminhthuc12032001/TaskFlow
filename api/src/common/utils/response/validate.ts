@@ -6,7 +6,10 @@ export function validateResponse<T extends ZodType>(schema: T) {
     const result = schema.safeParse(data);
 
     if (!result.success) {
-      throw new AppError(`Invalid API response shape: ${JSON.stringify(z.treeifyError(result.error))}`, 500);
+      throw new AppError(
+        `Invalid API response shape: ${JSON.stringify(z.treeifyError(result.error))}`,
+        500,
+      );
     }
 
     return result.data;

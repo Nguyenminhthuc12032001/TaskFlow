@@ -16,8 +16,18 @@ import cookieParser from 'cookie-parser';
 import { csrfProtection } from './common/middlewares/csrf.middleware.js';
 import { log } from './common/logger/logger.js';
 import { requestIdMiddleware } from './common/middlewares/requestId.middleware.js';
+import { fail } from './common/utils/response/format.js';
+import helmet from 'helmet';
 
 const app = express();
+
+app.disable('x-powered-by');
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 
 app.set('trust proxy', 1);
 
@@ -76,10 +86,9 @@ app.use('/api/leads', leadRoutes);
 setupSwagger(app);
 
 app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    ok: false,
-    error: { message: `Route not found: ${req.method} ${req.originalUrl}` },
-  });
+  res
+    .status(404)
+    .json(fail(`Route not found: ${req.method} ${req.originalUrl}`, 'ROUTE_NOT_FOUND'));
 });
 
 app.use(errorMiddleware);

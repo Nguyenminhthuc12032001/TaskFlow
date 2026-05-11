@@ -1,6 +1,11 @@
 import z from '../../docs/zod.js';
 import { TaskPriority } from '../../../prisma/generated/enums.js';
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 import { safeUserSchema } from '../auth/auth.schemas.js';
 
 // REQUEST
@@ -10,7 +15,7 @@ export const listTaskByColumnQuerySchema = paginationQuerySchema.extend({
   ...dataRangeQuerySchema.shape,
   dueDateRange: dataRangeQuerySchema.optional(),
   priority: z.enum(TaskPriority).optional(),
-})
+});
 export type ListTaskByColumnQueryType = z.infer<typeof listTaskByColumnQuerySchema>;
 
 export const createBodySchema = z.object({
@@ -154,7 +159,7 @@ export type SafeTask = z.infer<typeof safeTaskSchema>;
 
 export const safeTasksSchema = z.object({
   data: z.array(safeTaskSchema),
-  paginationMeta: paginationMetaSchema
+  paginationMeta: paginationMetaSchema,
 });
 export type SafeTasks = z.infer<typeof safeTasksSchema>;
 

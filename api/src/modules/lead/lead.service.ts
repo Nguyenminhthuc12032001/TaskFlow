@@ -1,4 +1,9 @@
-import { ActivityAction, Prisma, type Lead, type LeadTaskLink } from '../../../prisma/generated/client.js';
+import {
+  ActivityAction,
+  Prisma,
+  type Lead,
+  type LeadTaskLink,
+} from '../../../prisma/generated/client.js';
 import { AppError } from '../../common/errors/AppError.js';
 import type { PaginationMetaType } from '../../common/schemas/common.schemas.js';
 import type { ResourceContext } from '../../common/types/common.types.js';
@@ -72,36 +77,72 @@ export class LeadService {
     return lead;
   }
 
-  async listByWorkspace(ctx: ResourceContext, listLeadQuery: ListLeadsQueryType): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
-    const { safePage, safeLimit, skip, take } = buildPagination(listLeadQuery.page, listLeadQuery.limit);
+  async listByWorkspace(
+    ctx: ResourceContext,
+    listLeadQuery: ListLeadsQueryType,
+  ): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
+    const { safePage, safeLimit, skip, take } = buildPagination(
+      listLeadQuery.page,
+      listLeadQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listLeadQuery.startDate,
-      endDate: listLeadQuery.endDate
+      endDate: listLeadQuery.endDate,
     });
 
-    const countLeads = await this.leadRepo.countLeadsByWorkspace(ctx, listLeadQuery.search, dateRange, listLeadQuery.stage);
+    const countLeads = await this.leadRepo.countLeadsByWorkspace(
+      ctx,
+      listLeadQuery.search,
+      dateRange,
+      listLeadQuery.stage,
+    );
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
 
-    const leads = await this.leadRepo.listByWorkspace(ctx, listLeadQuery.search, dateRange, listLeadQuery.stage, { skip, take });
+    const leads = await this.leadRepo.listByWorkspace(
+      ctx,
+      listLeadQuery.search,
+      dateRange,
+      listLeadQuery.stage,
+      { skip, take },
+    );
 
     return { leads, paginationMeta };
   }
 
-  async listByActorWorkspaces(actorId: string, listLeadByActorQuery: ListLeadByActorQueryType): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
-    const { safePage, safeLimit, skip, take } = buildPagination(listLeadByActorQuery.page, listLeadByActorQuery.limit);
+  async listByActorWorkspaces(
+    actorId: string,
+    listLeadByActorQuery: ListLeadByActorQueryType,
+  ): Promise<{ leads: Lead[]; paginationMeta: PaginationMetaType }> {
+    const { safePage, safeLimit, skip, take } = buildPagination(
+      listLeadByActorQuery.page,
+      listLeadByActorQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listLeadByActorQuery.startDate,
-      endDate: listLeadByActorQuery.endDate
+      endDate: listLeadByActorQuery.endDate,
     });
 
-    const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(actorId, listLeadByActorQuery.search, dateRange, listLeadByActorQuery.stage, listLeadByActorQuery.workspaceId);
+    const countLeads = await this.leadRepo.countLeadsByActorWorkspaces(
+      actorId,
+      listLeadByActorQuery.search,
+      dateRange,
+      listLeadByActorQuery.stage,
+      listLeadByActorQuery.workspaceId,
+    );
 
     const paginationMeta = buildPaginationMeta(safePage, safeLimit, countLeads);
 
-    const leads = await this.leadRepo.listByActorWorkspaces(actorId, listLeadByActorQuery.search, dateRange, listLeadByActorQuery.stage, listLeadByActorQuery.workspaceId, { skip, take });
+    const leads = await this.leadRepo.listByActorWorkspaces(
+      actorId,
+      listLeadByActorQuery.search,
+      dateRange,
+      listLeadByActorQuery.stage,
+      listLeadByActorQuery.workspaceId,
+      { skip, take },
+    );
 
     return { leads, paginationMeta };
   }
@@ -217,7 +258,10 @@ export class LeadService {
     });
   }
 
-  async createFollowUpTask(data: CreateFollowUpBodyType, ctx: ResourceContext): Promise<LeadTaskLink> {
+  async createFollowUpTask(
+    data: CreateFollowUpBodyType,
+    ctx: ResourceContext,
+  ): Promise<LeadTaskLink> {
     const tasks = await this.taskRepo.allTasksByColumn(ctx);
 
     if (data.position) {

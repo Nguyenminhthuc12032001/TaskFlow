@@ -22,7 +22,7 @@ const envSchema = z.object({
   EMAIL_APP_PASSWORD: z.string().min(10, 'EMAIL_APP_PASSWORD looks invalid'),
   EMAIL_FROM: z.string().min(3),
   FRONTEND_URL: z.url(),
-  NODE_ENV: z.string().min(5),
+  NODE_ENV: z.enum(['development', 'test', 'production', 'local']).default('development'),
   LOG_LEVEL: z.string().min(2),
 
   TTL_ACCESS_TOKEN: ttl.default('15m'),

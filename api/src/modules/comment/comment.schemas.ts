@@ -1,4 +1,9 @@
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 import z from '../../docs/zod.js';
 
 // REQUEST
@@ -51,9 +56,9 @@ export const safeCommentSchema = z
   .strict();
 export type SafeCommentType = z.infer<typeof safeCommentSchema>;
 
-export const safeCommentsSchema = z.object({
-  data:
-    z.array(safeCommentSchema).superRefine((items, ctx) => {
+export const safeCommentsSchema = z
+  .object({
+    data: z.array(safeCommentSchema).superRefine((items, ctx) => {
       const idSet = new Set<string>();
 
       items.forEach((item, index) => {
@@ -67,6 +72,7 @@ export const safeCommentsSchema = z.object({
         idSet.add(item.id);
       });
     }),
-  paginationMeta: paginationMetaSchema
-}).strict();
+    paginationMeta: paginationMetaSchema,
+  })
+  .strict();
 export type SafeCommentsType = z.infer<typeof safeCommentsSchema>;

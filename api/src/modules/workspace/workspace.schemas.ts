@@ -1,7 +1,12 @@
 import z from '../../docs/zod.js';
 import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 
 // ========= REQUEST ==========
 

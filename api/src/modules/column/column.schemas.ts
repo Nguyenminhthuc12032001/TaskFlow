@@ -1,6 +1,11 @@
 import z from '../../docs/zod.js';
 import { ColumnType } from '../../../prisma/generated/enums.js';
-import { dataRangeQuerySchema, paginationMetaSchema, paginationQuerySchema, searchQuerySchema } from '../../common/schemas/common.schemas.js';
+import {
+  dataRangeQuerySchema,
+  paginationMetaSchema,
+  paginationQuerySchema,
+  searchQuerySchema,
+} from '../../common/schemas/common.schemas.js';
 
 // REQUEST
 
@@ -121,6 +126,6 @@ export const safeColumnsSchema = z.object({
       positionSet.add(item.position);
     });
   }),
-  paginationMeta: paginationMetaSchema
-})
+  paginationMeta: paginationMetaSchema,
+});
 export type SafeColumnsType = z.infer<typeof safeColumnsSchema>;

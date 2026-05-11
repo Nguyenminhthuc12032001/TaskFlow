@@ -4,7 +4,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class CommentRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
   async create(data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma): Promise<Comment> {
     return await db.comment.create({ data });
@@ -45,7 +45,7 @@ export class CommentRepo {
     dateRange: DataRangeQueryType,
     parentId: string | undefined,
     { skip, take }: { skip: number; take: number },
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Comment[]> {
     return await db.comment.findMany({
       where: {
@@ -66,33 +66,39 @@ export class CommentRepo {
             },
           },
         },
-        ...(search ? {
-          content: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
-        ...(parentId ? {
-          parentId
-        } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {})
+        ...(search
+          ? {
+              content: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
+        ...(parentId
+          ? {
+              parentId,
+            }
+          : {}),
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
       skip,
       take,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
   async allCommentsByTask(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<Comment[]> {
     return await db.comment.findMany({
       where: {
@@ -115,8 +121,8 @@ export class CommentRepo {
         },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -125,7 +131,7 @@ export class CommentRepo {
     search: string | undefined,
     dateRange: DataRangeQueryType,
     parentId: string | undefined,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     return await db.comment.count({
       where: {
@@ -146,19 +152,23 @@ export class CommentRepo {
             },
           },
         },
-        ...(search ? {
-          content: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
+        ...(search
+          ? {
+              content: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
         ...(parentId ? { parentId } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {})
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
     });
   }
@@ -193,10 +203,7 @@ export class CommentRepo {
     });
   }
 
-  async remove(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
-  ): Promise<Comment> {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Comment> {
     return await db.comment.delete({
       where: {
         id: ctx.CommentId,
@@ -223,7 +230,7 @@ export class CommentRepo {
 
   async getMember(
     ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma
+    db: DbOrTxClient = this.prisma,
   ): Promise<WorkspaceMember | null> {
     return await db.workspaceMember.findUnique({
       where: {

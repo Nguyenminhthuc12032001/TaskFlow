@@ -21,7 +21,13 @@ import {
   type WorkspaceWithCreator,
   type WorkspaceWithCreatorAndActorMembership,
 } from './workspace.repo.js';
-import type { CreateWorkspaceBody, ListInviteeCandidatesQuery, ListMemberByWorkspaceQuery, ListWorkspaceQuery, UpdateWorkspaceBody } from './workspace.schemas.js';
+import type {
+  CreateWorkspaceBody,
+  ListInviteeCandidatesQuery,
+  ListMemberByWorkspaceQuery,
+  ListWorkspaceQuery,
+  UpdateWorkspaceBody,
+} from './workspace.schemas.js';
 import { AuthRepo } from '../auth/auth.repo.js';
 import { env } from '../../config/env.js';
 import ms from 'ms';
@@ -57,10 +63,9 @@ export class WorkspaceService {
     readonly projectRepo: ProjectRepo,
     readonly activityService: ActivityService,
     readonly prisma: DbClient,
-  ) { }
+  ) {}
 
   async create(workspaceData: CreateWorkspaceBody, actorId: string): Promise<Workspace> {
-
     const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
 
     if (workspaces.some((w) => w.name === workspaceData.name)) {
@@ -106,54 +111,114 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async getByUserId(actorId: string, listWorkspaceQuery: ListWorkspaceQuery): Promise<WorkspacesByUserResult> {
-
-    const { safePage, safeLimit, take, skip } = buildPagination(listWorkspaceQuery.page, listWorkspaceQuery.limit);
+  async getByUserId(
+    actorId: string,
+    listWorkspaceQuery: ListWorkspaceQuery,
+  ): Promise<WorkspacesByUserResult> {
+    const { safePage, safeLimit, take, skip } = buildPagination(
+      listWorkspaceQuery.page,
+      listWorkspaceQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listWorkspaceQuery.startDate,
-      endDate: listWorkspaceQuery.endDate
+      endDate: listWorkspaceQuery.endDate,
     });
 
-    const workspaces = await this.workspaceRepo.findByUserId(actorId, listWorkspaceQuery.search, dateRange, listWorkspaceQuery.actorRole, { take, skip });
+    const workspaces = await this.workspaceRepo.findByUserId(
+      actorId,
+      listWorkspaceQuery.search,
+      dateRange,
+      listWorkspaceQuery.actorRole,
+      { take, skip },
+    );
 
-    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(actorId, listWorkspaceQuery.search, dateRange, listWorkspaceQuery.actorRole);
+    const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(
+      actorId,
+      listWorkspaceQuery.search,
+      dateRange,
+      listWorkspaceQuery.actorRole,
+    );
 
-    const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspacesByUser);
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(
+      safePage,
+      safeLimit,
+      countWorkspacesByUser,
+    );
 
     return { workspaces, paginationMeta };
   }
 
-  async listMembers(workspaceId: string, listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery): Promise<WorkspaceMembersResult> {
-    const { safePage, safeLimit, take, skip } = buildPagination(listMemberByWorkspaceQuery.page, listMemberByWorkspaceQuery.limit);
+  async listMembers(
+    workspaceId: string,
+    listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery,
+  ): Promise<WorkspaceMembersResult> {
+    const { safePage, safeLimit, take, skip } = buildPagination(
+      listMemberByWorkspaceQuery.page,
+      listMemberByWorkspaceQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listMemberByWorkspaceQuery.startDate,
-      endDate: listMemberByWorkspaceQuery.endDate
+      endDate: listMemberByWorkspaceQuery.endDate,
     });
 
-    const members = await this.workspaceRepo.findMembers(workspaceId, listMemberByWorkspaceQuery.search, dateRange, listMemberByWorkspaceQuery.role, { take, skip });
+    const members = await this.workspaceRepo.findMembers(
+      workspaceId,
+      listMemberByWorkspaceQuery.search,
+      dateRange,
+      listMemberByWorkspaceQuery.role,
+      { take, skip },
+    );
 
-    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(workspaceId, listMemberByWorkspaceQuery.search, dateRange, listMemberByWorkspaceQuery.role);
+    const countWorkspaceMembers = await this.workspaceRepo.countWorkspaceMembers(
+      workspaceId,
+      listMemberByWorkspaceQuery.search,
+      dateRange,
+      listMemberByWorkspaceQuery.role,
+    );
 
-    const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countWorkspaceMembers);
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(
+      safePage,
+      safeLimit,
+      countWorkspaceMembers,
+    );
 
     return { members, paginationMeta };
   }
 
-  async listInviteCandidates(workspaceId: string, listInviteeCandidatesQuery: ListInviteeCandidatesQuery): Promise<InviteCandidatesResult> {
-    const { safePage, safeLimit, take, skip } = buildPagination(listInviteeCandidatesQuery.page, listInviteeCandidatesQuery.limit);
+  async listInviteCandidates(
+    workspaceId: string,
+    listInviteeCandidatesQuery: ListInviteeCandidatesQuery,
+  ): Promise<InviteCandidatesResult> {
+    const { safePage, safeLimit, take, skip } = buildPagination(
+      listInviteeCandidatesQuery.page,
+      listInviteeCandidatesQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listInviteeCandidatesQuery.startDate,
-      endDate: listInviteeCandidatesQuery.endDate
+      endDate: listInviteeCandidatesQuery.endDate,
     });
 
-    const users = await this.workspaceRepo.findInviteCandidates(workspaceId, listInviteeCandidatesQuery.search, dateRange, { take, skip });
+    const users = await this.workspaceRepo.findInviteCandidates(
+      workspaceId,
+      listInviteeCandidatesQuery.search,
+      dateRange,
+      { take, skip },
+    );
 
-    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(workspaceId, listInviteeCandidatesQuery.search, dateRange);
+    const countInviteCandidates = await this.workspaceRepo.countInviteCandidates(
+      workspaceId,
+      listInviteeCandidatesQuery.search,
+      dateRange,
+    );
 
-    const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countInviteCandidates);
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(
+      safePage,
+      safeLimit,
+      countInviteCandidates,
+    );
 
     return { users, paginationMeta };
   }
@@ -166,7 +231,11 @@ export class WorkspaceService {
     return member;
   }
 
-  async update(workspaceId: string, workspaceData: UpdateWorkspaceBody, actorId: string): Promise<Workspace> {
+  async update(
+    workspaceId: string,
+    workspaceData: UpdateWorkspaceBody,
+    actorId: string,
+  ): Promise<Workspace> {
     const workspaces = await this.workspaceRepo.findAllByUserId(actorId);
 
     if (workspaces.some((w) => w.name === workspaceData.name && w.id !== workspaceId)) {
@@ -401,7 +470,11 @@ export class WorkspaceService {
     return result;
   }
 
-  async removeMember(workspaceId: string, memberId: string, actorId: string): Promise<WorkspaceMember> {
+  async removeMember(
+    workspaceId: string,
+    memberId: string,
+    actorId: string,
+  ): Promise<WorkspaceMember> {
     if (actorId !== memberId) {
       const actor = await this.workspaceRepo.findMembership(workspaceId, actorId);
       if (!actor) {

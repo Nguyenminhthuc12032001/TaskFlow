@@ -95,19 +95,40 @@ export class CommentService {
     return comment;
   }
 
-  async listByTask(ctx: ResourceContext, listCommentsQuery: ListCommentsQueryType): Promise<{ comments: Comment[]; paginationMeta: PaginationMetaType }> {
-    const { safePage, safeLimit, skip, take } = buildPagination(listCommentsQuery.page, listCommentsQuery.limit);
+  async listByTask(
+    ctx: ResourceContext,
+    listCommentsQuery: ListCommentsQueryType,
+  ): Promise<{ comments: Comment[]; paginationMeta: PaginationMetaType }> {
+    const { safePage, safeLimit, skip, take } = buildPagination(
+      listCommentsQuery.page,
+      listCommentsQuery.limit,
+    );
 
     const dateRange = buildDateRange({
       startDate: listCommentsQuery.startDate,
-      endDate: listCommentsQuery.endDate
+      endDate: listCommentsQuery.endDate,
     });
 
-    const countComments = await this.commentRepo.countCommentsByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId);
+    const countComments = await this.commentRepo.countCommentsByTask(
+      ctx,
+      listCommentsQuery.search,
+      dateRange,
+      listCommentsQuery.parentId,
+    );
 
-    const paginationMeta: PaginationMetaType = buildPaginationMeta(safePage, safeLimit, countComments);
+    const paginationMeta: PaginationMetaType = buildPaginationMeta(
+      safePage,
+      safeLimit,
+      countComments,
+    );
 
-    const comments = await this.commentRepo.listByTask(ctx, listCommentsQuery.search, dateRange, listCommentsQuery.parentId, { skip, take });
+    const comments = await this.commentRepo.listByTask(
+      ctx,
+      listCommentsQuery.search,
+      dateRange,
+      listCommentsQuery.parentId,
+      { skip, take },
+    );
 
     return { comments, paginationMeta };
   }

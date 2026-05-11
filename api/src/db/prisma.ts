@@ -27,15 +27,9 @@ type SoftDeleteArgs = {
 };
 
 type SoftDeleteDelegate = {
-  update(args: {
-    where: Record<string, unknown>;
-    data: { deletedAt: Date };
-  }): Promise<unknown>;
+  update(args: { where: Record<string, unknown>; data: { deletedAt: Date } }): Promise<unknown>;
 
-  updateMany(args: {
-    where: Record<string, unknown>;
-    data: { deletedAt: Date };
-  }): Promise<unknown>;
+  updateMany(args: { where: Record<string, unknown>; data: { deletedAt: Date } }): Promise<unknown>;
 };
 
 const db = new PrismaClient({
@@ -60,10 +54,7 @@ const softDeleteDelegates: Record<SoftDeleteModel, SoftDeleteDelegate> = {
 function addNotDeleted(args: SoftDeleteArgs): void {
   const where = args.where ?? {};
 
-  const hasDeletedAtFilter = Object.prototype.hasOwnProperty.call(
-    where,
-    'deletedAt',
-  );
+  const hasDeletedAtFilter = Object.prototype.hasOwnProperty.call(where, 'deletedAt');
 
   if (!hasDeletedAtFilter) {
     args.where = {
@@ -134,8 +125,7 @@ export const prisma = db.$extends({
 
 type InteractiveTransactionCallback = Parameters<typeof prisma.$transaction>[0];
 
-export type TxClient =
-  InteractiveTransactionCallback extends (tx: infer T) => unknown ? T : never;
+export type TxClient = InteractiveTransactionCallback extends (tx: infer T) => unknown ? T : never;
 
 export type DbClient = typeof prisma;
 export type DbOrTxClient = DbClient | TxClient;

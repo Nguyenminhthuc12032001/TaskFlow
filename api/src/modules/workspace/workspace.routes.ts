@@ -9,7 +9,11 @@ import { AuthRepo } from '../auth/auth.repo.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { prisma } from '../../db/prisma.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
-import { validateBody, validateParams, validateQuery } from '../../common/middlewares/validateRequest.middleware.js';
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '../../common/middlewares/validateRequest.middleware.js';
 import {
   acceptBodySchema,
   createBodySchema,
@@ -36,16 +40,14 @@ const workspaceController = new WorkspaceController(
   ),
 );
 
-router.post('',
-  authMiddleware,
-  validateBody(createBodySchema),
-  workspaceController.create);
+router.post('', authMiddleware, validateBody(createBodySchema), workspaceController.create);
 
-router.get('',
+router.get(
+  '',
   authMiddleware,
   validateBody(emptyBodySchema),
   validateQuery(listWorkspaceQuerySchema),
-  workspaceController.getByUserId
+  workspaceController.getByUserId,
 );
 
 router.get(

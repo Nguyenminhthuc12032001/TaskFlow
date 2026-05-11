@@ -7,7 +7,7 @@ import {
   updateBodySchema,
 } from './project.schemas.js';
 import z from '../../docs/zod.js';
-import { defaultResponse } from '../workspace/workspace.openApi.js'; 
+import { defaultResponse } from '../workspace/workspace.openApi.js';
 
 const defaultPath = '/api/projects/{workspaceId}';
 
@@ -53,7 +53,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: listProjectsQuerySchema
+    query: listProjectsQuerySchema,
   },
   responses: defaultResponse(listProjectsResponseSchema, [201, 409]),
 });

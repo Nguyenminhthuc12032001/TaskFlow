@@ -3,33 +3,37 @@ import type { PasswordResetToken, RefreshToken, User } from '../../../prisma/gen
 import { type DbClient, type DbOrTxClient } from '../../db/prisma.js';
 
 export class AuthRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
   async findUserById(userId: string, db: DbOrTxClient = this.prisma): Promise<User | null> {
     return db.user.findUnique({
       where: { id: userId },
     });
-  };
+  }
 
   async findUserByEmail(email: string, db: DbOrTxClient = this.prisma): Promise<User | null> {
     return db.user.findUnique({
       where: { email },
     });
-  };
+  }
 
   async createUser(
     data: { email: string; name: string; passwordHash: string },
     db: DbOrTxClient = this.prisma,
   ): Promise<User> {
     return db.user.create({ data });
-  };
+  }
 
-  async updatePassword(userId: string, passwordHash: string, db: DbOrTxClient = this.prisma): Promise<User> {
+  async updatePassword(
+    userId: string,
+    passwordHash: string,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<User> {
     return db.user.update({
       where: { id: userId },
       data: { passwordHash },
     });
-  };
+  }
 
   async saveRefreshToken(
     userId: string,
@@ -46,9 +50,12 @@ export class AuthRepo {
         expiresAt,
       },
     });
-  };
+  }
 
-  async findRefreshToken(jti: string, db: DbOrTxClient = this.prisma): Promise<RefreshToken | null> {
+  async findRefreshToken(
+    jti: string,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<RefreshToken | null> {
     return db.refreshToken.findUnique({
       where: {
         jti,
@@ -56,14 +63,17 @@ export class AuthRepo {
         expiresAt: { gt: new Date() },
       },
     });
-  };
+  }
 
-  async revokeAllRefreshTokenByUser(userId: string, db: DbOrTxClient = this.prisma): Promise<GetBatchResult> {
+  async revokeAllRefreshTokenByUser(
+    userId: string,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<GetBatchResult> {
     return db.refreshToken.updateMany({
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
-  };
+  }
 
   async revokeRefreshToken(jti: string, db: DbOrTxClient = this.prisma): Promise<GetBatchResult> {
     return db.refreshToken.updateMany({
@@ -74,7 +84,7 @@ export class AuthRepo {
       },
       data: { revokedAt: new Date() },
     });
-  };
+  }
 
   async saveResetToken(
     userId: string,
@@ -91,9 +101,12 @@ export class AuthRepo {
         expiresAt,
       },
     });
-  };
+  }
 
-  async findResetToken(jti: string, db: DbOrTxClient = this.prisma): Promise<PasswordResetToken | null> {
+  async findResetToken(
+    jti: string,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<PasswordResetToken | null> {
     return db.passwordResetToken.findFirst({
       where: {
         jti,
@@ -101,7 +114,7 @@ export class AuthRepo {
         expiresAt: { gt: new Date() },
       },
     });
-  };
+  }
 
   async markResetToken(jti: string, db: DbOrTxClient = this.prisma): Promise<GetBatchResult> {
     return db.passwordResetToken.updateMany({
@@ -112,5 +125,5 @@ export class AuthRepo {
       },
       data: { usedAt: new Date() },
     });
-  };
+  }
 }

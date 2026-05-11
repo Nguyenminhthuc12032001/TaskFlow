@@ -6,7 +6,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new AppError('Unauthorized', 401);
+    throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
   }
 
   const token = authHeader.slice('Bearer '.length).trim();
@@ -20,7 +20,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
       email: payload.email,
     };
   } catch {
-    throw new AppError('Invalid or expired token', 401);
+    throw new AppError('Invalid or expired token', 401, 'INVALID_TOKEN');
   }
 
   next();

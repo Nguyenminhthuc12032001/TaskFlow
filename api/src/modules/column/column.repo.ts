@@ -4,7 +4,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class ColumnRepo {
-  constructor(readonly prisma: DbClient) { }
+  constructor(readonly prisma: DbClient) {}
 
   async create(data: Prisma.ColumnCreateInput, db: DbOrTxClient = this.prisma): Promise<Column> {
     return await db.column.create({ data });
@@ -31,25 +31,29 @@ export class ColumnRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
         ...(type ? { type } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {})
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
       skip,
       take,
       orderBy: {
-        position: 'asc'
-      }
+        position: 'asc',
+      },
     });
   }
 
@@ -72,8 +76,8 @@ export class ColumnRepo {
         },
       },
       orderBy: {
-        position: 'asc'
-      }
+        position: 'asc',
+      },
     });
   }
 
@@ -97,27 +101,28 @@ export class ColumnRepo {
             },
           },
         },
-        ...(search ? {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          }
-        } : {}),
+        ...(search
+          ? {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            }
+          : {}),
         ...(type ? { type } : {}),
-        ...(dateRange?.startDate || dateRange?.endDate ? {
-          createdAt: {
-            ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-            ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-          }
-        } : {}) 
+        ...(dateRange?.startDate || dateRange?.endDate
+          ? {
+              createdAt: {
+                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+              },
+            }
+          : {}),
       },
     });
   }
 
-  async get(
-    ctx: ResourceContext, 
-    db: DbOrTxClient = this.prisma
-  ): Promise<Column | null> {
+  async get(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Column | null> {
     return await db.column.findFirst({
       where: {
         id: ctx.columnId,
@@ -163,10 +168,7 @@ export class ColumnRepo {
     });
   }
 
-  async remove(
-    ctx: ResourceContext,
-    db: DbOrTxClient = this.prisma,
-  ): Promise<Column> {
+  async remove(ctx: ResourceContext, db: DbOrTxClient = this.prisma): Promise<Column> {
     return await db.column.delete({
       where: {
         id: ctx.columnId,

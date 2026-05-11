@@ -42,7 +42,7 @@ import {
 import type { WorkspaceParamsType } from '../../common/schemas/common.schemas.js';
 
 export class WorkspaceController {
-  constructor(private workspaceService: WorkspaceService) { }
+  constructor(private workspaceService: WorkspaceService) {}
 
   create = async (req: Request<{}, {}, CreateWorkspaceBody>, res: Response): Promise<Response> => {
     const workspace = await this.workspaceService.create(req.body, req.user!.id);
@@ -84,20 +84,22 @@ export class WorkspaceController {
   getByUserId = async (req: Request, res: Response): Promise<Response> => {
     const listWorkspaceQuery: ListWorkspaceQuery = listWorkspaceQuerySchema.parse(req.query);
 
-    const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(req.user!.id, listWorkspaceQuery);
+    const { workspaces, paginationMeta } = await this.workspaceService.getByUserId(
+      req.user!.id,
+      listWorkspaceQuery,
+    );
 
     const workspacesResponse: SafeWorkspacesResponse = {
-      data:
-        workspaces.map((w) => ({
-          id: w.id,
-          name: w.name,
-          createdBy: w.createdBy,
-          createdByName: w.creator.name,
-          createdAt: w.createdAt,
-          updatedAt: w.updatedAt,
-          role: w.members[0].role,
-        })),
-      paginationMeta
+      data: workspaces.map((w) => ({
+        id: w.id,
+        name: w.name,
+        createdBy: w.createdBy,
+        createdByName: w.creator.name,
+        createdAt: w.createdAt,
+        updatedAt: w.updatedAt,
+        role: w.members[0].role,
+      })),
+      paginationMeta,
     };
 
     const envelope = ok(workspacesResponse);
@@ -108,22 +110,25 @@ export class WorkspaceController {
   };
 
   getMembersById = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
-    const listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery = listMemberByWorkspaceQuerySchema.parse(req.query);
+    const listMemberByWorkspaceQuery: ListMemberByWorkspaceQuery =
+      listMemberByWorkspaceQuerySchema.parse(req.query);
 
-    const { members, paginationMeta } = await this.workspaceService.listMembers(req.params.workspaceId, listMemberByWorkspaceQuery);
+    const { members, paginationMeta } = await this.workspaceService.listMembers(
+      req.params.workspaceId,
+      listMemberByWorkspaceQuery,
+    );
 
     const membersResponse: SafeMembersResponse = {
-      data:
-        members.map((m: SafeMemberResponse) => ({
-          user: {
-            id: m.user.id,
-            name: m.user.name,
-            email: m.user.email,
-          },
-          role: m.role,
-          joinedAt: m.joinedAt,
-        })),
-      paginationMeta
+      data: members.map((m: SafeMemberResponse) => ({
+        user: {
+          id: m.user.id,
+          name: m.user.name,
+          email: m.user.email,
+        },
+        role: m.role,
+        joinedAt: m.joinedAt,
+      })),
+      paginationMeta,
     };
 
     const envelope = ok(membersResponse);
@@ -133,8 +138,14 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  getMemberByUserId = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
-    const member = await this.workspaceService.getMemberByUserId(req.params.workspaceId, req.user!.id);
+  getMemberByUserId = async (
+    req: Request<WorkspaceParamsType>,
+    res: Response,
+  ): Promise<Response> => {
+    const member = await this.workspaceService.getMemberByUserId(
+      req.params.workspaceId,
+      req.user!.id,
+    );
 
     const memberResponse: SafeMemberResponse = {
       user: {
@@ -153,10 +164,17 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  getInviteCandidates = async (req: Request<WorkspaceParamsType>, res: Response): Promise<Response> => {
-    const listInviteeCandidatesQuery: ListInviteeCandidatesQuery = listInviteeCandidatesQuerySchema.parse(req.query);
+  getInviteCandidates = async (
+    req: Request<WorkspaceParamsType>,
+    res: Response,
+  ): Promise<Response> => {
+    const listInviteeCandidatesQuery: ListInviteeCandidatesQuery =
+      listInviteeCandidatesQuerySchema.parse(req.query);
 
-    const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(req.params.workspaceId, listInviteeCandidatesQuery);
+    const { users, paginationMeta } = await this.workspaceService.listInviteCandidates(
+      req.params.workspaceId,
+      listInviteeCandidatesQuery,
+    );
 
     const inviteCandidatesResponse: InviteCandidatesResponse = {
       data: users.map((user) => ({
@@ -174,7 +192,10 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  update = async (req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>, res: Response): Promise<Response> => {
+  update = async (
+    req: Request<WorkspaceParamsType, {}, UpdateWorkspaceBody>,
+    res: Response,
+  ): Promise<Response> => {
     const updateData: UpdateWorkspaceBody = { name: req.body.name };
     const result = await this.workspaceService.update(
       req.params.workspaceId,
@@ -215,7 +236,10 @@ export class WorkspaceController {
     return res.status(200).json(validatedEnvelope);
   };
 
-  invinte = async (req: Request<WorkspaceParamsType, {}, InviteBody>, res: Response): Promise<Response> => {
+  invinte = async (
+    req: Request<WorkspaceParamsType, {}, InviteBody>,
+    res: Response,
+  ): Promise<Response> => {
     const result = await this.workspaceService.inviteMember(
       req.params.workspaceId,
       req.body.userId,

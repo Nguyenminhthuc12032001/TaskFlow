@@ -72,7 +72,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     params: defaultParams,
-    query: listLeadsQuerySchema
+    query: listLeadsQuerySchema,
   },
   responses: defaultResponse(safeLeadsSchema, [201, 409]),
 });
