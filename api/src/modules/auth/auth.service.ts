@@ -102,7 +102,7 @@ export class AuthService {
         },
         'Login failed: email not found',
       );
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Invalid email or password', 401, 'INVALID_EMAIL_OR_PASSWORD');
     }
 
     if (!(await verifyHash(data.password, match.passwordHash))) {
@@ -112,7 +112,7 @@ export class AuthService {
         },
         'Login failed: invalid password',
       );
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Invalid email or password', 401, 'INVALID_EMAIL_OR_PASSWORD');
     }
 
     const accessTokenPayload: AccessTokenPayload = {

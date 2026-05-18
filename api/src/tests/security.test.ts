@@ -5,7 +5,7 @@ import { csrfTokenResponseSchema } from '../docs/registerPath.js';
 import { failEnvelopeSchema } from '../common/utils/response/format.js';
 let testServer: TestServer;
 
-function cookieHeaderFromSetCookie(setCookie: string): string {
+export function cookieHeaderFromSetCookie(setCookie: string): string {
   return setCookie.split(';')[0] ?? '';
 }
 
