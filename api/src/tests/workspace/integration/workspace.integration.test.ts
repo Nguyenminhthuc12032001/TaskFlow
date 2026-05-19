@@ -21,11 +21,7 @@ void describe('worksapce', () => {
     void it('creates a workspace and returns owner workspace payload', async () => {
         const registerAndLoginResponse = await registerAndLogin(testServer);
 
-        const { res, body } = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
-
-        assert.equal(res.status, 201);
-
-        assert.equal(body.ok, true);
+        const { body } = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
         assert.equal(body.data.createdBy, registerAndLoginResponse.body.data.user.id);
     });
 

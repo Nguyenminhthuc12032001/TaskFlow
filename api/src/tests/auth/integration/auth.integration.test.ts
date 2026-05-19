@@ -76,14 +76,7 @@ void describe('auth', () => {
     });
 
     void it('login with valid credentails', async () => {
-        const { res, body } = await registerAndLogin(testServer);
-
-        assert.equal(res.status, 200);
-
-        assert.equal(body.ok, true); 
-        assert.equal(typeof body.data.accessToken, 'string');
-        assert.ok(body.data.accessToken.length > 0);
-        assert.equal('passwordHash' in body.data.user, false);
+        const { res } = await registerAndLogin(testServer); 
 
         const setCookie = res.headers.get('set-cookie') ?? '';
         assert.match(setCookie, /refreshToken=/);

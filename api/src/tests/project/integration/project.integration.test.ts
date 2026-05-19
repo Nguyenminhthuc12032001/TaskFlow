@@ -23,17 +23,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
-        const { res, body } = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
+        const { body } = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(res.status, 201);
-        assert.equal(body.ok, true);
-        assert.equal(body.created, true);
         assert.equal(body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(body.data.createdAt.getTime()), false);
 
@@ -46,17 +40,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -87,8 +75,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const payload = {
@@ -114,8 +100,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
@@ -139,17 +123,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -173,17 +151,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -212,17 +184,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -246,8 +212,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const registerAndLoginResponseOutsider = await registerAndLogin(testServer);
@@ -273,17 +237,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -314,8 +272,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const registerAndLoginResponseOutsider = await registerAndLogin(testServer);
@@ -346,17 +302,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -391,17 +341,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -430,8 +374,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const payload = {
@@ -464,17 +406,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -511,17 +447,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -552,17 +482,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -601,17 +525,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -649,17 +567,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -691,17 +603,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -710,8 +616,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse2 = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse2.res.status, 201);
-        assert.equal(createWorkspaceResponse2.body.ok, true);
         assert.equal(createWorkspaceResponse2.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const payload = {
@@ -744,17 +648,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -763,17 +661,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse2 = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse2.res.status, 201);
-        assert.equal(createWorkspaceResponse2.body.ok, true);
         assert.equal(createWorkspaceResponse2.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse2 = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse2.body.data.id);
 
-        assert.equal(createProjectResponse2.res.status, 201);
-        assert.equal(createProjectResponse2.body.ok, true);
-        assert.equal(createProjectResponse2.body.created, true);
         assert.equal(createProjectResponse2.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse2.body.data.workspaceId, createWorkspaceResponse2.body.data.id);
         assert.equal(createProjectResponse2.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse2.body.data.createdAt.getTime()), false); 
 
@@ -808,17 +700,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -852,8 +738,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const { res, body } = await jsonRequest(testServer, `/api/projects/${createWorkspaceResponse.body.data.id}/${randomUUID()}`, {
@@ -876,17 +760,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -895,8 +773,6 @@ void describe('project', () => {
 
         const createWorkspaceResponse2 = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse2.res.status, 201);
-        assert.equal(createWorkspaceResponse2.body.ok, true);
         assert.equal(createWorkspaceResponse2.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const { res, body } = await jsonRequest(testServer, `/api/projects/${createWorkspaceResponse2.body.data.id}/${createProjectResponse.body.data.id}`, {
@@ -919,17 +795,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -962,17 +832,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -981,11 +845,7 @@ void describe('project', () => {
 
         const createProjectResponse2 = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse2.res.status, 201);
-        assert.equal(createProjectResponse2.body.ok, true);
-        assert.equal(createProjectResponse2.body.created, true);
         assert.equal(createProjectResponse2.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse2.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse2.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse2.body.data.createdAt.getTime()), false);
 
@@ -1017,17 +877,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -1062,17 +916,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 
@@ -1118,17 +966,11 @@ void describe('project', () => {
 
         const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
 
-        assert.equal(createWorkspaceResponse.res.status, 201);
-        assert.equal(createWorkspaceResponse.body.ok, true);
         assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
 
         const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
 
-        assert.equal(createProjectResponse.res.status, 201);
-        assert.equal(createProjectResponse.body.ok, true);
-        assert.equal(createProjectResponse.body.created, true);
         assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
-        assert.equal(createProjectResponse.body.data.workspaceId, createWorkspaceResponse.body.data.id);
         assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
         assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
 

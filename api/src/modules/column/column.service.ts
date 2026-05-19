@@ -28,11 +28,11 @@ export class ColumnService {
     const columns = await this.columnRepo.allColumnsByProject(ctx);
 
     if (columns.length >= 10) {
-      throw new AppError('Maximum number of columns reached', 409);
+      throw new AppError('Maximum number of columns reached', 409, "MAX_COLUMNS_REACHED");
     }
 
     if (columns.some((c) => c.name.toLowerCase() === data.name.toLowerCase())) {
-      throw new AppError('Duplicate name is not allowed', 409);
+      throw new AppError('Duplicate name is not allowed', 409, "DUPLICATE_NAME");
     }
 
     data.position = Math.max(...columns.map((c) => c.position), -1) + 1;
@@ -113,7 +113,7 @@ export class ColumnService {
     const columns = await this.columnRepo.allColumnsByProject(ctx);
 
     if (columns.some((c) => c.name === data.name && c.id !== ctx.columnId)) {
-      throw new AppError('Duplicate name is not allowed', 409);
+      throw new AppError('Duplicate name is not allowed', 409, 'DUPLICATE_NAME');
     }
 
     const updateData: Prisma.ColumnUpdateInput = {
@@ -149,13 +149,13 @@ export class ColumnService {
 
     oldColumns.map((c) => {
       if (!data.some((d) => d.columnId === c.id)) {
-        throw new AppError(`Column with id: ${c.id} not found in request`, 404);
+        throw new AppError(`Column with id: ${c.id} not found in request`, 404, 'NOT_FOUND_IN_REQUEST');
       }
     });
 
     data.map((d) => {
       if (!oldColumns.some((c) => c.id === d.columnId)) {
-        throw new AppError(`Column with id: ${d.columnId} not found in database`, 404);
+        throw new AppError(`Column with id: ${d.columnId} not found in database`, 404, 'NOT_FOUND_IN_DATABASE');
       }
     });
 

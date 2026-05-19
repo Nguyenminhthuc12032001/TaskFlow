@@ -28,7 +28,7 @@ export class ProjectService {
     const projects = await this.projectRepo.allProjectsByWorkspace(ctx);
 
     if (projects.some((p) => p.name === data.name)) {
-      throw new AppError('Duplicate name is not allowed', 409);
+      throw new AppError('Duplicate name is not allowed', 409, 'DUPLICATE_NAME');
     }
 
     const createData: Prisma.ProjectCreateInput = {
@@ -128,7 +128,7 @@ export class ProjectService {
         (p) => p.name.toLowerCase() === data.name.toLocaleLowerCase() && p.id !== ctx.projectId,
       )
     ) {
-      throw new AppError('Duplicate name is not allowed', 409);
+      throw new AppError('Duplicate name is not allowed', 409, 'DUPLICATE_NAME');
     }
 
     const updateData: ProjectUpdateInput = {

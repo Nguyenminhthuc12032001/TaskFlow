@@ -6,6 +6,7 @@ import { createResponseSchema } from "../modules/workspace/workspace.schemas.js"
 import { safeProjectResponseSchema } from "../modules/project/project.schemas.js";
 import type { WorkspaceRole } from "../../prisma/generated/enums.js";
 import { prisma } from "../db/prisma.js";
+import assert from "node:assert";
 
 export const uniqueEmail = (): string => `auth-${randomUUID()}@auth.test`;
 
@@ -41,11 +42,27 @@ export async function registerAndLogin(testServer: TestServer, name = 'Test User
         body: JSON.stringify(payload)
     });
 
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-type') ?? '', /^application\/json/);
+    assert.ok(body);
+
+    const parsed = okEnvelopeSchema(loginResponseSchema).parse(body);
+
+    assert.equal(parsed.ok, true);
+    assert.ok(parsed.data.accessToken.length > 0);
+    assert.equal(typeof parsed.data.accessToken, 'string');
+    assert.equal(typeof parsed.data.user.id, 'string');
+    assert.equal(parsed.data.user.email, payload.email);
+    assert.equal(parsed.data.user.name, name);
+
+    assert.equal('passwordHash' in parsed.data.user, false);
+    assert.equal('passwordSalt' in parsed.data.user, false);
+
     return {
         res,
-        body: okEnvelopeSchema(loginResponseSchema).parse(body),
+        body: parsed,
     }
-}
+};
 
 export async function createWorkspace(
     testServer: TestServer,
@@ -75,7 +92,16 @@ export async function createWorkspace(
         }
     });
 
+    assert.equal(res.status, 201);
+    assert.match(res.headers.get('content-type') ?? '', /^application\/json/);
+    assert.ok(body);
+
     const parsed = createdEnvelopeSchema(createResponseSchema).parse(body);
+
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.created, true);
+    assert.equal(typeof parsed.data.id, 'string');
+    assert.equal(parsed.data.name, name);  
 
     return {
         res,
@@ -126,18 +152,31 @@ export async function createProject(
 }> {
     const payload = {
         name,
-        description: 'Test project description', 
+        description: 'Test project description',
     }
     const { res, body } = await jsonRequest(testServer, `/api/projects/${workspaceId}`, {
-        method: 'POST', 
+        method: 'POST',
         body: JSON.stringify(payload),
         headers: {
             Authorization: `Bearer ${token}`,
         }
     });
 
+    assert.equal(res.status, 201);
+    assert.match(res.headers.get('content-type') ?? '', /^application\/json/);
+    assert.ok(body);
+
+    const parsed = createdEnvelopeSchema(safeProjectResponseSchema).parse(body);
+
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.created, true);
+    assert.equal(parsed.data.workspaceId, workspaceId);
+    assert.equal(typeof parsed.data.id, 'string');
+    assert.equal(parsed.data.name, payload.name);
+    assert.equal(parsed.data.description, payload.description);
+
     return {
         res,
-        body: createdEnvelopeSchema(safeProjectResponseSchema).parse(body),
+        body: parsed
     }
 };
