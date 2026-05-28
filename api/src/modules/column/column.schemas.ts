@@ -9,7 +9,7 @@ import {
 
 // REQUEST
 
-export const listColumnQuerySchema = paginationQuerySchema.extend({
+export const listColumnQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   type: z.enum(ColumnType).optional(),

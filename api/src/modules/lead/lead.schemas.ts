@@ -12,7 +12,7 @@ import {
 
 // REQUEST
 
-export const listLeadByActorQuerySchema = paginationQuerySchema.extend({
+export const listLeadByActorQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),
@@ -20,7 +20,7 @@ export const listLeadByActorQuerySchema = paginationQuerySchema.extend({
 });
 export type ListLeadByActorQueryType = z.infer<typeof listLeadByActorQuerySchema>;
 
-export const listLeadsQuerySchema = paginationQuerySchema.extend({
+export const listLeadsQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),

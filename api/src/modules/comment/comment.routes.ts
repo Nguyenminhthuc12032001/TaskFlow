@@ -26,8 +26,8 @@ const defaultRoute = '/:workspaceId/:projectId/:columnId/:taskId';
 router.post(
   defaultRoute,
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(createBodySchema),
   commentControlelr.create,
 );
@@ -35,8 +35,8 @@ router.post(
 router.post(
   defaultRoute + '/:commentId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(createBodySchema),
   commentControlelr.reply,
 );
@@ -44,8 +44,8 @@ router.post(
 router.get(
   defaultRoute + '/:commentId',
   authMiddleware,
-  requireWorkspaceRole(),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole(),
   validateBody(emptyBodySchema),
   commentControlelr.get,
 );
@@ -53,8 +53,8 @@ router.get(
 router.get(
   defaultRoute,
   authMiddleware,
-  requireWorkspaceRole(),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole(),
   validateBody(emptyBodySchema),
   validateQuery(listCommentsQuerySchema),
   commentControlelr.listByTask,
@@ -63,8 +63,8 @@ router.get(
 router.patch(
   defaultRoute + '/:commentId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(updateBodySchema),
   commentControlelr.update,
 );
@@ -72,8 +72,8 @@ router.patch(
 router.delete(
   defaultRoute + '/:commentId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   commentControlelr.remove,
 );

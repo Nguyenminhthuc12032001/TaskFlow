@@ -14,6 +14,8 @@ import { buildDateRange } from '../../common/utils/dateRange.js';
 import { buildPagination, buildPaginationMeta } from '../../common/utils/pagination.js';
 import type { DbClient } from '../../db/prisma.js';
 import { ActivityService } from '../activity/activity.service.js';
+import type { AuthRepo } from '../auth/auth.repo.js';
+import type { WorkspaceRepo } from '../workspace/workspace.repo.js';
 import type { TaskRepo, TaskWithAssignees, TaskWithAssigneeUsers } from './task.repo.js';
 import type {
   AssignBodyType,
@@ -29,6 +31,8 @@ export class TaskService {
     readonly prisma: DbClient,
     readonly activityService: ActivityService,
     readonly taskRepo: TaskRepo,
+    readonly authRepo: AuthRepo,
+    readonly workspaceRepo: WorkspaceRepo,
   ) {}
 
   async create(data: CreateBodyType, ctx: ResourceContext): Promise<Task> {
@@ -84,10 +88,22 @@ export class TaskService {
 
   async assign(data: AssignBodyType, ctx: ResourceContext): Promise<TaskAssignee> {
     const result = await this.prisma.$transaction(async (tx) => {
+      const existUser = await this.authRepo.findUserById(data.userId, tx);
+
+      if (!existUser) {
+        throw new AppError('User does not exist', 404, 'NOT_FOUND');
+      }
+
       const existAssignee = await this.taskRepo.isExistAssignee(data.userId, ctx, tx);
 
       if (existAssignee) {
-        throw new AppError('User is already assigned to this task', 409);
+        throw new AppError('User is already assigned to this task', 409, 'CONFLICT');
+      }
+
+      const isWorkspaceMember = await this.workspaceRepo.findMembership(ctx.workspaceId, data.userId, tx);
+
+      if (!isWorkspaceMember) {
+        throw new AppError('User is not a member of this workspace', 403, 'FORBIDDEN');
       }
 
       const assignData: Prisma.TaskAssigneeCreateInput = {

@@ -10,7 +10,7 @@ import { safeUserSchema } from '../auth/auth.schemas.js';
 
 // REQUEST
 
-export const listTaskByColumnQuerySchema = paginationQuerySchema.extend({
+export const listTaskByColumnQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   dueDateRange: dataRangeQuerySchema.optional(),

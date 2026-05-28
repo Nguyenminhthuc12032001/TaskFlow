@@ -21,7 +21,7 @@ import {
 import { validateResponse } from '../../common/utils/response/validate.js';
 
 export class CommentController {
-  constructor(readonly commentService: CommentService) {}
+  constructor(readonly commentService: CommentService) { }
 
   create = async (
     req: Request<WorkspaceParamsType, {}, CreateBodyType, {}, {}>,
@@ -44,6 +44,7 @@ export class CommentController {
       content: comment.content,
       createdAt: comment.createdAt,
       updatedAt: comment.updatedAt,
+      totalReplies: 0
     };
 
     const envelope = created(safeComment);
@@ -66,7 +67,7 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const comment = await this.commentService.get(ctx);
+    const { comment, totalReplies } = await this.commentService.get(ctx);
 
     const safeComment: SafeCommentType = {
       id: comment.id,
@@ -76,6 +77,7 @@ export class CommentController {
       content: comment.content,
       createdAt: comment.createdAt,
       updatedAt: comment.updatedAt,
+      totalReplies
     };
 
     const envelope = ok(safeComment);
@@ -99,13 +101,13 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const { comments, paginationMeta } = await this.commentService.listByTask(
+    const { commentsWithTotalReplies, paginationMeta } = await this.commentService.listByTask(
       ctx,
       listCommentsQuery,
     );
 
     const safeComments: SafeCommentsType = {
-      data: comments.map((comment) => ({
+      data: commentsWithTotalReplies.map((comment) => ({
         id: comment.id,
         taskId: comment.taskId,
         authorId: comment.authorId,
@@ -113,6 +115,7 @@ export class CommentController {
         content: comment.content,
         createdAt: comment.createdAt,
         updatedAt: comment.updatedAt,
+        totalReplies: comment.totalReplies
       })),
       paginationMeta,
     };
@@ -137,16 +140,17 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const comment = await this.commentService.update(req.body, ctx);
+    const { commentUpdated, totalReplies } = await this.commentService.update(req.body, ctx);
 
     const safeComment: SafeCommentType = {
-      id: comment.id,
-      taskId: comment.taskId,
-      authorId: comment.authorId,
-      parentId: comment.parentId ?? undefined,
-      content: comment.content,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
+      id: commentUpdated.id,
+      taskId: commentUpdated.taskId,
+      authorId: commentUpdated.authorId,
+      parentId: commentUpdated.parentId ?? undefined,
+      content: commentUpdated.content,
+      createdAt: commentUpdated.createdAt,
+      updatedAt: commentUpdated.updatedAt,
+      totalReplies
     };
 
     const envelope = ok(safeComment);
@@ -169,7 +173,7 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const comment = await this.commentService.reply(req.body, ctx);
+    const { comment, totalReplies } = await this.commentService.reply(req.body, ctx);
 
     const safeComment: SafeCommentType = {
       id: comment.id,
@@ -179,6 +183,7 @@ export class CommentController {
       content: comment.content,
       createdAt: comment.createdAt,
       updatedAt: comment.updatedAt,
+      totalReplies
     };
 
     const envelope = created(safeComment);
@@ -201,7 +206,7 @@ export class CommentController {
       ActorId: req.user!.id,
     };
 
-    const comment = await this.commentService.remove(ctx);
+    const { comment, totalReplies } = await this.commentService.remove(ctx);
 
     const safeComment: SafeCommentType = {
       id: comment.id,
@@ -211,6 +216,7 @@ export class CommentController {
       content: comment.content,
       createdAt: comment.createdAt,
       updatedAt: comment.updatedAt,
+      totalReplies
     };
 
     const envelope = ok(safeComment);

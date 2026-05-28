@@ -5,11 +5,11 @@ export function buildDateRange(query: { startDate?: Date; endDate?: Date }): Dat
   const now = new Date();
 
   if (query.startDate && query.startDate > now) {
-    throw new AppError('Start date must be in the past', 400);
+    throw new AppError('Start date must be in the past', 400, 'INVALID_ERROR');
   }
 
   if (query.endDate && query.endDate > now) {
-    throw new AppError('End date must be in the past', 400);
+    throw new AppError('End date must be in the past', 400, 'INVALID_ERROR');
   }
 
   return {

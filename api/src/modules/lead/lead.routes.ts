@@ -22,10 +22,12 @@ import { LeadRepo } from './lead.repo.js';
 import { TaskRepo } from '../task/task.repo.js';
 import { ActivityService } from '../activity/activity.service.js';
 import { ActivityRepo } from '../activity/activity.repo.js';
+import { WorkspaceRepo } from '../workspace/workspace.repo.js';
 
 const leadController = new LeadController(
   new LeadService(
     prisma,
+    new WorkspaceRepo(prisma),
     new LeadRepo(prisma),
     new TaskRepo(prisma),
     new ActivityService(new ActivityRepo()),
@@ -37,8 +39,8 @@ const router = Router();
 router.post(
   '/:workspaceId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(createBodySchema),
   leadController.create,
 );
@@ -54,8 +56,8 @@ router.get(
 router.get(
   '/:workspaceId/:leadId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   leadController.get,
 );
@@ -63,8 +65,8 @@ router.get(
 router.get(
   '/:workspaceId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   validateQuery(listLeadsQuerySchema),
   leadController.listByWorkspace,
@@ -73,8 +75,8 @@ router.get(
 router.patch(
   '/:workspaceId/:leadId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(updateBodySchema),
   leadController.update,
 );
@@ -82,8 +84,8 @@ router.patch(
 router.patch(
   '/:workspaceId/:leadId/updateStage',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(updateStageBodySchema),
   leadController.updateStage,
 );
@@ -91,8 +93,8 @@ router.patch(
 router.patch(
   '/:workspaceId/:leadId/:taskId/linkTask',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   leadController.linkTask,
 );
@@ -100,8 +102,8 @@ router.patch(
 router.delete(
   '/:workspaceId/:leadId/:taskId/unlinkTask',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   leadController.unlinkTask,
 );
@@ -109,8 +111,8 @@ router.delete(
 router.post(
   '/:workspaceId/:projectId/:columnId/:leadId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(createFollowUpTaskBodySchema),
   leadController.createFollowUpTask,
 );
@@ -118,8 +120,8 @@ router.post(
 router.delete(
   '/:workspaceId/:leadId',
   authMiddleware,
-  requireWorkspaceRole('member'),
   validateParams(workspaceParamsSchema),
+  requireWorkspaceRole('member'),
   validateBody(emptyBodySchema),
   leadController.remove,
 );

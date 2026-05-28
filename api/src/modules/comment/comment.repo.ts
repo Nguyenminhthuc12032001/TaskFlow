@@ -4,7 +4,7 @@ import type { ResourceContext } from '../../common/types/common.types.js';
 import type { DbClient, DbOrTxClient } from '../../db/prisma.js';
 
 export class CommentRepo {
-  constructor(readonly prisma: DbClient) {}
+  constructor(readonly prisma: DbClient) { }
 
   async create(data: Prisma.CommentCreateInput, db: DbOrTxClient = this.prisma): Promise<Comment> {
     return await db.comment.create({ data });
@@ -68,24 +68,26 @@ export class CommentRepo {
         },
         ...(search
           ? {
-              content: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            }
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }
           : {}),
         ...(parentId
           ? {
-              parentId,
-            }
-          : {}),
+            parentId,
+          }
+          : {
+            parentId: null,
+          }),
         ...(dateRange?.startDate || dateRange?.endDate
           ? {
-              createdAt: {
-                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-              },
-            }
+            createdAt: {
+              ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+              ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+            },
+          }
           : {}),
       },
       skip,
@@ -154,20 +156,20 @@ export class CommentRepo {
         },
         ...(search
           ? {
-              content: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            }
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }
           : {}),
         ...(parentId ? { parentId } : {}),
         ...(dateRange?.startDate || dateRange?.endDate
           ? {
-              createdAt: {
-                ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
-                ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
-              },
-            }
+            createdAt: {
+              ...(dateRange.startDate ? { gte: dateRange.startDate } : {}),
+              ...(dateRange.endDate ? { lte: dateRange.endDate } : {}),
+            },
+          }
           : {}),
       },
     });
@@ -240,5 +242,16 @@ export class CommentRepo {
         },
       },
     });
+  }
+
+  async getTotalReplies(
+    ctx: ResourceContext,
+    db: DbOrTxClient = this.prisma,
+  ): Promise<number> {
+    return await db.comment.count({
+      where: {
+        parentId: ctx.CommentId,
+      },
+    })
   }
 }

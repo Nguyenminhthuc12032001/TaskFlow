@@ -8,7 +8,7 @@ import z from '../../docs/zod.js';
 
 // REQUEST
 
-export const listProjectsQuerySchema = paginationQuerySchema.extend({
+export const listProjectsQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
 });

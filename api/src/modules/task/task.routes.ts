@@ -25,9 +25,11 @@ import {
   workspaceParamsSchema,
 } from '../../common/schemas/common.schemas.js';
 import { requireWorkspaceRole } from '../../common/middlewares/requireWorkspaceRole.middleware.js';
+import { WorkspaceRepo } from '../workspace/workspace.repo.js';
+import { AuthRepo } from '../auth/auth.repo.js';
 
 const taskController = new TaskController(
-  new TaskService(prisma, new ActivityService(new ActivityRepo()), new TaskRepo(prisma)),
+  new TaskService(prisma, new ActivityService(new ActivityRepo()), new TaskRepo(prisma), new AuthRepo(prisma), new WorkspaceRepo(prisma)),
 );
 const router = Router();
 

@@ -12,6 +12,7 @@ import { buildPagination, buildPaginationMeta } from '../../common/utils/paginat
 import type { DbClient } from '../../db/prisma.js';
 import type { ActivityService } from '../activity/activity.service.js';
 import type { TaskRepo } from '../task/task.repo.js';
+import type { WorkspaceRepo } from '../workspace/workspace.repo.js';
 import type { LeadRepo, LeadWithTaskLinks } from './lead.repo.js';
 import type {
   CreateBodyType,
@@ -25,18 +26,19 @@ import type {
 export class LeadService {
   constructor(
     readonly prisma: DbClient,
+    readonly workspaceRepo: WorkspaceRepo,
     readonly leadRepo: LeadRepo,
     readonly taskRepo: TaskRepo,
     readonly activityService: ActivityService,
-  ) {}
+  ) { }
 
   async create(data: CreateBodyType, ctx: ResourceContext): Promise<Lead> {
     if (data.email && (await this.leadRepo.existEmail(data.email, ctx))) {
-      throw new AppError('Duplicate email is not allowed', 409);
+      throw new AppError('Duplicate email is not allowed', 409, "DUPLICATE_EMAIL");
     }
 
     if (data.phone && (await this.leadRepo.existPhone(data.phone, ctx))) {
-      throw new AppError('Duplicate phone is not allowed', 409);
+      throw new AppError('Duplicate phone is not allowed', 409, "DUPLICATE_PHONE");
     }
 
     const dataCreate: Prisma.LeadCreateInput = {
@@ -311,6 +313,15 @@ export class LeadService {
 
   async remove(ctx: ResourceContext): Promise<Lead> {
     return await this.prisma.$transaction(async (tx) => {
+      const existLead = await this.leadRepo.get(ctx, tx);
+
+      if (existLead && existLead.createdBy !== ctx.ActorId) {
+        const actor = await this.workspaceRepo.findMembership(ctx.workspaceId, ctx.ActorId, tx);
+        if (actor && !['admin', 'owner'].includes(actor.role)) {
+          throw new AppError("You don't have permission to delete this lead", 403, 'NOT_LEAD_AUTHOR');
+        }
+      }
+
       const lead = await this.leadRepo.remove(ctx, tx);
 
       await this.leadRepo.removeLeadTaskLink(ctx, tx);

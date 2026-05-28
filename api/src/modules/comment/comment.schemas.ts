@@ -8,9 +8,9 @@ import z from '../../docs/zod.js';
 
 // REQUEST
 
-export const listCommentsQuerySchema = paginationQuerySchema.extend({
+export const listCommentsQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
+  ...paginationQuerySchema.shape,
   parentId: z.uuid().optional(),
 });
 export type ListCommentsQueryType = z.infer<typeof listCommentsQuerySchema>;
@@ -52,6 +52,7 @@ export const safeCommentSchema = z
       .max(100, 'Comment must be at most 100 characters long'),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
+    totalReplies: z.number().int().min(0),
   })
   .strict();
 export type SafeCommentType = z.infer<typeof safeCommentSchema>;

@@ -20,6 +20,15 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = 'viewer') {
 
     const workspaceId = req.params.workspaceId;
 
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      select: { id: true },
+    });
+
+    if (!workspace) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+
     const membership = await prisma.workspaceMember.findUnique({
       where: {
         workspaceId_userId: { workspaceId, userId },
@@ -81,7 +90,7 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = 'viewer') {
           });
 
           if (!taskInColumn) {
-            throw new AppError('Task not found', 404, 'TASK_OT_FOUND');
+            throw new AppError('Task not found', 404, 'TASK_NOT_IN_COLUMN');
           }
 
           const commentId = req.params.commentId;
@@ -93,7 +102,7 @@ export function requireWorkspaceRole(minRole: WorkspaceRole = 'viewer') {
             });
 
             if (!commentInTask) {
-              throw new AppError('Comment not found', 404, 'COMMENT_NOT_FOUND');
+              throw new AppError('Comment not found', 404, 'COMMENT_NOT_IN_TASK');
             }
           }
         }

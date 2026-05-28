@@ -120,6 +120,7 @@ export class LeadController {
         createdBy: taskLink.task.createdBy,
         createdAt: taskLink.task.createdAt,
         updatedAt: taskLink.task.updatedAt,
+        position: taskLink.task.position, 
         ...(taskLink.task.description != null && { description: taskLink.task.description }),
         ...(taskLink.task.dueDate != null && { dueDate: taskLink.task.dueDate }),
       })),
@@ -301,8 +302,8 @@ export class LeadController {
       workspaceId: req.params.workspaceId,
       LeadId: req.params.leadId!,
       ActorId: req.user!.id,
-    };
-
+    }; 
+ 
     const lead = await this.leadService.remove(ctx);
 
     const safeLead: SafeLeadType = {

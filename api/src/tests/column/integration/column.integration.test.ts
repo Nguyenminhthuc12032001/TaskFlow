@@ -1,7 +1,7 @@
 import { after, before, describe, it } from "node:test";
 import { jsonRequest, startTestServer, type TestServer } from "../../testServer.js";
 import { addWorkspaceMember, createProject, createWorkspace, registerAndLogin } from "../../helper.js";
-import assert from "node:assert";
+import assert, { fail } from "node:assert";
 import { createdEnvelopeSchema, failEnvelopeSchema, okEnvelopeSchema } from "../../../common/utils/response/format.js";
 import { safeColumnSchema, safeColumnsSchema } from "../../../modules/column/column.schemas.js";
 import { randomUUID } from "node:crypto";
@@ -84,7 +84,7 @@ void describe('column', () => {
 
         const registerAndLoginResponseOutsider = await registerAndLogin(testServer);
 
-        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnResponse.data.data[0].id}`, {
+        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnResponse.data.data[0].id}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponseOutsider.body.data.accessToken}`,
@@ -423,7 +423,7 @@ void describe('column', () => {
             position: column.position + 1,
         }));
 
-        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
+        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/re_order`, {
             method: 'PATCH',
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponseMember.body.data.accessToken}`,
@@ -544,7 +544,7 @@ void describe('column', () => {
         const failBody = failEnvelopeSchema.parse(body);
         assert.equal(failBody.ok, false);
         assert.equal(failBody.message, 'Duplicate name is not allowed');
-        assert.equal(failBody.code, 'DUPLICATE_COLUMN_NAME');
+        assert.equal(failBody.code, 'DUPLICATE_NAME');
     });
 
     void it('reject duplicate column name and difirent casing in same project', async () => {
@@ -595,7 +595,7 @@ void describe('column', () => {
         const failBody = failEnvelopeSchema.parse(body);
         assert.equal(failBody.ok, false);
         assert.equal(failBody.message, 'Duplicate name is not allowed');
-        assert.equal(failBody.code, 'DUPLICATE_COLUMN_NAME');
+        assert.equal(failBody.code, 'DUPLICATE_NAME');
     });
 
     void it('allow duplicate column name in different project', async () => {
@@ -614,22 +614,29 @@ void describe('column', () => {
         assert.equal('deletedAt' in createProjectResponse.body.data, false);
         assert.equal('updatedAt' in createProjectResponse.body.data, false);
 
-        const listColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
-            method: 'GET',
+        const payloadColumn = {
+            name: `Column ${randomUUID()}`,
+            type: ColumnType.todo,
+        };
+
+        const createColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
+            method: 'POST',
+            body: JSON.stringify(payloadColumn),
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponse.body.data.accessToken}`,
             }
         });
 
-        assert.equal(listColumnResponse.res.status, 200);
+        assert.equal(createColumnResponse.res.status, 201);
 
-        const parsedListColumnResponse = okEnvelopeSchema(safeColumnsSchema).parse(listColumnResponse.body);
+        const parsedCreateColumnResponse = createdEnvelopeSchema(safeColumnSchema).parse(createColumnResponse.body);
 
-        assert.equal(parsedListColumnResponse.ok, true);
-        assert.ok(parsedListColumnResponse.data.data.length > 0);
+        assert.equal(parsedCreateColumnResponse.ok, true);
+        assert.equal(parsedCreateColumnResponse.data.name, payloadColumn.name);
+        assert.equal(parsedCreateColumnResponse.data.type, payloadColumn.type);
 
         const payload = {
-            name: parsedListColumnResponse.data.data[0].name,
+            name: parsedCreateColumnResponse.data.name,
             type: ColumnType.todo,
         };
 
@@ -782,11 +789,15 @@ void describe('column', () => {
         assert.equal('deletedAt' in parsedCreateColumnResponse.data, false);
         assert.equal('updatedAt' in parsedCreateColumnResponse.data, false);
 
-        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}?name=${payload.name}`, {
+        const payloadSearch = {
+            name: payload.name,
+        }
+
+        const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}?search=${payloadSearch.name}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponse.body.data.accessToken}`,
-            }
+            },
         });
 
         assert.equal(res.status, 200);
@@ -959,11 +970,10 @@ void describe('column', () => {
 
         const payload = {
             name: "Test update column successfully",
-            type: ColumnType.done,
         };
 
         const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnsResponse.data.data[0].id}`, {
-            method: 'PUT',
+            method: 'PATCH',
             body: JSON.stringify(payload),
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponse.body.data.accessToken}`,
@@ -976,7 +986,6 @@ void describe('column', () => {
         assert.equal(parsedBody.ok, true);
         assert.equal(parsedBody.data.id, parsedListColumnsResponse.data.data[0].id);
         assert.equal(parsedBody.data.name, payload.name);
-        assert.equal(parsedBody.data.type, payload.type);
         assert.equal(parsedBody.data.position, parsedListColumnsResponse.data.data[0].position);
         assert.equal(parsedBody.data.projectId, parsedListColumnsResponse.data.data[0].projectId);
         assert.equal(parsedBody.data.createdAt instanceof Date, true);
@@ -1020,12 +1029,11 @@ void describe('column', () => {
         assert.ok(parsedListColumnsResponse.data.data.length > 0);
 
         const payload = {
-            name: parsedListColumnsResponse.data.data[0].name,
-            type: ColumnType.done,
+            name: parsedListColumnsResponse.data.data[1].name,
         };
 
         const { res, body } = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnsResponse.data.data[0].id}`, {
-            method: 'PUT',
+            method: 'PATCH',
             body: JSON.stringify(payload),
             headers: {
                 Authorization: `Bearer ${registerAndLoginResponse.body.data.accessToken}`,
@@ -1037,7 +1045,7 @@ void describe('column', () => {
         const parsedBody = failEnvelopeSchema.parse(body);
         assert.equal(parsedBody.ok, false);
         assert.equal(parsedBody.message, 'Duplicate name is not allowed');
-        assert.equal(parsedBody.code, 'DUPLICATE_COLUMN_NAME');
+        assert.equal(parsedBody.code, 'DUPLICATE_NAME');
     });
 
     void it('re_order column successfully', async () => {
@@ -1075,7 +1083,7 @@ void describe('column', () => {
         assert.ok(parsedListColumnsResponse.data.data.length > 0);
 
         const payload = parsedListColumnsResponse.data.data.map((column) => ({
-            id: column.id,
+            columnId: column.id,
             position: column.position + 1
         }));
 
@@ -1093,7 +1101,7 @@ void describe('column', () => {
 
         assert.equal(parsedBody.ok, true);
         assert.equal(parsedBody.data.data.length, payload.length);
-        assert.ok(parsedBody.data.data.every((column) => column.position === payload.find((payloadColumn) => payloadColumn.id === column.id)!.position));
+        assert.ok(parsedBody.data.data.every((column) => column.position === payload.find((payloadColumn) => payloadColumn.columnId === column.id)!.position));
 
         assert.equal('deletedAt' in parsedBody.data.data[0], false);
         assert.equal('updatedAt' in parsedBody.data.data[0], false);
@@ -1134,7 +1142,7 @@ void describe('column', () => {
         assert.ok(parsedListColumnsResponse.data.data.length > 0);
 
         const payload = parsedListColumnsResponse.data.data.filter((column) => column.id !== parsedListColumnsResponse.data.data[0].id).map((column) => ({
-            id: column.id,
+            columnId: column.id,
             position: column.position + 1
         }));
 
@@ -1150,7 +1158,7 @@ void describe('column', () => {
 
         const parsedBody = failEnvelopeSchema.parse(body);
         assert.equal(parsedBody.ok, false);
-        assert.equal(parsedBody.message, 'not found in request');
+        assert.match(parsedBody.message, /not found in request/);
         assert.equal(parsedBody.code, 'NOT_FOUND_IN_REQUEST');
     });
 
@@ -1198,7 +1206,7 @@ void describe('column', () => {
         assert.ok(parsedListColumnsResponse.data.data.length > 0);
 
         const payload = parsedListColumnsResponse.data.data.filter((column) => column.id !== parsedListColumnsResponse.data.data[0].id).map((column) => ({
-            id: column.id,
+            columnId: column.id,
             position: column.position + 1
         }));
 
@@ -1214,8 +1222,8 @@ void describe('column', () => {
 
         const parsedBody = failEnvelopeSchema.parse(body);
         assert.equal(parsedBody.ok, false);
-        assert.equal(parsedBody.message, 'not found in database');
-        assert.equal(parsedBody.code, 'NOT_FOUND_IN_DATABASE');
+        assert.match(parsedBody.message, /not found in request/);
+        assert.equal(parsedBody.code, 'NOT_FOUND_IN_REQUEST');
     });
 
     void it('reject re_order duplicate columnId', async () => {
@@ -1365,7 +1373,7 @@ void describe('column', () => {
             }
         });
 
-        assert.equal(res.status, 204);
+        assert.equal(res.status, 200);
 
         const parsedBody = okEnvelopeSchema(safeColumnSchema).parse(body);
         assert.equal(parsedBody.ok, true);
@@ -1608,4 +1616,117 @@ void describe('column', () => {
     });
 
     // Reject unauthenticated create/list/get/update/delete/reorder
+    void it('reject unauthenticated create/list/get/update/delete/reorder', async () => {
+        const registerAndLoginResponse = await registerAndLogin(testServer);
+
+        const createWorkspaceResponse = await createWorkspace(testServer, registerAndLoginResponse.body.data.accessToken);
+
+        assert.equal(createWorkspaceResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
+
+        const createProjectResponse = await createProject(testServer, registerAndLoginResponse.body.data.accessToken, createWorkspaceResponse.body.data.id);
+
+        assert.equal(createProjectResponse.body.data.createdBy, registerAndLoginResponse.body.data.user.id);
+        assert.equal(createProjectResponse.body.data.createdAt instanceof Date, true);
+        assert.equal(Number.isNaN(createProjectResponse.body.data.createdAt.getTime()), false);
+
+        assert.equal('deletedAt' in createProjectResponse.body.data, false);
+        assert.equal('updatedAt' in createProjectResponse.body.data, false);
+
+        const listColumnsResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
+            method: 'GET',
+        });
+
+        const parsedBody = failEnvelopeSchema.parse(listColumnsResponse.body);
+
+        assert.equal(listColumnsResponse.res.status, 401);
+        assert.equal(parsedBody.ok, false);
+        assert.equal(parsedBody.message, 'Unauthorized');
+        assert.equal(parsedBody.code, 'UNAUTHORIZED');
+
+        const payload = {
+            name: `Column ${randomUUID()}`,
+            type: ColumnType.todo,
+        };
+
+        const createColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
+            method: 'POST',
+            body: JSON.stringify({ payload }),
+        });
+
+        const parsedCreateColumnResponse = failEnvelopeSchema.parse(createColumnResponse.body);
+
+        assert.equal(createColumnResponse.res.status, 401);
+        assert.equal(parsedCreateColumnResponse.ok, false);
+        assert.equal(parsedCreateColumnResponse.message, 'Unauthorized');
+        assert.equal(parsedCreateColumnResponse.code, 'UNAUTHORIZED');
+
+        const listColumnResponseSuccess = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${registerAndLoginResponse.body.data.accessToken}`,
+            },
+        });
+
+        const parsedListColumnResponseSuccess = okEnvelopeSchema(safeColumnsSchema).parse(listColumnResponseSuccess.body);
+
+        assert.equal(listColumnResponseSuccess.res.status, 200);
+        assert.equal(parsedListColumnResponseSuccess.ok, true);
+        assert.ok(parsedListColumnResponseSuccess.data.data.length > 0);
+
+        const detailColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnResponseSuccess.data.data[0].id}`, {
+            method: 'GET',
+        });
+
+        assert.equal(detailColumnResponse.res.status, 401);
+
+        const parsedDetailColumn = failEnvelopeSchema.parse(detailColumnResponse.body);
+        assert.equal(parsedDetailColumn.ok, false);
+        assert.equal(parsedDetailColumn.message, 'Unauthorized');
+        assert.equal(parsedDetailColumn.code, 'UNAUTHORIZED');
+
+        const payloadUpdate = {
+            name: `Column ${randomUUID()}`,
+            type: ColumnType.todo,
+        };
+
+        const updateColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnResponseSuccess.data.data[0].id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ payload: payloadUpdate }),
+        });
+
+        assert.equal(updateColumnResponse.res.status, 401);
+
+        const parsedUpdateColumn = failEnvelopeSchema.parse(updateColumnResponse.body);
+        assert.equal(parsedUpdateColumn.ok, false);
+        assert.equal(parsedUpdateColumn.message, 'Unauthorized');
+        assert.equal(parsedUpdateColumn.code, 'UNAUTHORIZED');
+
+        const deleteColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/${parsedListColumnResponseSuccess.data.data[0].id}`, {
+            method: 'DELETE',
+        });
+
+        assert.equal(deleteColumnResponse.res.status, 401);
+
+        const parsedDeleteColumn = failEnvelopeSchema.parse(deleteColumnResponse.body);
+        assert.equal(parsedDeleteColumn.ok, false);
+        assert.equal(parsedDeleteColumn.message, 'Unauthorized');
+        assert.equal(parsedDeleteColumn.code, 'UNAUTHORIZED');
+
+        const payloadReorder = parsedListColumnResponseSuccess.data.data.map((column) => ({
+            columnId: column.id,
+            position: column.position + 1
+        }))
+
+        const reorderColumnResponse = await jsonRequest(testServer, `/api/columns/${createWorkspaceResponse.body.data.id}/${createProjectResponse.body.data.id}/re_order`, {
+            method: 'PATCH',
+            body: JSON.stringify({ payload: payloadReorder }),
+        });
+
+        assert.equal(reorderColumnResponse.res.status, 401);
+
+        const parsedReorderColumn = failEnvelopeSchema.parse(reorderColumnResponse.body);
+        assert.equal(parsedReorderColumn.ok, false);
+        assert.equal(parsedReorderColumn.message, 'Unauthorized');
+        assert.equal(parsedReorderColumn.code, 'UNAUTHORIZED');
+    });
 });

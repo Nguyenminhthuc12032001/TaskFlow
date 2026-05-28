@@ -10,21 +10,21 @@ import {
 
 // ========= REQUEST ==========
 
-export const listWorkspaceQuerySchema = paginationQuerySchema.extend({
+export const listWorkspaceQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   actorRole: z.enum(WorkspaceRole).optional(),
 });
 export type ListWorkspaceQuery = z.infer<typeof listWorkspaceQuerySchema>;
 
-export const listMemberByWorkspaceQuerySchema = paginationQuerySchema.extend({
+export const listMemberByWorkspaceQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
   role: z.enum(WorkspaceRole).optional(),
 });
 export type ListMemberByWorkspaceQuery = z.infer<typeof listMemberByWorkspaceQuerySchema>;
 
-export const listInviteeCandidatesQuerySchema = paginationQuerySchema.extend({
+export const listInviteeCandidatesQuerySchema = paginationQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...dataRangeQuerySchema.shape,
 });

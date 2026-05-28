@@ -14,7 +14,7 @@ export class CommentService {
     readonly prisma: DbClient,
     readonly activityService: ActivityService,
     readonly commentRepo: CommentRepo,
-  ) {}
+  ) { }
 
   async create(data: CreateBodyType, ctx: ResourceContext): Promise<Comment> {
     const dataCreate: Prisma.CommentCreateInput = {
@@ -48,7 +48,7 @@ export class CommentService {
     });
   }
 
-  async reply(data: CreateBodyType, ctx: ResourceContext): Promise<Comment> {
+  async reply(data: CreateBodyType, ctx: ResourceContext): Promise<{ comment: Comment; totalReplies: number }> {
     const dataReply: Prisma.CommentCreateInput = {
       content: data.content,
       parent: {
@@ -81,24 +81,28 @@ export class CommentService {
         tx,
       );
 
-      return comment;
+      const totalReplies = await this.commentRepo.getTotalReplies({ ...ctx, CommentId: ctx.CommentId });
+
+      return { comment, totalReplies };
     });
   }
 
-  async get(ctx: ResourceContext): Promise<Comment> {
+  async get(ctx: ResourceContext): Promise<{ comment: Comment; totalReplies: number }> {
     const comment = await this.commentRepo.get(ctx);
 
     if (!comment) {
       throw new AppError('Comment not found', 404);
     }
 
-    return comment;
+    const totalReplies = await this.commentRepo.getTotalReplies(ctx);
+
+    return { comment, totalReplies };
   }
 
   async listByTask(
     ctx: ResourceContext,
     listCommentsQuery: ListCommentsQueryType,
-  ): Promise<{ comments: Comment[]; paginationMeta: PaginationMetaType }> {
+  ): Promise<{ commentsWithTotalReplies: (Comment & { totalReplies: number })[]; paginationMeta: PaginationMetaType }> {
     const { safePage, safeLimit, skip, take } = buildPagination(
       listCommentsQuery.page,
       listCommentsQuery.limit,
@@ -130,27 +134,41 @@ export class CommentService {
       { skip, take },
     );
 
-    return { comments, paginationMeta };
+    const commentsWithTotalReplies = await Promise.all(
+      comments.map(async (comment) => {
+        const totalReplies = await this.commentRepo.getTotalReplies({ ...ctx, CommentId: comment.id });
+        return { ...comment, totalReplies };
+      })
+    )
+
+    return { commentsWithTotalReplies, paginationMeta };
   }
 
-  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<Comment> {
+  async update(data: UpdateBodyType, ctx: ResourceContext): Promise<{ commentUpdated: Comment; totalReplies: number }> {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);
     }
 
     if (comment.authorId !== ctx.ActorId) {
-      throw new AppError("You don't have permission to delete this comment", 403);
+      throw new AppError("You don't have permission to update this comment", 403, 'NOT_COMMENT_AUTHOR');
     }
 
     const updateData: Prisma.CommentUpdateInput = {
       content: data.content,
     };
 
-    return await this.commentRepo.update(updateData, ctx);
+    const totalReplies = await this.commentRepo.getTotalReplies(ctx);
+
+    const commentUpdated = await this.commentRepo.update(updateData, ctx);
+
+    return {
+      commentUpdated,
+      totalReplies,
+    };
   }
 
-  async remove(ctx: ResourceContext): Promise<Comment> {
+  async remove(ctx: ResourceContext): Promise<{ comment: Comment; totalReplies: number }> {
     const comment = await this.commentRepo.get(ctx);
     if (!comment) {
       throw new AppError('Comment not found', 404);
@@ -162,11 +180,13 @@ export class CommentService {
     }
 
     if (comment.authorId !== ctx.ActorId && !['admin', 'owner'].includes(actor.role)) {
-      throw new AppError("You don't have permission to delete this comment", 403);
+      throw new AppError("You don't have permission to delete this comment", 403, 'NOT_COMMENT_AUTHOR');
     }
 
     return await this.prisma.$transaction(async (tx) => {
       const comment = await this.commentRepo.remove(ctx, tx);
+
+      const totalReplies = await this.commentRepo.getTotalReplies(ctx);
 
       await this.activityService.logActivity(
         ctx.workspaceId,
@@ -178,7 +198,7 @@ export class CommentService {
         tx,
       );
 
-      return comment;
+      return { comment, totalReplies };
     });
   }
 }
