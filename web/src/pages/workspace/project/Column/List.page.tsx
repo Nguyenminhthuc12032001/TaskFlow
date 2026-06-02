@@ -254,12 +254,14 @@ export function ListColumnPage() {
       )
     );
 
+    const action = getQueryLink(searchParams, {
+      page: pagination?.page ?? 1,
+      limit: pagination?.limit ?? 10,
+    })
+
     fetcher.submit(formData, {
       method: "post",
-      action: getQueryLink(searchParams, {
-        page: pagination?.page ?? 1,
-        limit: pagination?.limit ?? 10,
-      }),
+      action: action === "." ? "?index" : `${action}&index`,
     });
   }
 

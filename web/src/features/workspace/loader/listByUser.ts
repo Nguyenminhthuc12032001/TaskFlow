@@ -53,7 +53,6 @@ export async function ListByUserLoader({ request }: LoaderFunctionArgs) {
             } satisfies ActionError
         }
 
-        throw error;
-         // need to handle this error properly in the UI
+        throw error; 
     }
 }

@@ -1,4 +1,4 @@
-import { randomInt, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { jsonRequest, type TestServer } from "./testServer.js";
 import { createdEnvelopeSchema, okEnvelopeSchema } from "../common/utils/response/format.js";
 import { loginResponseSchema } from "../modules/auth/auth.schemas.js";
@@ -756,6 +756,39 @@ export async function linkTask(testServer: TestServer, accessToken: string, work
     assert.equal(parsed.created, true); 
     assert.equal(parsed.data.leadId, leadId);
     assert.equal(parsed.data.taskId, taskId); 
+
+    return {
+        res,
+        body: parsed
+    }
+}
+
+export async function unLinkTask(testServer: TestServer, accessToken: string, workspaceId: string, leadId: string, taskId: string): Promise<{
+    res: Response;
+    body: {
+        ok: true; 
+        data: {
+            leadId: string;
+            taskId: string;
+        };
+    };
+}> {
+    const { res, body } = await jsonRequest(testServer, `/api/leads/${workspaceId}/${leadId}/${taskId}/unlinkTask`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    })
+
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get('content-type') ?? '', /^application\/json/);
+    assert.ok(body);
+
+    const parsed = okEnvelopeSchema(safeLeadTaskLinkSchema).parse(body);
+
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.data.leadId, leadId);
+    assert.equal(parsed.data.taskId, taskId);
 
     return {
         res,

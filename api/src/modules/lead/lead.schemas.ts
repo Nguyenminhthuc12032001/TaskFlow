@@ -12,19 +12,19 @@ import {
 
 // REQUEST
 
-export const listLeadByActorQuerySchema = paginationQuerySchema.safeExtend({
+export const listLeadByActorQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
+  ...paginationQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),
   workspaceId: z.uuid().optional(),
-});
+}).strict();
 export type ListLeadByActorQueryType = z.infer<typeof listLeadByActorQuerySchema>;
 
-export const listLeadsQuerySchema = paginationQuerySchema.safeExtend({
+export const listLeadsQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
+  ...paginationQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),
-});
+}).strict();
 export type ListLeadsQueryType = z.infer<typeof listLeadsQuerySchema>;
 
 export const createBodySchema = z.object({
@@ -52,7 +52,7 @@ export const createBodySchema = z.object({
     .trim()
     .min(5, 'Note must be at least 5 characters long')
     .max(200, 'Note must be at most 100 characters long'),
-});
+}).strict();
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
 export const updateBodySchema = z.object({
@@ -81,12 +81,12 @@ export const updateBodySchema = z.object({
     .min(5, 'Note must be at least 5 characters long')
     .max(200, 'Note must be at most 100 characters long')
     .optional(),
-});
+}).strict();
 export type UpdateBodyType = z.infer<typeof updateBodySchema>;
 
 export const updateStageBodySchema = z.object({
   stage: z.enum(LeadStage),
-});
+}).strict();
 export type UpdateStageBodyType = z.infer<typeof updateStageBodySchema>;
 
 export const createFollowUpTaskBodySchema = z.object({
@@ -108,7 +108,7 @@ export const createFollowUpTaskBodySchema = z.object({
     .int('Position must be an integer')
     .min(0, 'Position must be a positive number')
     .optional(),
-});
+}).strict();
 export type CreateFollowUpBodyType = z.infer<typeof createFollowUpTaskBodySchema>;
 
 // RESPONSE
@@ -143,7 +143,7 @@ export const safeLeadSchema = z.object({
   createdBy: z.uuid(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-});
+}).strict();
 export type SafeLeadType = z.infer<typeof safeLeadSchema>;
 
 export const safeLeadDetailSchema = z.object({
@@ -177,17 +177,17 @@ export const safeLeadDetailSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   taskLinks: z.array(safeTaskSchema),
-});
+}).strict();
 export type SafeLeadDetailType = z.infer<typeof safeLeadDetailSchema>;
 
 export const safeLeadTaskLinkSchema = z.object({
   leadId: z.uuid(),
   taskId: z.uuid(),
-});
+}).strict();
 export type SafeLeadTaskLinkType = z.infer<typeof safeLeadTaskLinkSchema>;
 
 export const safeLeadsSchema = z.object({
   data: z.array(safeLeadSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type SafeLeadsType = z.infer<typeof safeLeadsSchema>;

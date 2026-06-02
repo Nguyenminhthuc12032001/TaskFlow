@@ -132,7 +132,7 @@ registry.registerPath({
       taskId: z.uuid(),
     }),
   },
-  responses: defaultResponse(safeLeadSchema, [201, 409]),
+  responses: defaultResponse(safeLeadTaskLinkSchema, [201, 409]),
 });
 
 registry.registerPath({

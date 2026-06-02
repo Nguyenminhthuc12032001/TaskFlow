@@ -19,7 +19,7 @@ export const searchQuerySchema = z.preprocess((value) => {
   const trimmed = value.trim();
 
   return trimmed.length > 0 ? trimmed : undefined;
-}, z.string('Search query must be greater than 0 characters long').min(1, 'Search query must be at least 1 character long').max(100, 'Search query must be at most 100 characters long').optional());
+}, z.string().min(1, 'Search query must be at least 1 character long').max(100, 'Search query must be at most 100 characters long').optional());
 export type SearchQueryType = z.infer<typeof searchQuerySchema>;
 
 const optionalDateQuerySchema = z.preprocess((value) => {
