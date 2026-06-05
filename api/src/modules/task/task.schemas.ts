@@ -32,7 +32,7 @@ export const createBodySchema = z.object({
     .optional(),
   priority: z.enum(TaskPriority).optional(),
   dueDate: z.coerce.date().optional(),
-});
+}).strict();
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
 export const assignBodySchema = z.object({

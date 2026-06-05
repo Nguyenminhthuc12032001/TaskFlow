@@ -3,8 +3,7 @@ import { z } from '../../docs/zod.js';
 export const emailSchema = z.string().trim().toLowerCase().pipe(z.email('Invalid email address'));
 
 export const passwordSchema = z
-  .string()
-  .trim()
+  .string() 
   .min(8, 'Password must be at least 8 characters')
   .max(72, 'Password must be less than or equal 72 characters');
 
@@ -28,7 +27,7 @@ export type RegisterBody = z.infer<typeof registerBodySchema>;
 export const loginBodySchema = z
   .object({
     email: emailSchema,
-    password: z.string().min(1, 'Password cannot be empty'),
+    password: passwordSchema,
   })
   .strict();
 export type LoginBody = z.infer<typeof loginBodySchema>;
@@ -44,7 +43,7 @@ export type ForgotPasswordBody = z.infer<typeof forgotPasswordBodySchema>;
 // POST auth/reset-password
 export const resetPasswordBodySchema = z
   .object({
-    resetToken: z.string().min(10, 'Invalid reset token'),
+    resetToken: z.string().trim().min(10, 'Invalid reset token'),
     newPassword: passwordSchema,
   })
   .strict();
@@ -53,7 +52,7 @@ export type ResetPasswordBody = z.infer<typeof resetPasswordBodySchema>;
 // POST auth/change-password
 export const changePasswordBodySchema = z
   .object({
-    currentPassword: z.string().min(1, 'Current password cannot be empty'),
+    currentPassword: passwordSchema,
     newPassword: passwordSchema,
   })
   .strict();

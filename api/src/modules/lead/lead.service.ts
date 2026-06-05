@@ -184,7 +184,7 @@ export class LeadService {
       ...(data.note !== undefined && { note: data.note }),
     };
 
-    try { 
+    try {
       return await this.prisma.$transaction(async (tx) => {
         const lead = await this.leadRepo.update(dataUpdate, ctx, tx);
 
@@ -212,6 +212,20 @@ export class LeadService {
   }
 
   async updateStage(data: UpdateStageBodyType, ctx: ResourceContext): Promise<Lead> {
+    const actor = await this.workspaceRepo.findMembership(ctx.workspaceId, ctx.ActorId);
+
+    const lead = await this.leadRepo.get(ctx);
+
+    if (actor && !['admin', 'owner'].includes(actor.role)) {
+      if (lead && lead.createdBy !== ctx.ActorId) {
+        throw new AppError("You don't have permission to update this lead", 403, 'FORBIDDEN');
+      }
+    }
+
+    if (lead && lead.stage === data.stage) {
+      throw new AppError('You cannot update to the same stage', 400, 'BAD_REQUEST');
+    }
+
     const dataUpdateStage: Prisma.LeadUpdateInput = {
       stage: data.stage,
     };
@@ -253,21 +267,29 @@ export class LeadService {
       task: { connect: { id: ctx.TaskId } },
     };
 
-    return await this.prisma.$transaction(async (tx) => {
-      const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
+    try {
+      return await this.prisma.$transaction(async (tx) => {
+        const leadTaskLink = await this.leadRepo.linkTask(dataLinktask, tx);
 
-      await this.activityService.logActivity(
-        ctx.workspaceId,
-        ActivityAction.LINK_TASK,
-        'leadTaskLink',
-        ctx.ActorId,
-        `${leadTaskLink.leadId}`,
-        { leadTaskLink },
-        tx,
-      );
+        await this.activityService.logActivity(
+          ctx.workspaceId,
+          ActivityAction.LINK_TASK,
+          'leadTaskLink',
+          ctx.ActorId,
+          `${leadTaskLink.leadId}`,
+          { leadTaskLink },
+          tx,
+        );
 
-      return leadTaskLink;
-    });
+        return leadTaskLink;
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new AppError('Duplicate link task is not allowed', 409, 'CONFLICT');
+      }
+
+      throw error;
+    }
   }
 
   async unlinkTask(ctx: ResourceContext): Promise<LeadTaskLink> {
@@ -316,24 +338,27 @@ export class LeadService {
     data: CreateFollowUpBodyType,
     ctx: ResourceContext,
   ): Promise<LeadTaskLink> {
-    const tasks = await this.taskRepo.allTasksByColumn(ctx);
+    const actor = await this.workspaceRepo.findMembership(ctx.workspaceId, ctx.ActorId);
+    const lead = await this.leadRepo.get(ctx);
 
-    if (data.position) {
-      if (tasks.some((t) => t.position === data.position)) {
-        throw new AppError('Duplicate task position is not allowed', 409);
+    if (actor && !['admin', 'owner'].includes(actor.role)) {
+      if (lead && lead.createdBy !== ctx.ActorId) {
+        throw new AppError("You don't have permission to create follow up task", 403, 'FORBIDDEN');
       }
     }
 
+    const tasks = await this.taskRepo.allTasksByColumn(ctx); 
+
     const maxPosition = tasks.length > 0 ? Math.max(...tasks.map((t) => t.position)) : 0;
 
-    data.position = maxPosition + 1000;
+    const position = maxPosition + 1000;
 
     const dataCreateTask: Prisma.TaskCreateInput = {
       title: data.title,
       ...(data.description !== undefined && { description: data.description }),
       ...(data.priority !== undefined && { priority: data.priority }),
       ...(data.dueDate !== undefined && { dueDate: data.dueDate }),
-      ...(data.position !== undefined && { position: data.position }),
+      ...(position !== undefined && { position }),
       project: { connect: { id: ctx.projectId } },
       column: { connect: { id: ctx.columnId } },
       creator: { connect: { id: ctx.ActorId } },
@@ -355,7 +380,7 @@ export class LeadService {
         'task',
         ctx.ActorId,
         task.id,
-        { task, leadTaskLink },
+        { task },
         tx,
       );
 

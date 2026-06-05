@@ -9,6 +9,7 @@ import {
   paginationQuerySchema,
   searchQuerySchema,
 } from '../../common/schemas/common.schemas.js';
+import { createBodySchema as createTaskBodySchema } from '../task/task.schemas.js';
 
 // REQUEST
 
@@ -89,26 +90,7 @@ export const updateStageBodySchema = z.object({
 }).strict();
 export type UpdateStageBodyType = z.infer<typeof updateStageBodySchema>;
 
-export const createFollowUpTaskBodySchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(5, 'Title must be at least 5 characters long')
-    .max(100, 'Title must be at most 100 characters long'),
-  description: z
-    .string()
-    .trim()
-    .min(10, 'Description must be at least 10 characters long')
-    .max(100, 'Description must be at most 100 characters long')
-    .optional(),
-  priority: z.enum(TaskPriority).optional(),
-  dueDate: z.coerce.date().optional(),
-  position: z
-    .number()
-    .int('Position must be an integer')
-    .min(0, 'Position must be a positive number')
-    .optional(),
-}).strict();
+export const createFollowUpTaskBodySchema = createTaskBodySchema;
 export type CreateFollowUpBodyType = z.infer<typeof createFollowUpTaskBodySchema>;
 
 // RESPONSE
