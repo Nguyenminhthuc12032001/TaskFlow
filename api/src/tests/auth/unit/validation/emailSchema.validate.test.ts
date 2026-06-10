@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { emailSchema } from "../../../../modules/auth/auth.schemas.js";
 import { describe, it } from "node:test";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 
 void describe("emailSchema", () => {
@@ -112,26 +113,10 @@ void describe("emailSchema", () => {
                     title: 'email contains newline',
                     email: 'abc@gmail.\ncom',
                 },
-                {
-                    title: 'email is null',
-                    email: null,
-                },
-                {
-                    title: 'email is number',
-                    email: 123,
-                },
-                {
-                    title: 'email is boolean',
-                    email: true,
-                },
-                {
-                    title: 'email is object',
-                    email: {},
-                },
-                {
-                    title: 'email is array',
-                    email: ['abc@gmail.com'],
-                },
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `email is ${testValue.label}`,
+                    email: testValue.value,
+                })),
             ];
 
         for (const testCase of cases) {

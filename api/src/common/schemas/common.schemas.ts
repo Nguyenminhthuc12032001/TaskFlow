@@ -2,6 +2,14 @@ import z, { object } from 'zod';
 
 export const emptyBodySchema = z.undefined().or(object({}).strict());
 
+export const positiveIntegerSchema = z.preprocess((value) => {
+  if (value === undefined) return value;
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  if (!/^\d+$/.test(trimmed)) return value;
+  return Number(trimmed);
+}, z.number().int().positive());
+
 export const workspaceParamsSchema = z.object({
   workspaceId: z.uuid(),
   memberId: z.uuid().optional(),
@@ -14,7 +22,7 @@ export const workspaceParamsSchema = z.object({
 export type WorkspaceParamsType = z.infer<typeof workspaceParamsSchema>;
 
 export const searchQuerySchema = z.preprocess((value) => {
-  if (typeof value !== 'string') return undefined;
+  if (typeof value !== 'string') return value;
 
   const trimmed = value.trim();
 
@@ -23,10 +31,19 @@ export const searchQuerySchema = z.preprocess((value) => {
 export type SearchQueryType = z.infer<typeof searchQuerySchema>;
 
 const optionalDateQuerySchema = z.preprocess((value) => {
-  if (typeof value === 'string' && value.trim().length === 0) return undefined;
+  if (value === undefined) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) return value;
+
+    const date = new Date(trimmed);
+
+    if (isNaN(date.getTime())) return value;
+    return date;
+  } 
 
   return value;
-}, z.coerce.date().optional());
+}, z.date().optional());
 
 export const dataRangeQuerySchema = z
   .object({
@@ -45,8 +62,8 @@ export const dataRangeQuerySchema = z
 export type DataRangeQueryType = z.infer<typeof dataRangeQuerySchema>;
 
 export const paginationQuerySchema = z.object({
-  page: z.coerce.number().int().min(1, 'Page must be a positive integer').default(1),
-  limit: z.coerce.number().int().min(1, 'Limit must be a positive integer').default(10),
+  page: positiveIntegerSchema.optional(),
+  limit: positiveIntegerSchema.optional(),
 });
 export type PaginationQueryType = z.infer<typeof paginationQuerySchema>;
 

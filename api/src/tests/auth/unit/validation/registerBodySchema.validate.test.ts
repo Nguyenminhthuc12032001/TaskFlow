@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { registerBodySchema, type RegisterBody } from "../../../../modules/auth/auth.schemas.js";
 import { describe, it } from "node:test";
 import { uniqueEmail } from "../../../helper.js";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('registerBodySchema', () => {
     void it('accept valid payload', async () => {
@@ -180,78 +181,14 @@ void describe('registerBodySchema', () => {
                         password: 'password123',
                     },
                 },
-                {
-                    title: 'name invalid type (null)',
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `name invalid type (${testValue.label})`,
                     payload: {
-                        name: null,
+                        name: testValue.value,
                         email: `${uniqueEmail()}`,
                         password: 'password123',
                     },
-                },
-                {
-                    title: 'name invalid type (number)',
-                    payload: {
-                        name: 123,
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (boolean)',
-                    payload: {
-                        name: true,
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (object)',
-                    payload: {
-                        name: {},
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (array)',
-                    payload: {
-                        name: [],
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (symbol)',
-                    payload: {
-                        name: Symbol(),
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (undefined)',
-                    payload: {
-                        name: undefined,
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (function)',
-                    payload: {
-                        name: () => { },
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name invalid type (date)',
-                    payload: {
-                        name: new Date(),
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
+                })),
             ]
 
         for (const testCase of cases) {
@@ -267,80 +204,14 @@ void describe('registerBodySchema', () => {
         const cases: Array<{
             title: string;
             payload: {};
-        }> = [
-                {
-                    title: 'email invalid type (null)',
-                    payload: {
-                        name: 'Test User',
-                        email: null,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (number)',
-                    payload: {
-                        name: 'Test User',
-                        email: 123,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (boolean)',
-                    payload: {
-                        name: 'Test User',
-                        email: true,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (object)',
-                    payload: {
-                        name: 'Test User',
-                        email: {},
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (array)',
-                    payload: {
-                        name: 'Test User',
-                        email: [],
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (symbol)',
-                    payload: {
-                        name: 'Test User',
-                        email: Symbol(),
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (undefined)',
-                    payload: {
-                        name: 'Test User',
-                        email: undefined,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (function)',
-                    payload: {
-                        name: 'Test User',
-                        email: () => { },
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'email invalid type (date)',
-                    payload: {
-                        name: 'Test User',
-                        email: new Date(),
-                        password: 'password123',
-                    },
-                },
-            ];
+        }> = invalidNonStringValues.map((testValue) => ({
+            title: `email invalid type (${testValue.label})`,
+            payload: {
+                name: 'Test User',
+                email: testValue.value,
+                password: 'password123',
+            },
+        }));
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {
@@ -355,80 +226,14 @@ void describe('registerBodySchema', () => {
         const cases: Array<{
             title: string;
             payload: {};
-        }> = [
-                {
-                    title: 'password invalid type (null)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: null,
-                    },
-                },
-                {
-                    title: 'password invalid type (number)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: 123,
-                    },
-                },
-                {
-                    title: 'password invalid type (boolean)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: true,
-                    },
-                },
-                {
-                    title: 'password invalid type (object)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: {},
-                    },
-                },
-                {
-                    title: 'password invalid type (array)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: [],
-                    },
-                },
-                {
-                    title: 'password invalid type (symbol)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: Symbol(),
-                    },
-                },
-                {
-                    title: 'password invalid type (undefined)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: undefined,
-                    },
-                },
-                {
-                    title: 'password invalid type (function)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: () => { },
-                    },
-                },
-                {
-                    title: 'password invalid type (date)',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                        password: new Date(),
-                    },
-                }
-            ];
+        }> = invalidNonStringValues.map((testValue) => ({
+            title: `password invalid type (${testValue.label})`,
+            payload: {
+                name: 'Test User',
+                email: `${uniqueEmail()}`,
+                password: testValue.value,
+            },
+        }));
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {

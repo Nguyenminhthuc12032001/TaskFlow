@@ -118,7 +118,7 @@ export class WorkspaceService {
     const { safePage, safeLimit, take, skip } = buildPagination(
       listWorkspaceQuery.page,
       listWorkspaceQuery.limit,
-    );
+    ); 
 
     const dateRange = buildDateRange({
       startDate: listWorkspaceQuery.startDate,
@@ -128,16 +128,14 @@ export class WorkspaceService {
     const workspaces = await this.workspaceRepo.findByUserId(
       actorId,
       listWorkspaceQuery.search,
-      dateRange,
-      listWorkspaceQuery.actorRole,
+      dateRange, 
       { take, skip },
     );
 
     const countWorkspacesByUser = await this.workspaceRepo.countWorkspacesByUserId(
       actorId,
       listWorkspaceQuery.search,
-      dateRange,
-      listWorkspaceQuery.actorRole,
+      dateRange, 
     );
 
     const paginationMeta: PaginationMetaType = buildPaginationMeta(

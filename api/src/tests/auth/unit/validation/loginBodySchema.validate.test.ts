@@ -1,7 +1,8 @@
 import assert from "node:assert";
-import { loginBodySchema, registerBodySchema, type LoginBody } from "../../../../modules/auth/auth.schemas.js";
+import { loginBodySchema, type LoginBody } from "../../../../modules/auth/auth.schemas.js";
 import { describe, it } from "node:test";
 import { uniqueEmail } from "../../../helper.js";
+import { invalidNonObjectValues, invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('loginBodySchema', () => {
     void it('accept valid payload', async () => {
@@ -88,22 +89,6 @@ void describe('loginBodySchema', () => {
             email: unknown;
         }> = [
                 {
-                    title: 'email invalid type (null)',
-                    email: null,
-                },
-                {
-                    title: 'email invalid type (number)',
-                    email: 123,
-                },
-                {
-                    title: 'email invalid type (boolean)',
-                    email: true,
-                },
-                {
-                    title: 'email invalid type (array)',
-                    email: [],
-                },
-                {
                     title: 'invalid email format',
                     email: 'invalid-email-format',
                 },
@@ -114,7 +99,11 @@ void describe('loginBodySchema', () => {
                 {
                     title: 'email whitespace only',
                     email: '   ',
-                }
+                },
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `email invalid type (${testValue.label})`,
+                    email: testValue.value,
+                })),
             ];
 
         for (const testCase of cases) {
@@ -135,22 +124,6 @@ void describe('loginBodySchema', () => {
             password: unknown;
         }> = [
                 {
-                    title: 'password invalid type (null)',
-                    password: null,
-                },
-                {
-                    title: 'password invalid type (number)',
-                    password: 123,
-                },
-                {
-                    title: 'password invalid type (boolean)',
-                    password: true,
-                },
-                {
-                    title: 'password invalid type (array)',
-                    password: [],
-                },
-                {
                     title: 'password empty',
                     password: '',
                 },
@@ -165,7 +138,11 @@ void describe('loginBodySchema', () => {
                 {
                     title: 'password length greater than max',
                     password: 'a'.repeat(73)
-                }
+                },
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `password invalid type (${testValue.label})`,
+                    password: testValue.value,
+                })),
             ];
 
         for (const testCase of cases) {
@@ -213,28 +190,31 @@ void describe('loginBodySchema', () => {
         }
     });
 
-    void it('accept exactly password length', async (t) => {
+    void it('accept exactly password length', async (t) => { 
+
         const cases: Array<{
             title: string;
-            password: string;
+            payload: LoginBody;
         }> = [
                 {
                     title: 'password length exactly max',
-                    password: 'a'.repeat(72)
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'a'.repeat(72)
+                    }
                 },
                 {
                     title: 'password length exactly min',
-                    password: 'a'.repeat(8)
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'a'.repeat(8)
+                    }
                 }
             ];
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse({
-                    name: 'Test User',
-                    email: `${uniqueEmail()}`,
-                    password: testCase.password,
-                });
+                const result = loginBodySchema.safeParse(testCase.payload);
 
                 assert.equal(result.success, true);
             });
@@ -270,10 +250,99 @@ void describe('loginBodySchema', () => {
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse(testCase.payload);
+                const result = loginBodySchema.safeParse(testCase.payload);
 
                 assert.equal(result.success, false);
             });
+        }
+    });
+
+    void it('rejects strict object', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: {};
+            unrecognizedKeys: Array<string>;
+        }> = [
+                {
+                    title: 'unknown field',
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'password123',
+                        unknown: 'unknown',
+                    },
+                    unrecognizedKeys: ['unknown'],
+                },
+                {
+                    title: 'multiple unknown fields',
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'password123',
+                        unknown1: 'unknown1',
+                        unknown2: 'unknown2',
+                    },
+                    unrecognizedKeys: ['unknown1', 'unknown2'],
+                },
+                {
+                    title: 'passwordHash is not allowed',
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'password123',
+                        passwordHash: 'passwordHash',
+                    },
+                    unrecognizedKeys: ['passwordHash'],
+                },
+                {
+                    title: 'passwordSalt is not allowed',
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'password123',
+                        passwordSalt: 'passwordSalt',
+                    },
+                    unrecognizedKeys: ['passwordSalt'],
+                },
+                {
+                    title: 'refreshToken is not allowed',
+                    payload: {
+                        email: `${uniqueEmail()}`,
+                        password: 'password123',
+                        refreshToken: 'refreshToken',
+                    },
+                    unrecognizedKeys: ['refreshToken'],
+                }
+            ];
+
+            for (const testCase of cases) {
+                await t.test(testCase.title, () => {
+                    const result = loginBodySchema.safeParse(testCase.payload);
+
+                    const issue = result.error!.issues[0];
+
+                    assert.equal(result.success, false);
+                    assert.equal(issue.code, 'unrecognized_keys');
+                    assert.deepStrictEqual(issue.path, []);
+                    if (issue.code === 'unrecognized_keys') {
+                        assert.deepStrictEqual(issue.keys, testCase.unrecognizedKeys);
+                    } 
+                })
+            }
+    });
+
+    void it('wrong payload type', async (t) => {
+        const cases: Array<{
+          title: string;
+          payload: unknown;  
+        }> = [
+            ...invalidNonObjectValues.map((testValue) => ({
+                title: `payload invalid type (${testValue.label})`,
+                payload: testValue.value,
+            }))
+        ]
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = loginBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false); 
+            })
         }
     });
 });

@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import { resetPasswordBodySchema, type ResetPasswordBody } from "../../../../modules/auth/auth.schemas.js";
 import assert from "node:assert";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('resetPasswordBodySchema', () => {
     void it('accept valid payload', async (t) => {
@@ -87,69 +88,13 @@ void describe('resetPasswordBodySchema', () => {
                 newPassword: string;
             }
         }> = [
-                {
-                    title: 'resetToken invalid type (null)',
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `resetToken invalid type (${testValue.label})`,
                     payload: {
-                        resetToken: null,
+                        resetToken: testValue.value,
                         newPassword: 'password123'
                     }
-                },
-                {
-                    title: 'resetToken invalid type (number)',
-                    payload: {
-                        resetToken: 123,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (boolean)',
-                    payload: {
-                        resetToken: true,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (object)',
-                    payload: {
-                        resetToken: {},
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (array)',
-                    payload: {
-                        resetToken: [],
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (date)',
-                    payload: {
-                        resetToken: new Date(),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (symbol)',
-                    payload: {
-                        resetToken: Symbol(),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (undefined)',
-                    payload: {
-                        resetToken: undefined,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken invalid type (function)',
-                    payload: {
-                        resetToken: () => { },
-                        newPassword: 'password123'
-                    }
-                },
+                })),
                 {
                     title: 'resetToken invalid length (shorter than min)',
                     payload: {
@@ -190,69 +135,13 @@ void describe('resetPasswordBodySchema', () => {
                 newPassword: unknown;
             }
         }> = [
-                {
-                    title: 'newPassword invalid type (null)',
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `newPassword invalid type (${testValue.label})`,
                     payload: {
                         resetToken: 'a'.repeat(10),
-                        newPassword: null
+                        newPassword: testValue.value
                     }
-                },
-                {
-                    title: 'newPassword invalid type (number)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 123
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (boolean)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: true
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (object)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: {}
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (array)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: []
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (date)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: new Date()
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (symbol)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: Symbol()
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (undefined)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: undefined
-                    }
-                },
-                {
-                    title: 'newPassword invalid type (function)',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: () => { }
-                    }
-                },
+                })),
                 {
                     title: 'newPassword is empty',
                     payload: {
@@ -294,8 +183,7 @@ void describe('resetPasswordBodySchema', () => {
                     }
                 }
             ]
-
-        // assert issue code là unrecognized_keys nếu muốn chắc strict behavior
+ 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {
                 const result = resetPasswordBodySchema.safeParse(testCase.payload);

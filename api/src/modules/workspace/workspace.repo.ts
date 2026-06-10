@@ -291,8 +291,7 @@ export class WorkspaceRepo {
   async findByUserId(
     userId: string,
     search: string | undefined,
-    dateRange: DataRangeQueryType,
-    actorRole: WorkspaceRole | undefined,
+    dateRange: DataRangeQueryType, 
     { take, skip }: { take: number; skip: number },
     db: DbOrTxClient = this.prisma,
   ): Promise<WorkspaceWithCreatorAndActorMembership[]> {
@@ -302,8 +301,7 @@ export class WorkspaceRepo {
       where: {
         members: {
           some: {
-            userId,
-            ...(actorRole ? { role: actorRole } : {}),
+            userId, 
           },
         },
         ...(search
@@ -491,8 +489,7 @@ export class WorkspaceRepo {
   async countWorkspacesByUserId(
     userId: string,
     search: string | undefined,
-    dateRange: DataRangeQueryType,
-    actorRole: WorkspaceRole | undefined,
+    dateRange: DataRangeQueryType, 
     db: DbOrTxClient = this.prisma,
   ): Promise<number> {
     const createdAtFilter = buildDateRangeFilter(dateRange);
@@ -501,8 +498,7 @@ export class WorkspaceRepo {
       where: {
         members: {
           some: {
-            userId,
-            ...(actorRole ? { role: actorRole } : {}),
+            userId, 
           },
         },
         ...(search

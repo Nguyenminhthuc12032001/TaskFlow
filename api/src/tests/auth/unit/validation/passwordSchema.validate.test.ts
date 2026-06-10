@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { passwordSchema } from "../../../../modules/auth/auth.schemas.js";
 import { describe, it } from "node:test";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('passwordSchema', () => {
     // valid cases
@@ -81,28 +82,10 @@ void describe('passwordSchema', () => {
         const cases: Array<{
             title: string;
             password: unknown;
-        }> = [
-                {
-                    title: 'password is null',
-                    password: null,
-                },
-                {
-                    title: 'password is number',
-                    password: 12345678,
-                },
-                {
-                    title: 'password is boolean',
-                    password: true,
-                },
-                {
-                    title: 'password is object',
-                    password: {},
-                },
-                {
-                    title: 'password is array',
-                    password: ['a'.repeat(16)],
-                },
-            ]
+        }> = invalidNonStringValues.map((testValue) => ({
+            title: `password is ${testValue.label}`,
+            password: testValue.value,
+        }));
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {

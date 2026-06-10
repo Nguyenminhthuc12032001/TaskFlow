@@ -10,18 +10,17 @@ import {
 
 // ========= REQUEST ==========
 
-export const listWorkspaceQuerySchema = paginationQuerySchema.safeExtend({
+export const listWorkspaceQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
-  actorRole: z.enum(WorkspaceRole).optional(),
-});
+  ...paginationQuerySchema.shape, 
+}).strict();
 export type ListWorkspaceQuery = z.infer<typeof listWorkspaceQuerySchema>;
 
-export const listMemberByWorkspaceQuerySchema = paginationQuerySchema.safeExtend({
+export const listMemberByWorkspaceQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
+  ...paginationQuerySchema.shape,
   role: z.enum(WorkspaceRole).optional(),
-});
+}).strict();
 export type ListMemberByWorkspaceQuery = z.infer<typeof listMemberByWorkspaceQuerySchema>;
 
 export const listInviteeCandidatesQuerySchema = paginationQuerySchema.safeExtend({

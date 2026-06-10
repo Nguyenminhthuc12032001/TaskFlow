@@ -64,7 +64,7 @@ export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
 export const safeUserSchema = z
   .object({
     id: z.uuid(),
-    name: z.string(),
+    name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name must be less than or equal 100 characters'),
     email: emailSchema,
   })
   .strict();
@@ -74,7 +74,7 @@ export type SafeUserResponse = z.infer<typeof safeUserSchema>;
 export const registerResponseSchema = z
   .object({
     user: safeUserSchema,
-    accessToken: z.string(),
+    accessToken: z.string().trim().min(10, 'Invalid access token'),
   })
   .strict();
 export type RegisterResponse = z.infer<typeof registerResponseSchema>;
@@ -83,16 +83,11 @@ export type RegisterResponse = z.infer<typeof registerResponseSchema>;
 export const loginResponseSchema = z
   .object({
     user: safeUserSchema,
-    accessToken: z.string(),
+    accessToken: z.string().trim().min(10, 'Invalid access token'),
   })
   .strict();
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 
 // REFRESH
-export const refreshResponseSchema = z
-  .object({
-    user: safeUserSchema,
-    accessToken: z.string(),
-  })
-  .strict();
+export const refreshResponseSchema = loginResponseSchema;
 export type RefreshResponse = z.infer<typeof refreshResponseSchema>;

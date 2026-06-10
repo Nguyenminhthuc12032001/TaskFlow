@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import { forgotPasswordBodySchema } from "../../../../modules/auth/auth.schemas.js";
 import { uniqueEmail } from "../../../helper.js";
 import assert from "node:assert";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('forgotPasswordBodySchema', () => {
     void it('accept valid payload', async () => {
@@ -140,32 +141,10 @@ void describe('forgotPasswordBodySchema', () => {
         const cases: Array<{
             title: string;
             email: unknown;
-        }> = [
-                {
-                    title: 'email invalid type (null)',
-                    email: null,
-                },
-                {
-                    title: 'email invalid type (number)',
-                    email: 123,
-                },
-                {
-                    title: 'email invalid type (boolean)',
-                    email: true,
-                },
-                {
-                    title: 'email invalid type (array)',
-                    email: [],
-                },
-                {
-                    title: 'email invalid type (object)',
-                    email: {},
-                },
-                {
-                    title: 'email invalid type (symbol)',
-                    email: Symbol(),
-                },
-            ];
+        }> = invalidNonStringValues.map((testValue) => ({
+            title: `email invalid type (${testValue.label})`,
+            email: testValue.value,
+        }));
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {

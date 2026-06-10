@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import { changePasswordBodySchema, type ChangePasswordBody } from "../../../../modules/auth/auth.schemas.js";
 import assert from "node:assert";
+import { invalidNonStringValues } from "../../../validationTestValues.js";
 
 void describe('changePasswordBodySchema', () => {
     void it('accept valid payload', async (t) => {
@@ -99,69 +100,13 @@ void describe('changePasswordBodySchema', () => {
           title: string;
           payload: { }  
         }> = [
-                {
-                    title: 'invalid currentPassword type (null)',
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `invalid currentPassword type (${testValue.label})`,
                     payload: {
-                        currentPassword: null,
+                        currentPassword: testValue.value,
                         newPassword: 'password123'
                     }
-                }, 
-                {
-                    title: 'invalid currentPassword type (number)',
-                    payload: {
-                        currentPassword: 123,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (boolean)',
-                    payload: {
-                        currentPassword: true,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (object)',
-                    payload: {
-                        currentPassword: {},
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (array)',
-                    payload: {
-                        currentPassword: [],
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (date)',
-                    payload: {
-                        currentPassword: new Date(),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (symbol)',
-                    payload: {
-                        currentPassword: Symbol(),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (undefined)',
-                    payload: {
-                        currentPassword: undefined,
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword type (function)',
-                    payload: {
-                        currentPassword: () => { },
-                        newPassword: 'password123'
-                    }
-                },
+                })),
                 {
                     title: 'invalid currentPassword length (longer than max)',
                     payload: {
@@ -199,69 +144,13 @@ void describe('changePasswordBodySchema', () => {
           title: string;
           payload: { }  
         }> = [
-                {
-                    title: 'invalid newPassword type (null)',
+                ...invalidNonStringValues.map((testValue) => ({
+                    title: `invalid newPassword type (${testValue.label})`,
                     payload: {
                         currentPassword: 'password123',
-                        newPassword: null
+                        newPassword: testValue.value
                     }
-                }, 
-                {
-                    title: 'invalid newPassword type (number)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: 123
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (boolean)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: true
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (object)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: {}
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (array)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: []
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (date)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: new Date()
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (symbol)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: Symbol()
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (undefined)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: undefined
-                    }
-                },
-                {
-                    title: 'invalid newPassword type (function)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: () => { }
-                    }
-                },
+                })),
                 {
                     title: 'invalid newPassword length (longer than max)',
                     payload: {
