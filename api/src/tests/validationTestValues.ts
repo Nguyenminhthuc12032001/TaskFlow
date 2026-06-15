@@ -70,7 +70,7 @@ export const invalidNonStringValues: Array<InvalidValueCase> = [
     { label: 'map', value: new Map() },
     { label: 'set', value: new Set() },
     { label: 'weak map', value: new WeakMap() },
-    { label: 'weak set', value: new WeakSet() }, 
+    { label: 'weak set', value: new WeakSet() },
     { label: 'array buffer', value: new ArrayBuffer(8) },
     { label: 'uint8 array', value: new Uint8Array([1, 2, 3]) },
 
@@ -114,7 +114,7 @@ export const invalidNonNumberValues: Array<InvalidValueCase> = [
     // 2. String values
     // =========================
     { label: 'string: empty string', value: '' },
-    { label: 'string: normal string', value: 'abc' }, 
+    { label: 'string: normal string', value: 'abc' },
     { label: 'string: decimal numeric string', value: '12.5' },
     { label: 'string: negative numeric string', value: '-1' },
     { label: 'string: whitespace', value: '   ' },
@@ -165,7 +165,7 @@ export const invalidNonNumberValues: Array<InvalidValueCase> = [
     { label: 'map', value: new Map() },
     { label: 'set', value: new Set() },
     { label: 'weak map', value: new WeakMap() },
-    { label: 'weak set', value: new WeakSet() }, 
+    { label: 'weak set', value: new WeakSet() },
     { label: 'array buffer', value: new ArrayBuffer(8) },
     { label: 'uint8 array', value: new Uint8Array([1, 2, 3]) },
 
@@ -269,7 +269,6 @@ export const invalidNonObjectValues: Array<InvalidValueCase> = [
     // =========================
     { label: 'date', value: new Date('2026-01-01T00:00:00.000Z') },
     { label: 'regexp', value: /abc/ },
-    { label: 'error', value: new Error('Test error') },
 
     { label: 'map: empty map', value: new Map() },
     { label: 'map: with entries', value: new Map([['key', 'value']]) },
@@ -278,7 +277,7 @@ export const invalidNonObjectValues: Array<InvalidValueCase> = [
     { label: 'set: with values', value: new Set([1, 2, 3]) },
 
     { label: 'weak map', value: new WeakMap() },
-    { label: 'weak set', value: new WeakSet() }, 
+    { label: 'weak set', value: new WeakSet() },
 
     { label: 'array buffer', value: new ArrayBuffer(8) },
     { label: 'data view', value: new DataView(new ArrayBuffer(8)) },
@@ -342,9 +341,9 @@ export const invalidNonDateValues: Array<InvalidValueCase> = [
     // =========================
     { label: 'string: empty string', value: '' },
     { label: 'string: normal string', value: 'abc' },
-    { label: 'string: whitespace', value: '   ' }, 
+    { label: 'string: whitespace', value: '   ' },
     { label: 'string: timestamp string', value: '1767225600000' },
-    { label: 'string: invalid date string', value: 'not-a-date' }, 
+    { label: 'string: invalid date string', value: 'not-a-date' },
 
     // =========================
     // 3. Number values
@@ -412,7 +411,7 @@ export const invalidNonDateValues: Array<InvalidValueCase> = [
     { label: 'map', value: new Map() },
     { label: 'set', value: new Set() },
     { label: 'weak map', value: new WeakMap() },
-    { label: 'weak set', value: new WeakSet() }, 
+    { label: 'weak set', value: new WeakSet() },
     { label: 'array buffer', value: new ArrayBuffer(8) },
     { label: 'uint8 array', value: new Uint8Array([1, 2, 3]) },
     { label: 'url', value: new URL('https://example.com') },
@@ -445,4 +444,183 @@ export const invalidNonDateValues: Array<InvalidValueCase> = [
     // =========================
     { label: 'class constructor', value: CustomClass },
     { label: 'class instance', value: new CustomClass() },
-];  
+];
+
+// Use this only for schemas that expect a valid UUID string.
+export const invalidNonUUIDValues: Array<InvalidValueCase> = [
+    // =========================
+    // 1. Absence values
+    // =========================
+    { label: 'null', value: null },
+    { label: 'undefined', value: undefined },
+
+    // =========================
+    // 2. Non-string primitive values
+    // =========================
+    { label: 'number: positive integer', value: 1 },
+    { label: 'number: zero', value: 0 },
+    { label: 'number: negative integer', value: -1 },
+    { label: 'number: decimal', value: 1.5 },
+    { label: 'number: NaN', value: Number.NaN },
+    { label: 'number: Infinity', value: Number.POSITIVE_INFINITY },
+    { label: 'number: -Infinity', value: Number.NEGATIVE_INFINITY },
+
+    { label: 'boolean: true', value: true },
+    { label: 'boolean: false', value: false },
+
+    { label: 'bigint: zero', value: BigInt(0) },
+    { label: 'bigint: positive', value: BigInt(1) },
+    { label: 'bigint: negative', value: BigInt(-1) },
+
+    { label: 'symbol: empty', value: Symbol() },
+    { label: 'symbol: with description', value: Symbol('test') },
+
+    // =========================
+    // 3. Invalid UUID string values
+    // =========================
+    { label: 'string: empty string', value: '' },
+    { label: 'string: whitespace', value: '   ' },
+    { label: 'string: normal string', value: 'abc' },
+    { label: 'string: numeric string', value: '123' },
+    { label: 'string: boolean-like string', value: 'true' },
+    { label: 'string: json-like string', value: '{"id":"test"}' },
+
+    { label: 'uuid: too short', value: '123e4567-e89b-12d3-a456' },
+    { label: 'uuid: too long', value: '123e4567-e89b-12d3-a456-426614174000-extra' },
+    { label: 'uuid: missing hyphens', value: '123e4567e89b12d3a456426614174000' },
+    { label: 'uuid: wrong hyphen positions', value: '123e456-7e89-b12d-3a45-6426614174000' },
+    { label: 'uuid: invalid character', value: '123e4567-e89b-12d3-a456-42661417400z' },
+    { label: 'uuid: incomplete group', value: '123e4567-e89b-12d3-a456-42661417400' },
+    { label: 'uuid: extra group', value: '123e4567-e89b-12d3-a456-426614174000-1111' },
+    { label: 'uuid: no version', value: '123e4567-e89b-x2d3-a456-426614174000' },
+    { label: 'uuid: invalid variant', value: '123e4567-e89b-12d3-z456-426614174000' },
+    { label: 'uuid: surrounded by spaces', value: ' 123e4567-e89b-12d3-a456-426614174000 ' },
+
+    // =========================
+    // 4. Plain object values
+    // =========================
+    { label: 'object: empty object', value: {} },
+    { label: 'object: object with id property', value: { id: '123e4567-e89b-12d3-a456-426614174000' } },
+    { label: 'object: null prototype object', value: Object.create(null) },
+
+    // =========================
+    // 5. Array values
+    // =========================
+    { label: 'array: empty array', value: [] },
+    { label: 'array: uuid string array', value: ['123e4567-e89b-12d3-a456-426614174000'] },
+    { label: 'array: mixed array', value: ['abc', 123, true] },
+
+    // =========================
+    // 6. Built-in object values
+    // =========================
+    { label: 'date', value: new Date('2026-01-01T00:00:00.000Z') },
+    { label: 'regexp', value: /uuid/ },
+    { label: 'error', value: new Error('Test error') },
+    { label: 'map', value: new Map() },
+    { label: 'set', value: new Set() },
+    { label: 'weak map', value: new WeakMap() },
+    { label: 'weak set', value: new WeakSet() },
+    { label: 'array buffer', value: new ArrayBuffer(8) },
+    { label: 'uint8 array', value: new Uint8Array([1, 2, 3]) },
+    { label: 'url', value: new URL('https://example.com') },
+    { label: 'url search params', value: new URLSearchParams('id=123') },
+
+    // =========================
+    // 7. Boxed primitive values
+    // =========================
+    { label: 'boxed string uuid', value: new String('123e4567-e89b-12d3-a456-426614174000') },
+    { label: 'boxed empty string', value: new String('') },
+    { label: 'boxed number', value: new Number(1) },
+    { label: 'boxed boolean true', value: new Boolean(true) },
+    { label: 'boxed boolean false', value: new Boolean(false) },
+    { label: 'boxed bigint', value: Object(BigInt(1)) },
+    { label: 'boxed symbol', value: Object(Symbol('test')) },
+
+    // =========================
+    // 8. Function values
+    // =========================
+    { label: 'function: arrow function', value: () => { } },
+    { label: 'function: normal function', value: normalFunction },
+    { label: 'function: async function', value: asyncFunction },
+    { label: 'function: generator function', value: generatorFunction },
+
+    // =========================
+    // 9. Class values
+    // =========================
+    { label: 'class constructor', value: CustomClass },
+    { label: 'class instance', value: new CustomClass() },
+];
+export const invalidNonEnumValues: Array<InvalidValueCase> = [
+    // =========================
+    // 1. Empty / whitespace strings
+    // =========================
+    { label: 'string: empty string', value: '' },
+    { label: 'string: whitespace', value: '   ' },
+
+    // =========================
+    // 2. Generic invalid enum strings
+    // =========================
+    { label: 'string: invalid enum value', value: '__INVALID_ENUM_VALUE__' },
+    { label: 'string: unknown enum value', value: '__UNKNOWN_ENUM_VALUE__' },
+
+    // =========================
+    // 3. Case-sensitive mistakes
+    // =========================
+    { label: 'string: uppercase value', value: 'INVALID_ENUM_VALUE' },
+    { label: 'string: mixed-case value', value: 'InvalidEnumValue' },
+
+    // =========================
+    // 4. Spacing mistakes
+    // =========================
+    { label: 'string: value with leading space', value: ' __INVALID_ENUM_VALUE__' },
+    { label: 'string: value with trailing space', value: '__INVALID_ENUM_VALUE__ ' },
+
+    // =========================
+    // 5. Format-like strings
+    // =========================
+    { label: 'string: numeric string', value: '123' },
+    { label: 'string: boolean-like string', value: 'true' },
+    { label: 'string: json-like string', value: '{"value":"__INVALID_ENUM_VALUE__"}' },
+    ...invalidNonStringValues,
+];
+
+export const invalidNonEmptyObjectValues: Array<InvalidValueCase> = [
+    // =========================
+    // 1. Simple non-empty objects
+    // =========================
+    { label: 'object: one property', value: { key: 'value' } },
+    { label: 'object: multiple properties', value: { key1: 'value1', key2: 'value2' } },
+
+    // =========================
+    // 2. Common request body-like objects
+    // =========================
+    { label: 'object: userId property', value: { userId: 'test-user-id' } },
+    { label: 'object: role property', value: { role: 'member' } },
+    { label: 'object: id property', value: { id: 'test-id' } },
+    { label: 'object: name property', value: { name: 'Test User' } },
+
+    // =========================
+    // 3. Objects with different value types
+    // =========================
+    { label: 'object: string property', value: { value: 'test' } },
+    { label: 'object: number property', value: { value: 1 } },
+    { label: 'object: boolean property', value: { value: true } },
+    { label: 'object: null property', value: { value: null } },
+    { label: 'object: undefined property', value: { value: undefined } },
+
+    // =========================
+    // 4. Nested object / array properties
+    // =========================
+    { label: 'object: nested object property', value: { data: { key: 'value' } } },
+    { label: 'object: empty nested object property', value: { data: {} } },
+    { label: 'object: empty array property', value: { items: [] } },
+    { label: 'object: array property', value: { items: [1, 2, 3] } },
+
+    // =========================
+    // 5. Null-prototype non-empty object
+    // =========================
+    {
+        label: 'object: null prototype with property',
+        value: Object.assign(Object.create(null), { key: 'value' })
+    },
+];

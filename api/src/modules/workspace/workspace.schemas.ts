@@ -3,6 +3,7 @@ import { safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import {
   dataRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -23,10 +24,10 @@ export const listMemberByWorkspaceQuerySchema = dataRangeQuerySchema.safeExtend(
 }).strict();
 export type ListMemberByWorkspaceQuery = z.infer<typeof listMemberByWorkspaceQuerySchema>;
 
-export const listInviteeCandidatesQuerySchema = paginationQuerySchema.safeExtend({
+export const listInviteeCandidatesQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
-});
+  ...paginationQuerySchema.shape,
+}).strict();
 export type ListInviteeCandidatesQuery = z.infer<typeof listInviteeCandidatesQuerySchema>;
 
 // POST workspace/create
@@ -36,7 +37,7 @@ export const createBodySchema = z.object({
     .trim()
     .min(2, 'Name must be at least 2 characters long')
     .max(100, 'Name must be at most 100 characters long'),
-});
+}).strict();
 export type CreateWorkspaceBody = z.infer<typeof createBodySchema>;
 
 // Put workspace/:id
@@ -46,20 +47,20 @@ export const updateBodySchema = z.object({
     .trim()
     .min(2, 'Name must be at least 2 characters long')
     .max(100, 'Name must be at most 100 characters long'),
-});
+}).strict();
 export type UpdateWorkspaceBody = z.infer<typeof updateBodySchema>;
 
 // POST workspace/invite/:id
 export const inviteBodySchema = z.object({
   userId: z.uuid(),
   role: z.enum(WorkspaceRole),
-});
+}).strict();
 export type InviteBody = z.infer<typeof inviteBodySchema>;
 
 // POST workspace/accept_invite
 export const acceptBodySchema = z.object({
-  token: z.string(),
-});
+  token: z.string().trim().min(10, 'Invalid token'),
+}).strict();
 export type AcceptBody = z.infer<typeof acceptBodySchema>;
 
 // DELETE workspace/remove_member/:workspaceId/:memberId
@@ -69,12 +70,12 @@ export const removeMemberBodySchema = z.undefined().or(z.object({}).strict());
 
 // POST workspace/create
 export const createResponseSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdBy: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-});
+  id: z.uuid(),
+  name: z.string().trim().min(2, 'Name must be at least 2 characters long').max(100, 'Name must be at most 100 characters long'),
+  createdBy: z.uuid(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
+}).strict();
 export type SafeWorkspaceResponse = z.infer<typeof createResponseSchema>;
 
 // Get workspace/list
@@ -82,6 +83,7 @@ export const workspaceListItemResponseSchema = createResponseSchema.extend({
   createdByName: z.string(),
   role: z.enum(WorkspaceRole),
 });
+export type SafeWorkspaceListItemResponse = z.infer<typeof workspaceListItemResponseSchema>;
 
 export const getByUserIdResponseSchema = z.object({
   data: z.array(workspaceListItemResponseSchema),

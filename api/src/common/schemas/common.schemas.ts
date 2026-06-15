@@ -40,10 +40,25 @@ const optionalDateQuerySchema = z.preprocess((value) => {
 
     if (isNaN(date.getTime())) return value;
     return date;
-  } 
+  }
 
   return value;
 }, z.date().optional());
+
+export const dateSchema = z.preprocess((value) => {
+  if (value === undefined) return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) return value;
+
+    const date = new Date(trimmed);
+
+    if (isNaN(date.getTime())) return value;
+    return date;
+  }
+
+  return value;
+}, z.date());
 
 export const dataRangeQuerySchema = z
   .object({

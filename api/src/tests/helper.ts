@@ -12,6 +12,100 @@ import { safeColumnsSchema } from "../modules/column/column.schemas.js";
 import { safeCommentSchema } from "../modules/comment/comment.schemas.js";
 import { safeLeadSchema, safeLeadTaskLinkSchema, type CreateBodyType as CreateLeadBodyType } from "../modules/lead/lead.schemas.js";
 import { faker } from '@faker-js/faker';
+import type { InvalidValueCase } from "./validationTestValues.js"; 
+import type z from "zod";
+
+export const getRequiredFields = <T extends object>(schema: z.ZodType<T> , validPayload: T): Array<keyof T & string> => {
+    const fields = Object.keys(validPayload) as Array<keyof T & string>;
+
+    return fields.filter((field) => {
+        const validPayloadWithoutField = omitFields(validPayload, [field]);
+        const result = schema.safeParse(validPayloadWithoutField);
+
+        if (result.success) {
+            return false;
+        }
+        
+        return result.error.issues.some((issue) => issue.path[0] === field);
+    })
+}; 
+
+type MissingRequiredFieldCase<T extends Record<string, unknown>> = {
+    title: string;
+    payload: unknown;
+    missingFields: Array<keyof T & string>;
+}
+
+export const createMissingRequiredFieldCases = <T extends Record<string, unknown>>(schema: z.ZodType<T>, validPayload: T): Array<MissingRequiredFieldCase<T>> => {
+    const requiredFields = getRequiredFields(schema, validPayload);
+
+    return getKeyCombinations(requiredFields).map((combination) => {
+        return {
+            title: `missing required field ${combination.join(', ')}`,
+            payload: omitFields(validPayload, combination),
+            missingFields: combination
+        } satisfies MissingRequiredFieldCase<T>
+    });
+}
+
+export const omitFields = <T extends object, K extends keyof T>(obj: T, fields: K[]): Omit<T, K> => {
+    const result = { ...obj };
+    for (const field of fields) {
+        delete result[field];
+    }
+    return result;
+};
+
+export const getKeyCombinations = <T extends PropertyKey>(keys: T[]): T[][] => {
+    const combinations: T[][] = [];
+
+    for (let mask = 1; mask < 2 ** keys.length; mask++) {
+        const combination: T[] = [];
+        for (let i = 0; i < keys.length; i++) {
+            if (mask & (1 << i)) {
+                combination.push(keys[i]);
+            }
+        }
+        combinations.push(combination);
+    }
+
+    return combinations;
+};
+
+export type InvalidCasesByField<T extends Record<string, unknown>> = {
+    [K in keyof T]: ReadonlyArray<InvalidValueCase>;
+};
+
+export const cartesianProduct = <T>(arrays: ReadonlyArray<ReadonlyArray<T>>): T[][] => {
+    return arrays.reduce<T[][]>(
+        (acc, array) => acc.flatMap((x) => array.map((y) => [...x, y])),
+        [[]],
+    )
+}
+
+export const createSingleInvalidFieldCases = <T extends Record<string, unknown>>(
+    validPayload: T,
+    invalidCasesByField: InvalidCasesByField<T>,
+): Array<{
+    title: string;
+    payload: Record<string, unknown>;
+    invalidField: keyof T & string;
+}> => {
+    const fields = Object.keys(invalidCasesByField) as Array<keyof T & string>;
+
+    return fields.flatMap((field) => {
+        const invalidValues = invalidCasesByField[field] ?? [];
+
+        return invalidValues.map((invalidValue) => ({
+            title: `rejects ${field}: ${invalidValue.label}`,
+            payload: {
+                ...validPayload,
+                [field]: invalidValue.value,
+            },
+            invalidField: field,
+        }));
+    });
+};
 
 export const uniqueEmail = (): string => `auth-${randomUUID()}@auth.test`;
 export const uniquePhoneNumber = (): string => {
@@ -753,9 +847,9 @@ export async function linkTask(testServer: TestServer, accessToken: string, work
     const parsed = createdEnvelopeSchema(safeLeadTaskLinkSchema).parse(body);
 
     assert.equal(parsed.ok, true);
-    assert.equal(parsed.created, true); 
+    assert.equal(parsed.created, true);
     assert.equal(parsed.data.leadId, leadId);
-    assert.equal(parsed.data.taskId, taskId); 
+    assert.equal(parsed.data.taskId, taskId);
 
     return {
         res,
@@ -766,7 +860,7 @@ export async function linkTask(testServer: TestServer, accessToken: string, work
 export async function unLinkTask(testServer: TestServer, accessToken: string, workspaceId: string, leadId: string, taskId: string): Promise<{
     res: Response;
     body: {
-        ok: true; 
+        ok: true;
         data: {
             leadId: string;
             taskId: string;
