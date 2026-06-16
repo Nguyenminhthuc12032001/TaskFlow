@@ -88,7 +88,7 @@ export type SafeWorkspaceListItemResponse = z.infer<typeof workspaceListItemResp
 export const getByUserIdResponseSchema = z.object({
   data: z.array(workspaceListItemResponseSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
 // Get workspace/:workspaceId

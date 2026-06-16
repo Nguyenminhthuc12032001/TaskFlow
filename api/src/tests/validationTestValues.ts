@@ -624,3 +624,205 @@ export const invalidNonEmptyObjectValues: Array<InvalidValueCase> = [
         value: Object.assign(Object.create(null), { key: 'value' })
     },
 ];
+
+export const invalidNonBooleanValues: Array<InvalidValueCase> = [
+    // =========================
+    // 1. Absence values
+    // =========================
+    { label: 'null', value: null },
+    { label: 'undefined', value: undefined },
+
+    // =========================
+    // 2. String values
+    // =========================
+    { label: 'string: empty string', value: '' },
+    { label: 'string: normal string', value: 'abc' },
+    { label: 'string: boolean-like string true', value: 'true' },
+    { label: 'string: boolean-like string false', value: 'false' },
+    { label: 'string: numeric string', value: '123' },
+    { label: 'string: whitespace', value: '   ' },
+    { label: 'string: json-like string', value: '{"value":true}' },
+
+    // =========================
+    // 3. Number values
+    // =========================
+    { label: 'number: positive integer', value: 1 },
+    { label: 'number: zero', value: 0 },
+    { label: 'number: negative integer', value: -1 },
+    { label: 'number: decimal', value: 1.5 },
+    { label: 'number: NaN', value: Number.NaN },
+    { label: 'number: Infinity', value: Number.POSITIVE_INFINITY },
+    { label: 'number: -Infinity', value: Number.NEGATIVE_INFINITY },
+
+    // =========================
+    // 4. BigInt values
+    // =========================
+    { label: 'bigint: zero', value: BigInt(0) },
+    { label: 'bigint: positive', value: BigInt(1) },
+    { label: 'bigint: negative', value: BigInt(-1) },
+
+    // =========================
+    // 5. Symbol values
+    // =========================
+    { label: 'symbol: empty', value: Symbol() },
+    { label: 'symbol: with description', value: Symbol('test') },
+
+    // =========================
+    // 6. Plain object values
+    // =========================
+    { label: 'object: empty object', value: {} },
+    { label: 'object: object with boolean property', value: { value: true } },
+    { label: 'object: null prototype object', value: Object.create(null) },
+
+    // =========================
+    // 7. Array values
+    // =========================
+    { label: 'array: empty array', value: [] },
+    { label: 'array: boolean array', value: [true, false] },
+    { label: 'array: single boolean array', value: [true] },
+    { label: 'array: string boolean array', value: ['true'] },
+    { label: 'array: mixed array', value: [true, 'false', 1] },
+
+    // =========================
+    // 8. Built-in object values
+    // =========================
+    { label: 'date', value: new Date('2026-01-01T00:00:00.000Z') },
+    { label: 'regexp', value: /true/ },
+    { label: 'error', value: new Error('Test error') },
+    { label: 'map', value: new Map() },
+    { label: 'set', value: new Set() },
+    { label: 'weak map', value: new WeakMap() },
+    { label: 'weak set', value: new WeakSet() },
+    { label: 'array buffer', value: new ArrayBuffer(8) },
+    { label: 'uint8 array', value: new Uint8Array([1, 2, 3]) },
+    { label: 'url', value: new URL('https://example.com') },
+    { label: 'url search params', value: new URLSearchParams('value=true') },
+
+    // =========================
+    // 9. Boxed primitive values
+    // These look close to primitive values,
+    // but their typeof is "object".
+    // =========================
+    { label: 'boxed boolean true', value: new Boolean(true) },
+    { label: 'boxed boolean false', value: new Boolean(false) },
+    { label: 'boxed string true', value: new String('true') },
+    { label: 'boxed string false', value: new String('false') },
+    { label: 'boxed number one', value: new Number(1) },
+    { label: 'boxed number zero', value: new Number(0) },
+    { label: 'boxed bigint', value: Object(BigInt(1)) },
+    { label: 'boxed symbol', value: Object(Symbol('test')) },
+
+    // =========================
+    // 10. Function values
+    // =========================
+    { label: 'function: arrow function', value: () => { } },
+    { label: 'function: normal function', value: normalFunction },
+    { label: 'function: async function', value: asyncFunction },
+    { label: 'function: generator function', value: generatorFunction },
+
+    // =========================
+    // 11. Class values
+    // =========================
+    { label: 'class constructor', value: CustomClass },
+    { label: 'class instance', value: new CustomClass() },
+];
+
+// Use this only for schemas that expect an array.
+export const invalidNonArrayValues: Array<InvalidValueCase> = [
+    // =========================
+    // 1. Absence values
+    // =========================
+    { label: 'null', value: null },
+    { label: 'undefined', value: undefined },
+
+    // =========================
+    // 2. String values
+    // =========================
+    { label: 'string: empty string', value: '' },
+    { label: 'string: normal string', value: 'abc' },
+    { label: 'string: numeric string', value: '123' },
+    { label: 'string: whitespace', value: '   ' },
+    { label: 'string: array-like string', value: '[1,2,3]' },
+    { label: 'string: json-like array string', value: '[{"id":"test"}]' },
+
+    // =========================
+    // 3. Number values
+    // =========================
+    { label: 'number: positive integer', value: 1 },
+    { label: 'number: zero', value: 0 },
+    { label: 'number: negative integer', value: -1 },
+    { label: 'number: decimal', value: 1.5 },
+    { label: 'number: NaN', value: Number.NaN },
+    { label: 'number: Infinity', value: Number.POSITIVE_INFINITY },
+    { label: 'number: -Infinity', value: Number.NEGATIVE_INFINITY },
+
+    // =========================
+    // 4. Boolean values
+    // =========================
+    { label: 'boolean: true', value: true },
+    { label: 'boolean: false', value: false },
+
+    // =========================
+    // 5. BigInt values
+    // =========================
+    { label: 'bigint: zero', value: BigInt(0) },
+    { label: 'bigint: positive', value: BigInt(1) },
+    { label: 'bigint: negative', value: BigInt(-1) },
+
+    // =========================
+    // 6. Symbol values
+    // =========================
+    { label: 'symbol: empty', value: Symbol() },
+    { label: 'symbol: with description', value: Symbol('test') },
+
+    // =========================
+    // 7. Plain object values
+    // =========================
+    { label: 'object: empty object', value: {} },
+    { label: 'object: object with properties', value: { id: 'test-id' } },
+    { label: 'object: object with array property', value: { items: [1, 2, 3] } },
+    { label: 'object: null prototype object', value: Object.create(null) },
+
+    // =========================
+    // 8. Built-in object values
+    // =========================
+    { label: 'date', value: new Date('2026-01-01T00:00:00.000Z') },
+    { label: 'regexp', value: /array/ },
+    { label: 'error', value: new Error('Test error') },
+    { label: 'map', value: new Map() },
+    { label: 'set', value: new Set() },
+    { label: 'weak map', value: new WeakMap() },
+    { label: 'weak set', value: new WeakSet() },
+    { label: 'array buffer', value: new ArrayBuffer(8) },
+    { label: 'data view', value: new DataView(new ArrayBuffer(8)) },
+    { label: 'uint8 array typed array', value: new Uint8Array([1, 2, 3]) },
+    { label: 'url', value: new URL('https://example.com') },
+    { label: 'url search params', value: new URLSearchParams('items=1,2,3') },
+
+    // =========================
+    // 9. Boxed primitive values
+    // These look close to primitive values,
+    // but their typeof is "object".
+    // =========================
+    { label: 'boxed string', value: new String('abc') },
+    { label: 'boxed empty string', value: new String('') },
+    { label: 'boxed number', value: new Number(1) },
+    { label: 'boxed boolean true', value: new Boolean(true) },
+    { label: 'boxed boolean false', value: new Boolean(false) },
+    { label: 'boxed bigint', value: Object(BigInt(1)) },
+    { label: 'boxed symbol', value: Object(Symbol('test')) },
+
+    // =========================
+    // 10. Function values
+    // =========================
+    { label: 'function: arrow function', value: () => { } },
+    { label: 'function: normal function', value: normalFunction },
+    { label: 'function: async function', value: asyncFunction },
+    { label: 'function: generator function', value: generatorFunction },
+
+    // =========================
+    // 11. Class values
+    // =========================
+    { label: 'class constructor', value: CustomClass },
+    { label: 'class instance', value: new CustomClass() },
+];
