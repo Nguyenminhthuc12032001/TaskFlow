@@ -93,21 +93,23 @@ export type SafeWorkspacesResponse = z.infer<typeof getByUserIdResponseSchema>;
 
 // Get workspace/:workspaceId
 export const getByIdResponseSchema = createResponseSchema.extend({
-  createdByName: z.string(),
-});
+  createdByName: z.string().trim().min(2, 'Name must be at least 2 characters long').max(100, 'Name must be at most 100 characters long'),
+}).strict();
 export type SafeWorkspaceDetailResponse = z.infer<typeof getByIdResponseSchema>;
 
 // Put workspace/:workspaceId
 export const updateResponseSchema = createResponseSchema;
+export type SafeWorkspaceUpdateResponse = z.infer<typeof updateResponseSchema>;
 
 // DELETE workspace/:workspaceId
 export const deleteResponseSchema = createResponseSchema;
+export type SafeWorkspaceDeleteResponse = z.infer<typeof deleteResponseSchema>;
 
 export const safeMemberResponseSchema = z.object({
   user: safeUserSchema,
   role: z.enum(WorkspaceRole),
-  joinedAt: z.coerce.date(),
-});
+  joinedAt: dateSchema,
+}).strict();
 export type SafeMemberResponse = z.infer<typeof safeMemberResponseSchema>;
 
 // GET workspace/members/:workspaceId
