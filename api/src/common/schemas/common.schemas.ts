@@ -18,7 +18,7 @@ export const workspaceParamsSchema = z.object({
   taskId: z.uuid().optional(),
   commentId: z.uuid().optional(),
   leadId: z.uuid().optional(),
-});
+}).strict();
 export type WorkspaceParamsType = z.infer<typeof workspaceParamsSchema>;
 
 export const searchQuerySchema = z.preprocess((value) => {
@@ -73,13 +73,13 @@ export const dataRangeQuerySchema = z
         path: ['startDate'],
       });
     }
-  });
+  }).strict();
 export type DataRangeQueryType = z.infer<typeof dataRangeQuerySchema>;
 
 export const paginationQuerySchema = z.object({
   page: positiveIntegerSchema.optional(),
   limit: positiveIntegerSchema.optional(),
-});
+}).strict();
 export type PaginationQueryType = z.infer<typeof paginationQuerySchema>;
 
 export const paginationMetaSchema = z.object({
@@ -89,5 +89,5 @@ export const paginationMetaSchema = z.object({
   totalPages: z.number().int().min(0),
   hasNextPage: z.boolean(),
   hasPrevPage: z.boolean(),
-});
+}).strict();
 export type PaginationMetaType = z.infer<typeof paginationMetaSchema>;

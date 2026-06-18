@@ -276,16 +276,6 @@ void describe('safeMemberResponseSchema', () => {
     });
 
     void it('rejects invalid payload type', async (t) => {
-        const validPayload: SafeMemberResponse = {
-            user: {
-                id: `${randomUUID()}`,
-                name: 'Test User',
-                email: uniqueEmail(),
-            },
-            role: WorkspaceRole.member,
-            joinedAt: new Date()
-        };
-
         const cases: Array<{
             title: string;
             payload: unknown;

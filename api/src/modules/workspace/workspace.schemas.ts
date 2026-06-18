@@ -1,5 +1,5 @@
 import z from '../../docs/zod.js';
-import { safeUserSchema } from '../auth/auth.schemas.js';
+import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import {
   dataRangeQuerySchema,
@@ -116,27 +116,27 @@ export type SafeMemberResponse = z.infer<typeof safeMemberResponseSchema>;
 export const membersResponseSchema = z.object({
   data: z.array(safeMemberResponseSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type SafeMembersResponse = z.infer<typeof membersResponseSchema>;
 
 // GET workspace/invitees/:workspaceId
 export const inviteCandidatesResponseSchema = z.object({
   data: z.array(safeUserSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type InviteCandidatesResponse = z.infer<typeof inviteCandidatesResponseSchema>;
 
 // POST workspace/invite/:workspaceId
 export const inviteResponseSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   workspaceId: z.uuid(),
-  email: z.string(),
+  email: emailSchema,
   role: z.enum(WorkspaceRole),
-  jti: z.string(),
-  tokenHash: z.string(),
-  createdAt: z.coerce.date(),
+  jti: z.uuid(),
+  tokenHash: z.string().trim().min(10, 'Token hash must be at least 10 characters long').max(100, 'Token hash must be at most 100 characters long'),
+  createdAt: dateSchema,
   createdBy: z.uuid(),
-});
+}).strict();
 export type InviteResponse = z.infer<typeof inviteResponseSchema>;
 
 // POST workspace/accept_invite
@@ -144,16 +144,16 @@ export const acceptResponseSchema = z.object({
   role: z.enum(WorkspaceRole),
   userId: z.uuid(),
   workspaceId: z.uuid(),
-  joinedAt: z.coerce.date(),
-});
+  joinedAt: dateSchema,
+}).strict();
 export type AcceptResponse = z.infer<typeof acceptResponseSchema>;
 
 // DELETE workspace/remove_member/:workspaceId/:memberId
 export const removeMemberResponseSchema = z.object({
   userId: z.uuid(),
-  deletedAt: z.coerce.date(),
+  deletedAt: dateSchema,
   workspaceId: z.uuid(),
   role: z.enum(WorkspaceRole),
-  joinedAt: z.coerce.date(),
-});
+  joinedAt: dateSchema,
+}).strict();
 export type RemoveMemberResponse = z.infer<typeof removeMemberResponseSchema>;
