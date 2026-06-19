@@ -826,3 +826,5 @@ export const invalidNonArrayValues: Array<InvalidValueCase> = [
     { label: 'class constructor', value: CustomClass },
     { label: 'class instance', value: new CustomClass() },
 ];
+
+

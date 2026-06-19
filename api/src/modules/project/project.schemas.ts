@@ -1,5 +1,6 @@
 import {
   dataRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -8,10 +9,10 @@ import z from '../../docs/zod.js';
 
 // REQUEST
 
-export const listProjectsQuerySchema = paginationQuerySchema.safeExtend({
+export const listProjectsQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
-});
+  ...paginationQuerySchema.shape,
+}).strict();
 export type ListProjectsQueryType = z.infer<typeof listProjectsQuerySchema>;
 
 export const createBodySchema = z.object({
@@ -26,7 +27,7 @@ export const createBodySchema = z.object({
     .min(10, 'Description must be at least 10 characters long')
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
-});
+}).strict();
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
 export const updateBodySchema = z.object({
@@ -34,14 +35,15 @@ export const updateBodySchema = z.object({
     .string()
     .trim()
     .min(2, 'Name must be at least 2 characters long')
-    .max(100, 'Name must be at most 100 characters long'),
+    .max(100, 'Name must be at most 100 characters long')
+    .optional(),
   description: z
     .string()
     .trim()
     .min(10, 'Description must be at least 10 characters long')
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
-});
+}).strict();
 export type UpdateBodyType = z.infer<typeof updateBodySchema>;
 
 // RESPONSE
@@ -58,14 +60,15 @@ export const safeProjectResponseSchema = z.object({
     .string()
     .trim()
     .min(10, 'Name must be at least 10 characters long')
-    .max(100, 'Name must be at most 100 characters long'),
-  createdAt: z.coerce.date(),
+    .max(100, 'Name must be at most 100 characters long')
+    .optional(),
+  createdAt: dateSchema,
   createdBy: z.uuid(),
-});
+}).strict();
 export type SafeProjectResponseType = z.infer<typeof safeProjectResponseSchema>;
 
 export const listProjectsResponseSchema = z.object({
   data: z.array(safeProjectResponseSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type ListProjectResponseType = z.infer<typeof listProjectsResponseSchema>;
