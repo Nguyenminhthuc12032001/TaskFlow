@@ -2,6 +2,7 @@ import z from '../../docs/zod.js';
 import { ColumnType } from '../../../prisma/generated/enums.js';
 import {
   dataRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -9,11 +10,11 @@ import {
 
 // REQUEST
 
-export const listColumnQuerySchema = paginationQuerySchema.safeExtend({
+export const listColumnQuerySchema = dataRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
+  ...paginationQuerySchema.shape,
   type: z.enum(ColumnType).optional(),
-});
+}).strict();
 export type ListColumnQueryType = z.infer<typeof listColumnQuerySchema>;
 
 export const createBodySchema = z
@@ -97,8 +98,8 @@ export const safeColumnSchema = z.object({
     .int('Position must be an integer')
     .min(0, 'Position must be greater than or equal to 0'),
   type: z.enum(ColumnType),
-  createdAt: z.coerce.date(),
-});
+  createdAt: dateSchema,
+}).strict();
 export type SafeColumnType = z.infer<typeof safeColumnSchema>;
 
 export const safeColumnsSchema = z.object({
@@ -127,5 +128,5 @@ export const safeColumnsSchema = z.object({
     });
   }),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type SafeColumnsType = z.infer<typeof safeColumnsSchema>;
