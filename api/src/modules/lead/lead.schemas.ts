@@ -1,10 +1,11 @@
-import { LeadStage, TaskPriority } from '../../../prisma/generated/enums.js';
+import { LeadStage } from '../../../prisma/generated/enums.js';
 import z from '../../docs/zod.js';
 import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { safeTaskSchema } from '../task/task.schemas.js';
 import {
   dataRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -37,6 +38,7 @@ export const createBodySchema = z.object({
   email: emailSchema.optional(),
   phone: z
     .string()
+    .trim()
     .refine(isValidPhoneNumber, {
       message: 'Is valid phone number',
     })
@@ -66,6 +68,7 @@ export const updateBodySchema = z.object({
   email: emailSchema.optional(),
   phone: z
     .string()
+    .trim()
     .refine(isValidPhoneNumber, {
       message: 'Is valid phone number',
     })
@@ -123,8 +126,8 @@ export const safeLeadSchema = z.object({
     .min(5, 'Note must be at least 5 characters long')
     .max(200, 'Note must be at most 100 characters long'),
   createdBy: z.uuid(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
 }).strict();
 export type SafeLeadType = z.infer<typeof safeLeadSchema>;
 
@@ -156,8 +159,8 @@ export const safeLeadDetailSchema = z.object({
     .min(5, 'Note must be at least 5 characters long')
     .max(200, 'Note must be at most 100 characters long'),
   createdBy: z.uuid(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
   taskLinks: z.array(safeTaskSchema),
 }).strict();
 export type SafeLeadDetailType = z.infer<typeof safeLeadDetailSchema>;
