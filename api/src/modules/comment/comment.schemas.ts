@@ -1,5 +1,6 @@
 import {
   dataRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -50,8 +51,8 @@ export const safeCommentSchema = z
       .trim()
       .min(5, 'Comment must be at least 5 characters long')
       .max(100, 'Comment must be at most 100 characters long'),
-    createdAt: z.coerce.date(),
-    updatedAt: z.coerce.date(),
+    createdAt: dateSchema,
+    updatedAt: dateSchema,
     totalReplies: z.number().int().min(0),
   })
   .strict();
@@ -67,7 +68,7 @@ export const safeCommentsSchema = z
           ctx.addIssue({
             code: 'custom',
             message: 'Duplicate id is not allowed',
-            path: [index, 'commentId'],
+            path: [index, 'id'],
           });
         }
         idSet.add(item.id);
