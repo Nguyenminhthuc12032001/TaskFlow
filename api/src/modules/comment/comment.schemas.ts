@@ -1,5 +1,5 @@
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
   dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
@@ -9,7 +9,7 @@ import z from '../../docs/zod.js';
 
 // REQUEST
 
-export const listCommentsQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listCommentsQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
   parentId: z.uuid().optional(),

@@ -1,7 +1,8 @@
 import z from '../../docs/zod.js';
 import { TaskPriority } from '../../../prisma/generated/enums.js';
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
+  dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
   searchQuerySchema,
@@ -10,10 +11,10 @@ import { safeUserSchema } from '../auth/auth.schemas.js';
 
 // REQUEST
 
-export const listTaskByColumnQuerySchema = paginationQuerySchema.safeExtend({
+export const listTaskByColumnQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
-  ...dataRangeQuerySchema.shape,
-  dueDateRange: dataRangeQuerySchema.optional(),
+  ...paginationQuerySchema.shape,
+  dueDateRange: dateRangeQuerySchema.optional(),
   priority: z.enum(TaskPriority).optional(),
 });
 export type ListTaskByColumnQueryType = z.infer<typeof listTaskByColumnQuerySchema>;
@@ -31,13 +32,13 @@ export const createBodySchema = z.object({
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
   priority: z.enum(TaskPriority).optional(),
-  dueDate: z.coerce.date().optional(),
+  dueDate: dateSchema.optional(),
 }).strict();
 export type CreateBodyType = z.infer<typeof createBodySchema>;
 
 export const assignBodySchema = z.object({
   userId: z.uuid(),
-});
+}).strict();
 export type AssignBodyType = z.infer<typeof assignBodySchema>;
 
 export const updateBodySchema = z.object({
@@ -54,8 +55,8 @@ export const updateBodySchema = z.object({
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
   priority: z.enum(TaskPriority).optional(),
-  dueDate: z.coerce.date().optional(),
-});
+  dueDate: dateSchema.optional(),
+}).strict();
 export type UpdateBodyType = z.infer<typeof updateBodySchema>;
 
 export const reOrderBodySchema = z
@@ -101,7 +102,7 @@ export const bulkRemoveBodySchema = z
   .array(
     z.object({
       taskId: z.uuid(),
-    }),
+    }).strict(),
   )
   .min(1, 'Bulk remove id cannot be empty')
   .superRefine((items, ctx) => {
@@ -120,6 +121,12 @@ export const bulkRemoveBodySchema = z
   });
 export type BulkRemoveBodyType = z.infer<typeof bulkRemoveBodySchema>;
 
+export const safeAssigneeSchema = z.object({
+  taskId: z.uuid(),
+  userId: z.uuid(),
+}).strict();
+export type SafeAssignee = z.infer<typeof safeAssigneeSchema>;
+
 // Response
 export const safeTaskSchema = z.object({
   id: z.uuid(),
@@ -137,46 +144,33 @@ export const safeTaskSchema = z.object({
     .max(100, 'Description must be at most 100 characters long')
     .optional(),
   priority: z.enum(TaskPriority),
-  dueDate: z.coerce.date().optional(),
+  dueDate: dateSchema.optional(),
   position: z
     .number()
     .int('Position must be an integer')
     .min(0, 'Position must be a positive number')
     .optional(),
   createdBy: z.uuid(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: dateSchema,
+  updatedAt: dateSchema,
   assignees: z
-    .array(
-      z.object({
-        taskId: z.uuid(),
-        userId: z.uuid(),
-      }),
-    )
+    .array(safeAssigneeSchema)
     .optional(),
-});
+}).strict();
 export type SafeTask = z.infer<typeof safeTaskSchema>;
 
 export const safeTasksSchema = z.object({
   data: z.array(safeTaskSchema),
   paginationMeta: paginationMetaSchema,
-});
+}).strict();
 export type SafeTasks = z.infer<typeof safeTasksSchema>;
 
-export const safeAssigneeSchema = z.object({
-  taskId: z.uuid(),
-  userId: z.uuid(),
-});
-export type SafeAssignee = z.infer<typeof safeAssigneeSchema>;
-
-export const safeTaskDetailAssigneeSchema = z.object({
-  taskId: z.uuid(),
-  userId: z.uuid(),
+export const safeAssigneeDetailSchema = safeAssigneeSchema.extend({
   user: safeUserSchema,
-});
-export type SafeTaskDetailAssignee = z.infer<typeof safeTaskDetailAssigneeSchema>;
+})
+export type SafeTaskDetailAssignee = z.infer<typeof safeAssigneeDetailSchema>;
 
 export const safeTaskDetailSchema = safeTaskSchema.extend({
-  assignees: z.array(safeTaskDetailAssigneeSchema),
-});
+  assignees: z.array(safeAssigneeDetailSchema),
+}).strict();
 export type SafeTaskDetail = z.infer<typeof safeTaskDetailSchema>;

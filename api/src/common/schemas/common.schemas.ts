@@ -60,7 +60,7 @@ export const dateSchema = z.preprocess((value) => {
   return value;
 }, z.date());
 
-export const dataRangeQuerySchema = z
+export const dateRangeQuerySchema = z
   .object({
     startDate: optionalDateQuerySchema,
     endDate: optionalDateQuerySchema,
@@ -74,7 +74,7 @@ export const dataRangeQuerySchema = z
       });
     }
   }).strict();
-export type DataRangeQueryType = z.infer<typeof dataRangeQuerySchema>;
+export type DataRangeQueryType = z.infer<typeof dateRangeQuerySchema>;
 
 export const paginationQuerySchema = z.object({
   page: positiveIntegerSchema.optional(),

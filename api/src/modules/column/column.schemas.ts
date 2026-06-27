@@ -1,7 +1,7 @@
 import z from '../../docs/zod.js';
 import { ColumnType } from '../../../prisma/generated/enums.js';
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
   dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
@@ -10,7 +10,7 @@ import {
 
 // REQUEST
 
-export const listColumnQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listColumnQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
   type: z.enum(ColumnType).optional(),

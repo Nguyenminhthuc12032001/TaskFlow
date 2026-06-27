@@ -1,5 +1,5 @@
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
   dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
@@ -9,7 +9,7 @@ import z from '../../docs/zod.js';
 
 // REQUEST
 
-export const listProjectsQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listProjectsQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
 }).strict();

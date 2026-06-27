@@ -2,7 +2,7 @@ import z from '../../docs/zod.js';
 import { emailSchema, safeUserSchema } from '../auth/auth.schemas.js';
 import { WorkspaceRole } from '../../../prisma/generated/enums.js';
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
   dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
@@ -11,20 +11,20 @@ import {
 
 // ========= REQUEST ==========
 
-export const listWorkspaceQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listWorkspaceQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape, 
 }).strict();
 export type ListWorkspaceQuery = z.infer<typeof listWorkspaceQuerySchema>;
 
-export const listMemberByWorkspaceQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listMemberByWorkspaceQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
   role: z.enum(WorkspaceRole).optional(),
 }).strict();
 export type ListMemberByWorkspaceQuery = z.infer<typeof listMemberByWorkspaceQuerySchema>;
 
-export const listInviteeCandidatesQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listInviteeCandidatesQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
 }).strict();

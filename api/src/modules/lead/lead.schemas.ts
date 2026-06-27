@@ -4,7 +4,7 @@ import { emailSchema } from '../auth/auth.schemas.js';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import { safeTaskSchema } from '../task/task.schemas.js';
 import {
-  dataRangeQuerySchema,
+  dateRangeQuerySchema,
   dateSchema,
   paginationMetaSchema,
   paginationQuerySchema,
@@ -14,7 +14,7 @@ import { createBodySchema as createTaskBodySchema } from '../task/task.schemas.j
 
 // REQUEST
 
-export const listLeadByActorQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listLeadByActorQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),
@@ -22,7 +22,7 @@ export const listLeadByActorQuerySchema = dataRangeQuerySchema.safeExtend({
 }).strict();
 export type ListLeadByActorQueryType = z.infer<typeof listLeadByActorQuerySchema>;
 
-export const listLeadsQuerySchema = dataRangeQuerySchema.safeExtend({
+export const listLeadsQuerySchema = dateRangeQuerySchema.safeExtend({
   search: searchQuerySchema,
   ...paginationQuerySchema.shape,
   stage: z.enum(LeadStage).optional(),
