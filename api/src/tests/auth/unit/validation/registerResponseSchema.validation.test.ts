@@ -1,173 +1,161 @@
 import { randomUUID } from "node:crypto";
 import { describe, it } from "node:test";
-import { uniqueEmail } from "../../../helper.js";
+import { createMissingRequiredFieldCases, createSingleInvalidFieldCases, uniqueEmail, type InvalidCasesByField } from "../../../helper.js";
 import { registerResponseSchema, type RegisterResponse } from "../../../../modules/auth/auth.schemas.js";
 import assert from "node:assert";
-import { invalidNonStringValues } from "../../../validationTestValues.js";
+import { invalidNonObjectValues, invalidNonStringValues } from "../../../validationTestValues.js";
 
-void describe('registerResponseSchema', () => {
-    void it('accept valid payload', async () => {
-        const payload: RegisterResponse = {
-            user: {
-                id: `${randomUUID()}`,
-                name: 'Test User',
-                email: `  ${uniqueEmail()}  `,
-            },
-            accessToken: 'accessToken'
-        }
+const validPayload: RegisterResponse = {
+    user: {
+        id: `${randomUUID()}`,
+        name: 'Test User',
+        email: `${uniqueEmail()}`,
+    },
+    accessToken: 'accessToken'
+}
 
-        const result = registerResponseSchema.safeParse(payload);
-
-        assert.ok(result.success);
-        payload.user.email = payload.user.email.trim().toLowerCase();
-        assert.deepEqual(result.data, payload);
-    });
-
-    void it('rejects when required fields is missing', async (t) => { 
-         
-        const cases: Array<{
-            title: string,
-            payload: {}
-        }> = [
-                {
-                    title: 'missing user',
-                    payload: {
-                        accessToken: 'accessToken'
-                    }
-                },
-                {
-                    title: 'missing accessToken',
-                    payload: {
-                        user: {
-                            id: `${randomUUID()}`,
-                            name: 'Test User',
-                            email: `  ${uniqueEmail()}  `,
-                        }
-                    }
-                },
-                {
-                    title: 'missing both user and accessToken',
-                    payload: {}
-                }
-            ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, async () => {
-                const result = registerResponseSchema.safeParse(testCase.payload);
-                assert.ok(!result.success);
-            });
-        }
-    });
-
-    void it('rejects when nested user invalid', async (t) => {
+void describe('login_refreshResponseSchema', () => {
+    void it('accept valid payload', async (t) => {
         const cases: Array<{
             title: string;
-            payload: unknown; 
-        }> = 
-        [
-            ...invalidNonStringValues.map((testValue) => ({
-                title: `email invalid type (${testValue.label})`,
-                payload: {
-                    user: {
-                        id: `${randomUUID()}`,
-                        name: 'Test User',
-                        email: testValue.value
-                    },
-                    accessToken: 'accessToken'
-                }
-            })),
-            ...invalidNonStringValues.map((testValue) => ({
-                title: `name invalid type (${testValue.label})`,
-                payload: {
-                    user: {
-                        id: `${randomUUID()}`,
-                        name: testValue.value,
-                        email: `  ${uniqueEmail()}  `,
-                    },
-                    accessToken: 'accessToken'
-                }
-            })),
-            ...invalidNonStringValues.map((testValue) => ({
-                title: `id invalid type (${testValue.label})`,
-                payload: {
-                    user: {
-                        id: testValue.value,
-                        name: 'Test User',
-                        email: `  ${uniqueEmail()}  `,
-                    },
-                    accessToken: 'accessToken'
-                }
-            }))
-        ]
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, async () => {
-                const result = registerResponseSchema.safeParse(testCase.payload);
-                assert.equal(result.success, false); 
-            })
-        }
-    });
-
-    void it('rejects accessToken invalid', async (t) => {
-        const cases: Array<{
-          title: string;
-          payload: unknown;  
+            payload: unknown;
         }> = [
-            ...invalidNonStringValues.map((testValue) => ({
-                title: `accessToken invalid type (${testValue.label})`,
-                payload: {
-                    user: {
-                        id: `${randomUUID()}`,
-                        name: 'Test User',
-                        email: `  ${uniqueEmail()}  `,
-                    },
-                    accessToken: testValue.value
+                {
+                    title: 'valid normal payload',
+                    payload: validPayload
+                },
+                {
+                    title: 'accept valid payload with leading/trailing whitespace',
+                    payload: {
+                        user: {
+                            ...validPayload.user,
+                            name: ` ${validPayload.user.name} `,
+                            email: `   ${validPayload.user.email}   `,
+                        },
+                        accessToken: `  ${validPayload.accessToken}  `
+                    }
+                },
+                {
+                    title: 'accept valid payload with exactly min length accessToken',
+                    payload: {
+                        ...validPayload,
+                        accessToken: 'a'.repeat(10)
+                    }
                 }
-            }))
-        ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, async () => {
-                const result = registerResponseSchema.safeParse(testCase.payload);
-                assert.equal(result.success, false); 
-            })
-        }
-    });
-
-    void it('accept accessToken length exactly 10 chars', async (t) => {
-        const cases: Array<{
-          title: string;
-          payload: RegisterResponse;  
-        }> = [
-            {
-                title: 'accessToken length exactly 10 chars',
-                payload: {
-                    user: {
-                        id: `${randomUUID()}`,
-                        name: 'Test User',
-                        email: `  ${uniqueEmail()}  `,
-                    },
-                    accessToken: 'accessToken'
-                }
-            },
-            {
-                title: 'accessToken length exactly 10 chars after trim',
-                payload: {
-                    user: {
-                        id: `${randomUUID()}`,
-                        name: 'Test User',
-                        email: `  ${uniqueEmail()}  `,
-                    },
-                    accessToken: 'accessToken'
-                }
-            }
-        ]; 
+            ]
 
         for (const testCase of cases) {
             await t.test(testCase.title, async () => {
                 const result = registerResponseSchema.safeParse(testCase.payload);
                 assert.ok(result.success);
+                if (testCase.title === 'accept valid payload with min length accessToken') {
+                    assert.deepStrictEqual(result.data, testCase.payload);
+                }
             })
         }
     });
+
+    void it('rejects missing required fields', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            missingFields: string[]
+        }> = createMissingRequiredFieldCases(registerResponseSchema, validPayload);
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = registerResponseSchema.safeParse(testCase.payload);
+                assert.equal(result.success, false);
+                const codes = result.error!.issues.map((issue) => issue.code);
+                const paths = result.error!.issues.map((issue) => issue.path[0]);
+                assert.deepStrictEqual(codes.every((code) => code === 'invalid_type'), true);
+                assert.deepStrictEqual(paths.sort(), testCase.missingFields.sort());
+            })
+        }
+    });
+
+    void it('rejects invalid fields', async (t) => {
+        const invalidCasesByField: InvalidCasesByField<RegisterResponse> = {
+            user: invalidNonObjectValues,
+            accessToken: invalidNonStringValues
+        } 
+
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            invalidField: string
+        }> = createSingleInvalidFieldCases(validPayload, invalidCasesByField);
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, () => {
+                const result = registerResponseSchema.safeParse(testCase.payload);
+
+                assert.equal(result.success, false);
+                const code = result.error!.issues[0].code;
+                const path = result.error!.issues[0].path[0];
+                assert.ok(code === 'invalid_type' || code === 'invalid_format' || code === 'invalid_value');
+                assert.deepStrictEqual(path, testCase.invalidField);
+            })
+        }
+    });
+
+    void it('rejects invalid payload type', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+        }> = invalidNonObjectValues.filter((test) => typeof test.value !== 'object').map((test) => ({
+            title: `rejects invalid payload type ${test.label}`,
+            payload: test.value
+        }))
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = registerResponseSchema.safeParse(testCase.payload);
+                assert.equal(result.success, false); 
+                const issues = result.error!.issues[0];
+                assert.equal(issues.code, 'invalid_type');
+            })
+        }
+    });
+
+    void it('rejects unknown fields', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            unknownFields: Array<string>
+        }> = [
+            {
+                title: 'rejects unknown fields',
+                payload: {
+                    ...validPayload,
+                    unknown: 'unknown'
+                },
+                unknownFields: ['unknown']
+            },
+            {
+                title: 'rejects multiple unknown fields',
+                payload: {
+                    ...validPayload,
+                    unknown: 'unknown',
+                    anotherUnknown: 'anotherUnknown'
+                },
+                unknownFields: ['unknown', 'anotherUnknown']
+            }
+        ]
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = await registerResponseSchema.safeParseAsync(testCase.payload);
+                assert.equal(result.success, false);
+                const issuses = result.error!.issues;
+                const code = issuses[0].code;
+                const path = issuses[0].path;
+                assert.ok(code === 'unrecognized_keys');
+                assert.deepStrictEqual(path, []);
+                if (code === 'unrecognized_keys') {
+                    assert.deepStrictEqual(issuses[0].keys, testCase.unknownFields);
+                }
+            })
+        }
+    })
 });

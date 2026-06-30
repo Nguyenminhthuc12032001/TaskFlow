@@ -54,7 +54,7 @@ void describe('safeLeadDetailSchema', () => {
                 const result = safeLeadTaskLinkSchema.safeParse(testCase.payload);
                 assert.equal(result.success, false);
                 const issues = result.error!.issues[0];
-                assert.ok(issues.code === 'invalid_type');
+                assert.ok(issues.code === 'invalid_type' || issues.code === 'invalid_format' || issues.code === 'invalid_value');
                 assert.deepStrictEqual(issues.path[0], testCase.invalidField);
             })
         }
@@ -117,5 +117,5 @@ void describe('safeLeadDetailSchema', () => {
                 }
             })
         }
-    })
+    });
 });

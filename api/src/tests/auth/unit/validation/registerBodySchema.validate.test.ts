@@ -1,253 +1,108 @@
 import assert from "node:assert";
 import { registerBodySchema, type RegisterBody } from "../../../../modules/auth/auth.schemas.js";
 import { describe, it } from "node:test";
-import { uniqueEmail } from "../../../helper.js";
-import { invalidNonStringValues } from "../../../validationTestValues.js";
+import { createMissingRequiredFieldCases, createSingleInvalidFieldCases, uniqueEmail, type InvalidCasesByField } from "../../../helper.js";
+import { invalidNonObjectValues, invalidNonStringValues } from "../../../validationTestValues.js";
+
+const validPayload: RegisterBody = {
+    name: 'Test User',
+    email: `${uniqueEmail()}`,
+    password: 'password123',
+};
 
 void describe('registerBodySchema', () => {
-    void it('accept valid payload', async () => {
-        const payload: RegisterBody = {
-            name: 'Test User',
-            email: `${uniqueEmail()}`,
-            password: 'password123',
-        };
-
-        const result = registerBodySchema.safeParse(payload);
-
-        assert.ok(result.success);
-        assert.deepEqual(result.data, payload);
-    });
-
-    void it('trim whitespace from name/email ', async (t) => {
-        const payload: RegisterBody = {
-            name: 'Test User',
-            email: `${uniqueEmail()}`,
-            password: 'password123',
-        };
-
+    void it('accept valid payload', async (t) => {
         const cases: Array<{
             title: string;
             payload: RegisterBody;
         }> = [
                 {
-                    title: 'trim name',
+                    title: 'valid payload',
+                    payload: validPayload,
+                },
+                {
+                    title: 'accept valid payload with leading/trailing whitespace',
                     payload: {
-                        ...payload,
-                        name: '   Test User   ',
+                        ...validPayload,
+                        name: `   ${validPayload.name}   `,
                     },
                 },
                 {
-                    title: 'trim email',
+                    title: 'accept valid payload with exactly max length name',
                     payload: {
-                        ...payload,
-                        email: `   ${payload.email}   `,
+                        ...validPayload,
+                        name: 'a'.repeat(100),
                     },
                 },
-            ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse(testCase.payload);
-
-                assert.ok(result.success);
-                assert.equal(result.data.name, testCase.payload.name.trim());
-                assert.equal(result.data.email, testCase.payload.email.toLowerCase().trim());
-                assert.equal(result.data.password, testCase.payload.password);
-            });
-        }
-    });
-
-    void it('accept name length exactly max/min', async (t) => {
-        const cases: Array<{
-            title: string;
-            name: string;
-        }> = [
                 {
-                    title: 'name length exactly max',
-                    name: 'a'.repeat(100)
-                },
-                {
-                    title: 'name length exactly min',
-                    name: 'a'.repeat(2)
+                    title: 'accept valid payload with exactly min length name',
+                    payload: {
+                        ...validPayload,
+                        name: 'a'.repeat(2),
+                    },
                 }
             ]
 
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse({
-                    name: testCase.name,
-                    email: `${uniqueEmail()}`,
-                    password: 'password123',
-                });
+            for (const testCase of cases) {
+                await t.test(testCase.title, () => {
+                    const result = registerBodySchema.safeParse(testCase.payload);
+                    assert.ok(result.success);
+                    testCase.payload.name = testCase.payload.name.trim();
+                    assert.deepStrictEqual(result.data, testCase.payload);
+                })
+            }
+    });
 
-                assert.ok(result.success);
-                assert.equal(result.data.name, testCase.name);
-            });
+    void it('rejects missing required fields', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            missingFields: string[]
+        }> = createMissingRequiredFieldCases(registerBodySchema, validPayload);
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = registerBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false);
+                const codes = result.error!.issues.map((issue) => issue.code);
+                const paths = result.error!.issues.map((issue) => issue.path[0]);
+                assert.deepStrictEqual(codes.every((code) => code === 'invalid_type'), true);
+                assert.deepStrictEqual(paths.sort(), testCase.missingFields.sort());
+            })
         }
     });
 
-    void it('accept password length exactly max/min', async (t) => {
-        const cases: Array<{
-            title: string;
-            password: string;
-        }> = [
-                {
-                    title: 'password length exactly max',
-                    password: 'a'.repeat(72)
-                },
-                {
-                    title: 'password length exactly min',
-                    password: 'a'.repeat(8)
-                }
-            ]
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse({
-                    name: 'Test User',
-                    email: `${uniqueEmail()}`,
-                    password: testCase.password,
-                });
-
-                assert.ok(result.success);
-                assert.equal(result.data.password, testCase.password);
-            });
+    void it('rejects invalid fields', async (t) => {
+        const invalidCasesByField: InvalidCasesByField<RegisterBody> = {
+            name: invalidNonStringValues,
+            email: invalidNonStringValues,
+            password: invalidNonStringValues
         }
-    });
 
-    void it('rejects missing name/email/password', async (t) => {
         const cases: Array<{
             title: string;
-            payload: Partial<RegisterBody>;
-        }> = [
-                {
-                    title: 'missing name',
-                    payload: {
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'missing email',
-                    payload: {
-                        name: 'Test User',
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'missing password',
-                    payload: {
-                        name: 'Test User',
-                        email: `${uniqueEmail()}`,
-                    },
-                },
-            ];
+            payload: unknown;
+            invalidField: string
+        }> = createSingleInvalidFieldCases(validPayload, invalidCasesByField);
 
         for (const testCase of cases) {
             await t.test(testCase.title, () => {
                 const result = registerBodySchema.safeParse(testCase.payload);
 
                 assert.equal(result.success, false);
-            });
+                const code = result.error!.issues[0].code;
+                const path = result.error!.issues[0].path[0];
+                assert.ok(code === 'invalid_type' || code === 'invalid_format' || code === 'invalid_value');
+                assert.deepStrictEqual(path, testCase.invalidField);
+            })
         }
     });
 
-    void it('invalid name cases', async (t) => {
+    void it('rejects unknown fields', async (t) => {
         const cases: Array<{
             title: string;
-            payload: {};
-        }> = [
-                {
-                    title: 'name length less than min',
-                    payload: {
-                        name: 'a'.repeat(1),
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name length greater than max',
-                    payload: {
-                        name: 'a'.repeat(101),
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                {
-                    title: 'name whitespace only',
-                    payload: {
-                        name: '   ',
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                },
-                ...invalidNonStringValues.map((testValue) => ({
-                    title: `name invalid type (${testValue.label})`,
-                    payload: {
-                        name: testValue.value,
-                        email: `${uniqueEmail()}`,
-                        password: 'password123',
-                    },
-                })),
-            ]
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('invalid email cases', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {};
-        }> = invalidNonStringValues.map((testValue) => ({
-            title: `email invalid type (${testValue.label})`,
-            payload: {
-                name: 'Test User',
-                email: testValue.value,
-                password: 'password123',
-            },
-        }));
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('invalid password cases', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {};
-        }> = invalidNonStringValues.map((testValue) => ({
-            title: `password invalid type (${testValue.label})`,
-            payload: {
-                name: 'Test User',
-                email: `${uniqueEmail()}`,
-                password: testValue.value,
-            },
-        }));
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = registerBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('strict object cases', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {};
+            payload: unknown;
+            unrecognizedKeys: Array<string>;
         }> = [
                 {
                     title: 'unknown field',
@@ -257,6 +112,7 @@ void describe('registerBodySchema', () => {
                         password: 'password123',
                         unknown: 'unknown',
                     },
+                    unrecognizedKeys: ['unknown'],
                 },
                 {
                     title: 'multiple unknown fields',
@@ -267,6 +123,7 @@ void describe('registerBodySchema', () => {
                         unknown1: 'unknown1',
                         unknown2: 'unknown2',
                     },
+                    unrecognizedKeys: ['unknown1', 'unknown2'],
                 }
             ];
 
@@ -275,43 +132,32 @@ void describe('registerBodySchema', () => {
                 const result = registerBodySchema.safeParse(testCase.payload);
 
                 assert.equal(result.success, false);
+                const issue = result.error!.issues[0];
+                assert.equal(issue.code, 'unrecognized_keys');
+                assert.deepStrictEqual(issue.path, []);
+                if (issue.code === 'unrecognized_keys') {
+                    assert.deepStrictEqual(issue.keys, testCase.unrecognizedKeys);
+                }
             });
         }
     });
 
-    void it('wrong payload type', async (t) => {
+    void it('rejects invalid payload type', async (t) => {
         const cases: Array<{
             title: string;
             payload: unknown;
-        }> = [
-                {
-                    title: 'payload invalid type (null)',
-                    payload: null,
-                },
-                {
-                    title: 'payload invalid type (number)',
-                    payload: 123,
-                },
-                {
-                    title: 'payload invalid type (boolean)',
-                    payload: true,
-                },
-                {
-                    title: 'payload invalid type (array)',
-                    payload: [],
-                },
-                {
-                    title: 'payload invalid type (string)',
-                    payload: 'a'.repeat(100),
-                }
-            ];
+        }> = invalidNonObjectValues.filter((test) => typeof test.value !== 'object').map((test) => ({
+            title: `rejects invalid payload type ${test.label}`,
+            payload: test.value
+        }))
 
         for (const testCase of cases) {
-            await t.test(testCase.title, () => {
+            await t.test(testCase.title, async () => {
                 const result = registerBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
+                assert.equal(result.success, false); 
+                const issues = result.error!.issues[0];
+                assert.equal(issues.code, 'invalid_type');
+            })
         }
     });
 });

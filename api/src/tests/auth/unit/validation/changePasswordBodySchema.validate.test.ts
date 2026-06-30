@@ -1,7 +1,13 @@
 import { describe, it } from "node:test";
 import { changePasswordBodySchema, type ChangePasswordBody } from "../../../../modules/auth/auth.schemas.js";
 import assert from "node:assert";
-import { invalidNonStringValues } from "../../../validationTestValues.js";
+import { invalidNonObjectValues, invalidNonStringValues } from "../../../validationTestValues.js";
+import { createMissingRequiredFieldCases, createSingleInvalidFieldCases, type InvalidCasesByField } from "../../../helper.js";
+
+const validPayload: ChangePasswordBody = {
+    currentPassword: 'password123',
+    newPassword: 'password123'
+}
 
 void describe('changePasswordBodySchema', () => {
     void it('accept valid payload', async (t) => {
@@ -10,45 +16,28 @@ void describe('changePasswordBodySchema', () => {
             payload: ChangePasswordBody;
         }> = [
                 {
-                    title: 'valid payload',
+                    title: 'valid normail payload',
+                    payload: validPayload
+                },
+                {
+                    title: 'accept valid payload with leading/trailing whitespace',
                     payload: {
-                        currentPassword: 'password123',
-                        newPassword: 'password123'
+                        currentPassword: '   password123   ',
+                        newPassword: '   password123   '
                     }
                 },
                 {
-                    title: 'valid payload with ',
+                    title: 'accept valid payload with maximum length of fields',
                     payload: {
-                        currentPassword: '  password123 ',
-                        newPassword: ' password1234   '
-                    }
-                },
-                {
-                    title: 'new password exactly min length',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: 'a'.repeat(8)
-                    }
-                },
-                {
-                    title: 'new password exactly max length',
-                    payload: {
-                        currentPassword: 'password123',
+                        currentPassword: 'a'.repeat(72),
                         newPassword: 'a'.repeat(72)
                     }
                 },
                 {
-                    title: 'current password exactly min length',
+                    title: 'accept valid payload with minimum length of fields',
                     payload: {
                         currentPassword: 'a'.repeat(8),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'current password exactly max length',
-                    payload: {
-                        currentPassword: 'a'.repeat(72),
-                        newPassword: 'password123'
+                        newPassword: 'a'.repeat(8)
                     }
                 }
             ];
@@ -66,127 +55,53 @@ void describe('changePasswordBodySchema', () => {
     void it('rejects missing required field', async (t) => {
         const cases: Array<{
             title: string,
-            payload: Partial<ChangePasswordBody>
-        }> = [
-                {
-                    title: 'missing currentPassword',
-                    payload: {
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'missing newPassword',
-                    payload: {
-                        currentPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'missing both currentPassword and newPassword',
-                    payload: {}
-                }
-            ];
+            payload: unknown;
+            missingFields: string[]
+        }> = createMissingRequiredFieldCases(changePasswordBodySchema, validPayload);
             
             for (const testCase of cases) {
                 await t.test(testCase.title, () => {
                     const result = changePasswordBodySchema.safeParse(testCase.payload);
 
                     assert.equal(result.success, false);
+                    const codes = result.error!.issues.map((issue) => issue.code);
+                    const paths = result.error!.issues.map((issue) => issue.path[0]);
+                    assert.deepStrictEqual(codes.every((code) => code === 'invalid_type'), true);
+                    assert.deepStrictEqual(paths.sort(), testCase.missingFields.sort());
                 })
             }
     });
 
-    void it('rejects invalid current password', async (t) => {
+    void it('rejects invalid fields', async (t) => {
+        const invalidCasesByField: InvalidCasesByField<ChangePasswordBody> = {
+            currentPassword: invalidNonStringValues,
+            newPassword: invalidNonStringValues
+        }
+
         const cases: Array<{
           title: string;
-          payload: { }  
-        }> = [
-                ...invalidNonStringValues.map((testValue) => ({
-                    title: `invalid currentPassword type (${testValue.label})`,
-                    payload: {
-                        currentPassword: testValue.value,
-                        newPassword: 'password123'
-                    }
-                })),
-                {
-                    title: 'invalid currentPassword length (longer than max)',
-                    payload: {
-                        currentPassword: 'a'.repeat(73),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword length (shorter than min)',
-                    payload: {
-                        currentPassword: 'a'.repeat(7),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'invalid currentPassword is empty',
-                    payload: {
-                        currentPassword: '',
-                        newPassword: 'password123'
-                    }
-                },
-            ]; 
+          payload: unknown;
+          invalidField: string
+        }> = createSingleInvalidFieldCases(validPayload, invalidCasesByField);
 
             for (const testCase of cases) {
                 await t.test(testCase.title, () => {
                     const result = changePasswordBodySchema.safeParse(testCase.payload);
 
                     assert.equal(result.success, false);
+                    const code = result.error!.issues[0].code;
+                    const path = result.error!.issues[0].path[0];
+                    assert.ok(code === 'invalid_type' || code === 'invalid_format' || code === 'invalid_value');
+                    assert.deepStrictEqual(path, testCase.invalidField);
                 })
             }
     });
 
-    void it('rejects invalid new password', async (t) => {
+    void it('rejects unknown fields', async (t) => {
         const cases: Array<{
           title: string;
-          payload: { }  
-        }> = [
-                ...invalidNonStringValues.map((testValue) => ({
-                    title: `invalid newPassword type (${testValue.label})`,
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: testValue.value
-                    }
-                })),
-                {
-                    title: 'invalid newPassword length (longer than max)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: 'a'.repeat(73)
-                    }
-                },
-                {
-                    title: 'invalid newPassword length (shorter than min)',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: 'a'.repeat(7)
-                    }
-                },
-                {
-                    title: 'invalid newPassword is empty',
-                    payload: {
-                        currentPassword: 'password123',
-                        newPassword: ''
-                    }
-                }
-        ]
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = changePasswordBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            })
-        }
-    });
-
-    void it('rejects strict object mode', async (t) => {
-        const cases: Array<{
-          title: string;
-          payload: { }  
+          payload: unknown;
+          unrecognizedFields: Array<string>
         }> = [
                 {
                     title: 'unknown fields are not allowed',
@@ -194,7 +109,8 @@ void describe('changePasswordBodySchema', () => {
                         currentPassword: 'password123',
                         newPassword: 'password123',
                         unknown: 'unknown'
-                    }
+                    },
+                    unrecognizedFields: ['unknown']
                 },
                 {
                     title: 'multiple unknown fields are not allowed',
@@ -203,7 +119,8 @@ void describe('changePasswordBodySchema', () => {
                         newPassword: 'password123',
                         unknown1: 'unknown1',
                         unknown2: 'unknown2'
-                    }
+                    },
+                    unrecognizedFields: ['unknown1', 'unknown2']
                 }
         ]
 
@@ -212,47 +129,33 @@ void describe('changePasswordBodySchema', () => {
                 const result = changePasswordBodySchema.safeParse(testCase.payload);
 
                 assert.equal(result.success, false);
+                const issues = result.error!.issues;
+                const code = issues[0].code;
+                const path = issues[0].path;
+                assert.ok(code === 'unrecognized_keys');
+                assert.deepStrictEqual(path, []);
+                if (code === 'unrecognized_keys') {
+                    assert.deepStrictEqual(issues[0].keys, testCase.unrecognizedFields);
+                }
             })
         }
     });
 
-    void it('rejects wrong payload type', async (t) => {
+    void it('rejects invalid payload type', async (t) => {
         const cases: Array<{
             title: string;
             payload: unknown;
-        }> = [
-                {
-                    title: 'payload invalid type (null)',
-                    payload: null,
-                },
-                {
-                    title: 'payload invalid type (number)',
-                    payload: 123,
-                },
-                {
-                    title: 'payload invalid type (boolean)',
-                    payload: true,
-                },
-                {
-                    title: 'payload invalid type (array)',
-                    payload: [],
-                },
-                {
-                    title: 'payload invalid type (string)',
-                    payload: 'a'.repeat(100),
-                },
-                {
-                    title: 'payload invalid type (date)',
-                    payload: new Date(),
-                }
-            ];
+        }> = invalidNonObjectValues.filter((test) => typeof test.value !== 'object').map((test) => ({
+            title: `rejects invalid payload type ${test.label}`,
+            payload: test.value
+        }))
 
-            for (const testCase of cases) {
-                await t.test(testCase.title, () => {
-                    const result = changePasswordBodySchema.safeParse(testCase.payload);
-
-                    assert.equal(result.success, false);
-                })
-            }
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = changePasswordBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false); 
+                assert.equal(result.error!.issues[0].code, 'invalid_type');
+            })
+        }
     });
 });

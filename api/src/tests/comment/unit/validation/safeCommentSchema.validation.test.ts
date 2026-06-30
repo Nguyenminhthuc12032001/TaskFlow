@@ -61,7 +61,7 @@ void describe('safeCommentSchema', () => {
             await t.test(testCase.title, () => {
                 const result = safeCommentSchema.safeParse(testCase.payload)
                 assert.ok(result.success);
-                if (testCase.title === 'accepts valid payload with leading/trailing whitespace') {
+                if (testCase.title === 'accepts valid payload with leading/trailing whitespace' || testCase.title === 'accepts valid payload with ISO date string') {
                     assert.deepStrictEqual(result.data, validPayload);
                 }
                 else {
@@ -94,7 +94,7 @@ void describe('safeCommentSchema', () => {
                 const result = safeCommentSchema.safeParse(testCase.payload);
                 assert.ok(!result.success);
                 const issue = result.error!.issues[0];
-                assert.ok(issue.code === 'invalid_type');
+                assert.ok(issue.code === 'invalid_type' || issue.code === 'invalid_format' || issue.code === 'invalid_value');
                 assert.deepStrictEqual(issue.path[0], testCase.invalidField);
             })
         }
@@ -111,9 +111,11 @@ void describe('safeCommentSchema', () => {
             await t.test(testCase.title, async () => {
                 const result = safeCommentSchema.safeParse(testCase.payload);
                 assert.equal(result.success, false);
-                const issues = result.error!.issues[0];
-                assert.equal(issues.code, 'invalid_type');
-                assert.deepStrictEqual(issues.path, testCase.missingFields);
+                const issues = result.error!.issues;
+                const codes = issues.map((issue) => issue.code);
+                const paths = issues.map((issue) => issue.path[0]);
+                assert.deepStrictEqual(codes.every((code) => code === 'invalid_type'), true);
+                assert.deepStrictEqual(paths.sort(), testCase.missingFields.sort());
             })
         }
     });

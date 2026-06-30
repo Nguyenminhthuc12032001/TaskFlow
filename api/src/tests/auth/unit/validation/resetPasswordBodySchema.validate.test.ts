@@ -2,197 +2,47 @@ import { describe, it } from "node:test";
 import { resetPasswordBodySchema, type ResetPasswordBody } from "../../../../modules/auth/auth.schemas.js";
 import assert from "node:assert";
 import { invalidNonStringValues } from "../../../validationTestValues.js";
+import { createMissingRequiredFieldCases, createSingleInvalidFieldCases, type InvalidCasesByField } from "../../../helper.js";
+
+const validPayload: ResetPasswordBody = {
+    resetToken: 'a'.repeat(10),
+    newPassword: 'password123'
+}
 
 void describe('resetPasswordBodySchema', () => {
-    void it('accept valid payload', async (t) => {
+    void it('accepts valid payload', async (t) => {
         const cases: Array<{
-            title: string,
-            payload: ResetPasswordBody
+            title: string;
+            payload: unknown;
         }> = [
                 {
-                    title: 'accept resetToken length exactly min',
+                    title: 'accepts valid payload',
+                    payload: validPayload
+                },
+                {
+                    title: 'accepts valid payload with leading/trailing whitespace',
                     payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 'password123'
+                        ...validPayload,
+                        resetToken: `   ${validPayload.resetToken}   `
                     }
                 },
                 {
-                    title: 'accept resetToken length longer than min',
+                    title: 'accepts valid payload with exactly min length resetToken',
                     payload: {
-                        resetToken: 'a'.repeat(11),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'accept resetPassword length exactly min',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'accept resetPassword length exactly max',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 'password1234'
-                    }
-                }
-            ]
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = resetPasswordBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, true);
-            });
-        }
-    });
-
-    void it('rejects required fields is missing', async (t) => {
-        const cases: Array<{
-            title: string,
-            payload: {}
-        }> = [
-                {
-                    title: 'missing resetToken',
-                    payload: {
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'missing newPassword',
-                    payload: {
+                        ...validPayload,
                         resetToken: 'a'.repeat(10)
                     }
-                },
-                {
-                    title: 'missing both resetToken and newPassword',
-                    payload: {}
-                }
-            ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = resetPasswordBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('rejects invalid resetToken', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {
-                resetToken: unknown;
-                newPassword: string;
-            }
-        }> = [
-                ...invalidNonStringValues.map((testValue) => ({
-                    title: `resetToken invalid type (${testValue.label})`,
-                    payload: {
-                        resetToken: testValue.value,
-                        newPassword: 'password123'
-                    }
-                })),
-                {
-                    title: 'resetToken invalid length (shorter than min)',
-                    payload: {
-                        resetToken: 'a'.repeat(9),
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken is empty',
-                    payload: {
-                        resetToken: '',
-                        newPassword: 'password123'
-                    }
-                },
-                {
-                    title: 'resetToken is whitespace only',
-                    payload: {
-                        resetToken: '              ',
-                        newPassword: 'password123'
-                    }
-                }
-            ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = resetPasswordBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('rejects when newPassword is invalid', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {
-                resetToken: string;
-                newPassword: unknown;
-            }
-        }> = [
-                ...invalidNonStringValues.map((testValue) => ({
-                    title: `newPassword invalid type (${testValue.label})`,
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: testValue.value
-                    }
-                })),
-                {
-                    title: 'newPassword is empty',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: ''
-                    }
-                },
-            ];
-
-        for (const testCase of cases) {
-            await t.test(testCase.title, () => {
-                const result = resetPasswordBodySchema.safeParse(testCase.payload);
-
-                assert.equal(result.success, false);
-            });
-        }
-    });
-
-    void it('strict object', async (t) => {
-        const cases: Array<{
-            title: string;
-            payload: {};
-        }> = [
-                {
-                    title: 'unknown fields are not allowed',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 'password123',
-                        unknown: 'unknown'
-                    }
-                },
-                {
-                    title: 'multiple unknown fields are not allowed',
-                    payload: {
-                        resetToken: 'a'.repeat(10),
-                        newPassword: 'password123',
-                        unknown1: 'unknown1',
-                        unknown2: 'unknown2'
-                    }
                 }
             ]
- 
+
         for (const testCase of cases) {
-            await t.test(testCase.title, () => {
+            await t.test(testCase.title, async () => {
                 const result = resetPasswordBodySchema.safeParse(testCase.payload);
-                assert.equal(result.success, false);
-
-                const issue = result.error!.issues[0];
-
-                assert.equal(issue.code, 'unrecognized_keys');
-            });
+                assert.ok(result.success);
+                if (testCase.title === 'accepts valid payload with min length resetToken') {
+                    assert.deepStrictEqual(result.data, testCase.payload);
+                }
+            })
         }
     });
 
@@ -200,63 +50,101 @@ void describe('resetPasswordBodySchema', () => {
         const cases: Array<{
             title: string;
             payload: unknown;
-        }> = [
-                {
-                    title: 'invalid type (null)',
-                    payload: null
-                },
-                {
-                    title: 'invalid type (number)',
-                    payload: 123
-                },
-                {
-                    title: 'invalid type (boolean)',
-                    payload: true
-                },
-                {
-                    title: 'invalid type (object)',
-                    payload: {}
-                },
-                {
-                    title: 'invalid type (array)',
-                    payload: []
-                },
-                {
-                    title: 'invalid type (date)',
-                    payload: new Date()
-                },
-                {
-                    title: 'invalid type (symbol)',
-                    payload: Symbol()
-                },
-                {
-                    title: 'invalid type (undefined)',
-                    payload: undefined
-                },
-                {
-                    title: 'invalid type (function)',
-                    payload: () => { }
-                },
-                {
-                    title: 'invalid type (string)',
-                    payload: 'a'.repeat(100)
-                },
-                {
-                    title: 'invalid type (bigint)',
-                    payload: BigInt(1)
-                },
-                {
-                    title: 'invalid type (buffer)',
-                    payload: Buffer.from('a'.repeat(100))
-                },
-            ];
+        }> = invalidNonStringValues.filter((test) => typeof test.value !== 'string').map((test) => ({
+            title: `rejects invalid payload type ${test.label}`,
+            payload: test.value
+        }))
 
         for (const testCase of cases) {
-            await t.test(testCase.title, () => {
+            await t.test(testCase.title, async () => {
                 const result = resetPasswordBodySchema.safeParse(testCase.payload);
-
                 assert.equal(result.success, false);
-            });
+                const issues = result.error!.issues[0];
+                assert.equal(issues.code, 'invalid_type');
+            })
         }
-    })
+    });
+
+    void it('rejects invalid fields', async (t) => {
+        const invalidCasesByField: InvalidCasesByField<ResetPasswordBody> = {
+            resetToken: invalidNonStringValues,
+            newPassword: invalidNonStringValues
+        }
+
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            invalidField: string
+        }> = createSingleInvalidFieldCases(validPayload, invalidCasesByField);
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = resetPasswordBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false);
+                const issues = result.error!.issues[0];
+                assert.ok(issues.code === 'invalid_type' || issues.code === 'invalid_format' || issues.code === 'invalid_value');
+                assert.deepStrictEqual(issues.path, [testCase.invalidField]);
+            })
+        }
+    });
+
+    void it('rejects missing required fields', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            missingFields: string[]
+        }> = createMissingRequiredFieldCases(resetPasswordBodySchema, validPayload);
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = resetPasswordBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false);
+                const codes = result.error!.issues.map((issue) => issue.code);
+                const paths = result.error!.issues.map((issue) => issue.path[0]);
+                assert.deepStrictEqual(codes.every((code) => code === 'invalid_type'), true);
+                assert.deepStrictEqual(paths.sort(), testCase.missingFields.sort());
+            })
+        }
+    });
+
+    void it('rejects unknown fields', async (t) => {
+        const cases: Array<{
+            title: string;
+            payload: unknown;
+            unrecognizedFields: string[]
+        }> = [
+            {
+                title: 'rejects unknown fields',
+                payload: {
+                    ...validPayload,
+                    unknownField: 'value'
+                },
+                unrecognizedFields: ['unknownField']
+            },
+            {
+                title: 'rejects multiple unknown fields',
+                payload: {
+                    ...validPayload,
+                    unknownField1: 'value1',
+                    unknownField2: 'value2'
+                },
+                unrecognizedFields: ['unknownField1', 'unknownField2']
+            }
+        ]
+
+        for (const testCase of cases) {
+            await t.test(testCase.title, async () => {
+                const result = resetPasswordBodySchema.safeParse(testCase.payload);
+                assert.equal(result.success, false);
+                const issues = result.error!.issues;
+                const code = issues[0].code;
+                const path = issues[0].path;
+                assert.ok(code === 'unrecognized_keys');
+                assert.deepStrictEqual(path, []);
+                if (code === 'unrecognized_keys') {
+                    assert.deepStrictEqual(issues[0].keys, testCase.unrecognizedFields);
+                }
+            })
+        }
+    });
 });

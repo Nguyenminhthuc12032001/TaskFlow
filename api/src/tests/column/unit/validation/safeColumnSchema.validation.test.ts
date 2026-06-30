@@ -75,7 +75,12 @@ void describe('safeColumnSchema', () => {
             await t.test(testCase.title, async () => {
                 const result = safeColumnSchema.safeParse(testCase.payload);
                 assert.ok(result.success);
-                assert.deepEqual(result.data, testCase.payload);
+                if (testCase.title === 'valid payload with leading/trailing whitespace' || testCase.title === 'accept ISO date') {
+                    assert.deepStrictEqual(result.data, validPayload);
+                }
+                else {
+                    assert.deepStrictEqual(result.data, testCase.payload);
+                }
             })
         }
     });
